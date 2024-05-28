@@ -228,6 +228,7 @@
         <h1>Welcome to Wit-o-Igniter <?= CodeIgniter\CodeIgniter::CI_VERSION ?></h1>
       <p>It is getting boring</p>
       <p>1, 2, 3 and counting</p>
+      <p>4...</p>
         <h2>The small framework with powerful features</h2>
 
     </div>
