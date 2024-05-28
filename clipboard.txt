@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/remedium/winiwoni/app/
-    - /bin/cp -R * $DEPLOYPATH
