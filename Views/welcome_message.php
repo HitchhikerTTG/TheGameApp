@@ -229,6 +229,7 @@
       <p>It is getting boring</p>
       <p>1, 2, 3 and counting</p>
       <p>4...</p>
+      <p>Niby tak, ale jak to ze mną, mam questions</p>
         <h2>The small framework with powerful features</h2>
 
     </div>
