@@ -230,6 +230,7 @@
       <p>1, 2, 3 and counting</p>
       <p>4...</p>
       <p>Niby tak, ale jak to ze mną, mam questions</p>
+      <p>No niestety ni cholery i na dodatek, we are stuck</p>
         <h2>The small framework with powerful features</h2>
 
     </div>
