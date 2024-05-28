@@ -231,6 +231,7 @@
       <p>4...</p>
       <p>Niby tak, ale jak to ze mną, mam questions</p>
       <p>No niestety ni cholery i na dodatek, we are stuck</p>
+      <p> To znaczy... manual updates ok, ale nie wiem jak to zautomatyzować</p>
         <h2>The small framework with powerful features</h2>
 
     </div>
