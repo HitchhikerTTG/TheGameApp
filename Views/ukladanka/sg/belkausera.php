@@ -1,0 +1,1 @@
+    <h1>Witaj <?= esc($daneUzytkownika['nick']) ?></h1>

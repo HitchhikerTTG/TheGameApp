@@ -1,0 +1,167 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(async function() {
+    const mecze = <?= json_encode($mecze); ?>;
+    const turniejId = <?= json_encode($turniejID); ?>;
+    const userID = <?=json_encode($userID);?>    
+    const container = $('#matchContainer');
+    let lastDate = null;
+
+    mecze.sort((a, b) => new Date(a.Date + 'T' + a.Time) - new Date(b.Date + 'T' + b.Time));
+
+    for (const mecz of mecze) {
+        const jsonUrl = `/mecze/${turniejId}/${mecz.ApiID}`;
+        try {
+            const response = await fetch(jsonUrl);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok for ${jsonUrl}`);
+            }
+            const data = await response.json();
+
+            if (lastDate !== data.date) {
+                container.append(`<div class="row"><div class="col-12"><strong>Data meczu: ${data.date}</strong></div></div>`);
+                lastDate = data.date;
+            }
+            const typyTekst = mecz.typy !== 'Brak typów' ? `Twój typ: ${mecz.typy.HomeTyp}:${mecz.typy.AwayTyp}` : 'Wytypuj';
+            let detailsHTML = `
+                <div class="row mt-2">
+                    <div class="col-2">${data.time.substring(0, 5)}</div>
+                    <div class="col-5">${data.home_team.name} - ${data.away_team.name}</div>
+                    <div class="col-3">${typyTekst}</div>
+                    <div class="col-2"><button class="btn btn-info toggle-details" data-api-id="${mecz.ApiID}"><i class="bi bi-caret-down"></i></button></div>
+                </div>
+                <div class="row details-row" style="display:none;">
+                    
+                </div>
+                <div class="row match form-row text-center" style="display:none;">
+                    <div class="col">
+                        <form action="https://jakiwynik.com/typer/zapiszTypMeczu" method="post">
+                        <input type="hidden" name="userID" value="${userID}">
+                        <input type="hidden" name="gameID" value="${mecz.Id}">
+                        <input type="hidden" name="turniejID" value="${turniejId}">
+
+                        <div class="row">
+                            <div class ="col team h_${data.home_team.id}">
+                                <div class="row">
+                                    <div class="col team-name">
+                                    ${data.home_team.name}
+                                    </div>    
+                                </div>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <div class="score-display">${mecz.typy.HomeTyp || '-'}</div>
+                                        <input type="hidden" name="H" class="score-value" value="${mecz.typy.HomeTyp || 0}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col zminusem"><button type="button" class="minus">-</button></div>
+                                    <div class="col zplusem"><button type="button" class="plus">+</button></div>
+                                </div>
+                            </div>
+                            <div class ="col team a_${data.away_team.id}">
+                                <div class="row">
+                                    <div class="col team-name">
+                                    ${data.away_team.name}
+                                    </div>    
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="score-display">${mecz.typy.AwayTyp || '-'}</div>
+                                        <input type="hidden" name="A" class="score-value" value="${mecz.typy.AwayTyp || 0}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col zminusem text-center"><button type="button" class="minus">-</button></div>
+                                    <div class="col zplusem text-center"><button type="button" class="plus">+</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col">
+                                <button type="submit" class="btn btn-primary">Typuję!</button>
+                                </form>
+                            </div>                        
+                        </div>
+                    <div class="row">
+                        <div class="col betting-hints">
+                            <div class="col-12">
+                                <div class="hints-title">Podpowiedź bookmacherów</div>
+                                    <div class="odds-container">
+                                    <div class="odds">1: ${data.odds['1'] || 'N/A'}</div>
+                                    <div class="odds">X: ${data.odds['X'] || 'N/A'}</div>
+                                    <div class="odds">2: ${data.odds['2'] || 'N/A'}</div>                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.append(detailsHTML);
+        } catch (error) {
+            console.error('Error loading match data:', error);
+            alert('Błąd ładowania danych meczu.');
+        }
+    }
+
+    // Automatyczne rozwijanie wierszy zgodnie ze stanem w localStorage po stworzeniu wszystkich wierszy
+    $('.toggle-details').each(function() {
+        const apiId = $(this).data('api-id');
+        const matchRow = $(this).closest('.row');
+        const detailsRow = matchRow.next('.details-row');
+        const formRow = detailsRow.next('.form-row');
+        if (localStorage.getItem(`details-${apiId}`) === 'open') {
+            detailsRow.show();
+            formRow.show();
+        }
+    });
+
+
+ $('body').on('click', '.toggle-details', function() {
+    const detailsRow = $(this).closest('.row').next('.details-row');
+    const formRow = detailsRow.next('.form-row');
+    console.log(detailsRow, formRow); // Dodano logowanie do debugowania
+    const apiId = $(this).data('api-id');
+
+    if (detailsRow.is(':hidden')) {
+        detailsRow.slideDown();
+        formRow.slideDown();
+        localStorage.setItem(`details-${apiId}`, 'open');
+        console.log('Opening:', apiId); // Logowanie otwarcia
+    } else {
+        detailsRow.slideUp();
+        formRow.slideUp();
+        localStorage.removeItem(`details-${apiId}`);
+        console.log('Closing:', apiId); // Logowanie zamknięcia
+    }
+});
+
+$('body').on('click', '.plus', function(event) {
+    event.preventDefault(); // Zapobiega wysyłaniu formularza
+    // Znajdź najbliższy wyświetlacz wyniku i odpowiedni ukryty input
+    var $scoreDisplay = $(this).closest('.team').find('.score-display');
+    var $scoreValue = $(this).closest('.team').find('.score-value');
+    var currentVal = isNaN(parseInt($scoreDisplay.text())) ? 0 : parseInt($scoreDisplay.text());
+    currentVal++;
+    $scoreDisplay.text(currentVal);
+    $scoreValue.val(currentVal);
+});
+
+$('body').on('click', '.minus', function(event) {
+    event.preventDefault(); // Zapobiega wysyłaniu formularza
+    var $scoreDisplay = $(this).closest('.team').find('.score-display');
+    var $scoreValue = $(this).closest('.team').find('.score-value');
+    var currentVal = parseInt($scoreDisplay.text()) || 0;
+    if (currentVal > 0) {
+        currentVal--;
+        $scoreDisplay.text(currentVal);
+        $scoreValue.val(currentVal);
+    }
+});
+
+
+
+});
+
+ 
+</script>
