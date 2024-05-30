@@ -104,16 +104,8 @@ protected $_key;
     // Pobranie ID turnieju z formularza (lub innego źródła, zależnie od implementacji)
     $aktywnyTurniejId = $this->request->getVar('aktywnyTurniej');
 
-    // Ustawienie wszystkich turniejów na nieaktywne
-    $turniejModel->set('Active', 0)->update();
-
-    // Ustawienie wybranego turnieju na aktywny
-    $turniejModel->update($aktywnyTurniejId, ['Active' => 1]);
-
-    // A TU MUSZĘ JESZCZE ZMIENIĆ PLIK KONFIGURACYJNY
-
-    // Pobranie danych aktywnego turnieju
-    $turniej = $turniejModel->find($aktywnyTurniejId);
+    // Zmiana aktywnego turnieju (i pobranie ID aktywnego turnieju)
+    $turniej = $turniejModel->zmienAktywnyTurniej($aktywnyTurniejId);
 
     // Lokalizacja pliku konfiguracyjnego
     $configPath = WRITEPATH . 'ActiveTournament.json';
