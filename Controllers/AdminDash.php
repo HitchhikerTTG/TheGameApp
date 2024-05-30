@@ -126,13 +126,13 @@ protected $_key;
 
     
     // Pobranie listy użytkowników w aktywnym turnieju
-    //$usersInActiveTournament = $ktoWCoGraModel->getUsersOfTournament($turniej['ID']);
+    $usersInActiveTournament = $ktoWCoGraModel->getUsersOfTournament($turniej['id']);
 
     // Resetowanie flag dla wszystkich użytkowników
-//    $userModel->resetAllUsersActiveTournamentFlag();
+   $userModel->resetAllUsersActiveTournamentFlag();
 
     // Ustawienie flagi aktywnego turnieju dla użytkowników w aktywnym turnieju
-//    $userModel->setActiveTournamentFlagForUsers($usersInActiveTournament);
+    $userModel->setActiveTournamentFlagForUsers($usersInActiveTournament);
     
     // Przekierowanie lub wyświetlenie wiadomości po zmianie aktywnego turnieju
     return redirect()->to('hell')->with('message', 'Aktywny turniej został zmieniony.');
