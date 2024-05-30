@@ -107,8 +107,7 @@ protected $_key;
     // Zmiana aktywnego turnieju (i pobranie ID aktywnego turnieju)
     $turniej = $turniejModel->zmienAktywnyTurniej($aktywnyTurniejId);
 
-    print_r($turniej);
-
+    echo "<script>console.log('PHP Log: " . json_encode($turniej) . "');</script>";
     // Lokalizacja pliku konfiguracyjnego
     $configPath = WRITEPATH . 'ActiveTournament.json';
 
