@@ -302,57 +302,56 @@ public function loadClubs(){
     }
 
 
-    public function index(){
+public function index() {
+    // Wczytanie z pliku konfiguracyjnego json:
+    $common = new Common();
+    $tournaments = $common->loadTournaments();
+    $kluby = $this->loadClubs();
 
-        // Wczytanie z pliku konfuguracyjnego json:
-        $common = new Common();
-        $tournaments = $common->loadTournaments();
-        $kluby = $this->loadClubs();
+    $meczService = new MeczService;
 
-        $meczService = new MeczService;
+    $configPath = WRITEPATH . 'ActiveTournament.json';
 
-        $configPath = WRITEPATH . 'ActiveTournament.json';
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-
-
+    if (!file_exists($configPath)) {
+        // Plik nie istnieje, ustaw komunikat o błędzie
         $data = [
             'pageTitle' => 'Twoje własne osobiste piekielko',
-            'message' => 'Well... here it all starts.',
+            'message' => 'Nie wybrano aktywnego turnieju.',
             'turnieje' => $tournaments,
-            'kluby'=>$kluby,
-            'config' =>$config
+            'kluby' => $kluby,
+            'config' => null,
+            'mecze' => []
         ];
 
-        $mecze = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
-        
-        //return view('administracja/index', $data);
-        return view('administracja/listaTurniejow', $data)
+        return view('administracja/index', $data)
+               .view('administracja/listaTurniejow', $data)
                .view('administracja/dodajTurniej', $data)
                .view('administracja/dodajKlub', $data)
                .view('administracja/listaKlubow', $data)
-               .view('administracja/listaMeczow', ['mecze'=>$mecze]);
-/*        echo("
-        <p>Ponieważ chcę móc na razie działać na core a nie na view, to zostawię to tak;</p>
-        <p>Rzeczy, które chce móc tu wyświetlić... </p>
-        <p>Co potrzebuję wiedzieć o turnieju i skąd mogę to wiedzieć....</p>
-        <ul>
-        <li>Nazwa turnieju</li>
-        <li>mecze turnieju</li>
-        <li>W sumie można by to wczytać z pliku / livescore api... Czyli </li>
-        </ul>
-        ");
-*/
+               .view('administracja/listaMeczow', ['mecze' => $data['mecze']]);
+    }
 
-//    $this->sendEmail();
-//    echo "No to... jeśli mail doszedł, do piekło zamarzło";
+    $jsonString = file_get_contents($configPath);
+    $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
 
-//    echo $this->loadTournaments();
+    $data = [
+        'pageTitle' => 'Twoje własne osobiste piekielko',
+        'message' => 'Well... here it all starts.',
+        'turnieje' => $tournaments,
+        'kluby' => $kluby,
+        'config' => $config
+    ];
 
-//    $service = new Common();
-//    echo $service->sharedFunction();
+    $mecze = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
 
+    return view('administracja/index', $data)
+           .view('administracja/listaTurniejow', $data)
+           .view('administracja/dodajTurniej', $data)
+           .view('administracja/dodajKlub', $data)
+           .view('administracja/listaKlubow', $data)
+           .view('administracja/listaMeczow', ['mecze' => $mecze]);
 }
+
 
 
 }
