@@ -312,37 +312,28 @@ public function index() {
 
     $configPath = WRITEPATH . 'ActiveTournament.json';
 
-    if (!file_exists($configPath)) {
-        // Plik nie istnieje, ustaw komunikat o błędzie
-        $data = [
-            'pageTitle' => 'Twoje własne osobiste piekielko',
-            'message' => 'Nie wybrano aktywnego turnieju.',
-            'turnieje' => $tournaments,
-            'kluby' => $kluby,
-            'config' => null,
-            'mecze' => []
-        ];
-
-        return view('administracja/index', $data)
-               .view('administracja/listaTurniejow', $data)
-               .view('administracja/dodajTurniej', $data)
-               .view('administracja/dodajKlub', $data)
-               .view('administracja/listaKlubow', $data)
-               .view('administracja/listaMeczow', ['mecze' => $data['mecze']]);
+    $config = [];
+    if (file_exists($configPath)) {
+        $jsonString = file_get_contents($configPath);
+        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+    } else {
+        // Ustawianie domyślnych wartości jeśli plik nie istnieje
+        $config['activeTournamentId'] = 'Brak danych';
+        $config['activeCompetitionId'] = 'Brak danych';
+        $config['activeTournamentName'] = 'Brak danych';
     }
-
-    $jsonString = file_get_contents($configPath);
-    $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
 
     $data = [
         'pageTitle' => 'Twoje własne osobiste piekielko',
-        'message' => 'Well... here it all starts.',
+        'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
         'turnieje' => $tournaments,
         'kluby' => $kluby,
         'config' => $config
     ];
 
-    $mecze = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
+    $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
+             ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
+             : [];
 
     return view('administracja/index', $data)
            .view('administracja/listaTurniejow', $data)
@@ -351,6 +342,7 @@ public function index() {
            .view('administracja/listaKlubow', $data)
            .view('administracja/listaMeczow', ['mecze' => $mecze]);
 }
+
 
 
 
