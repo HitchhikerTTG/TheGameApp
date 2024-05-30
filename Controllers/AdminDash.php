@@ -12,6 +12,7 @@ use App\Models\ClubMembersModel;
 use App\Services\MeczService;
 use App\Libraries\Common;
 
+$logger = \Config\Services::logger();
 
 class AdminDash extends BaseController
 {
@@ -107,7 +108,9 @@ protected $_key;
     // Zmiana aktywnego turnieju (i pobranie ID aktywnego turnieju)
     $turniej = $turniejModel->zmienAktywnyTurniej($aktywnyTurniejId);
 
-    echo "<script>console.log('PHP Log: " . json_encode($turniej) . "');</script>";
+    $logger->info('Dane dotyczące turnieju', $turniej);
+
+
     // Lokalizacja pliku konfiguracyjnego
     $configPath = WRITEPATH . 'ActiveTournament.json';
 
@@ -116,6 +119,9 @@ protected $_key;
     $config['activeCompetitionId'] = $turniej['CompetitionID']; // Przykładowa zmiana nazwy 
     $newJsonString = json_encode($config, JSON_PRETTY_PRINT); // JSON_PRETTY_PRINT dla czytelności
     file_put_contents($configPath, $newJsonString);
+
+
+
     
     // Pobranie listy użytkowników w aktywnym turnieju
     //$usersInActiveTournament = $ktoWCoGraModel->getUsersOfTournament($turniej['ID']);
