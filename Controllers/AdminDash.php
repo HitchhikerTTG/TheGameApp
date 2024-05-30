@@ -110,14 +110,14 @@ protected $_key;
     // Lokalizacja pliku konfiguracyjnego
     $configPath = WRITEPATH . 'ActiveTournament.json';
 
-    $config['activeTournamentId'] = $aktywnyTurniejId; // Przykładowa zmiana ID
+    $config['activeTournamentId'] = $turniej['ID']; // Przykładowa zmiana ID
     $config['activeTournamentName'] = $turniej['CompetitionName']; // Przykładowa zmiana nazwy
     $config['activeCompetitionId'] = $turniej['CompetitionID']; // Przykładowa zmiana nazwy 
     $newJsonString = json_encode($config, JSON_PRETTY_PRINT); // JSON_PRETTY_PRINT dla czytelności
     file_put_contents($configPath, $newJsonString);
     
     // Pobranie listy użytkowników w aktywnym turnieju
-    $usersInActiveTournament = $ktoWCoGraModel->getUsersOfTournament($aktywnyTurniejId);
+    $usersInActiveTournament = $ktoWCoGraModel->getUsersOfTournament($turniej['ID']);
 
     // Resetowanie flag dla wszystkich użytkowników
     $userModel->resetAllUsersActiveTournamentFlag();
