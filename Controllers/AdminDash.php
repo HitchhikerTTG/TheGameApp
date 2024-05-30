@@ -110,13 +110,13 @@ protected $_key;
     // Zmiana aktywnego turnieju (i pobranie ID aktywnego turnieju)
     $turniej = $turniejModel->zmienAktywnyTurniej($aktywnyTurniejId);
 
-    $logger->info('Dane dotyczące turnieju', $turniej);
+$logger->info('Dane dotyczące turnieju: ' . json_encode($turniej));
 
 
     // Lokalizacja pliku konfiguracyjnego
     $configPath = WRITEPATH . 'ActiveTournament.json';
 
-    $config['activeTournamentId'] = $turniej['Id']; // Przykładowa zmiana ID
+//    $config['activeTournamentId'] = $turniej['Id']; // Przykładowa zmiana ID
     $config['activeTournamentName'] = $turniej['CompetitionName']; // Przykładowa zmiana nazwy
     $config['activeCompetitionId'] = $turniej['CompetitionID']; // Przykładowa zmiana nazwy 
     $newJsonString = json_encode($config, JSON_PRETTY_PRINT); // JSON_PRETTY_PRINT dla czytelności
