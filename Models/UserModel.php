@@ -27,13 +27,13 @@ class UserModel extends Model{
     }
 
     public function resetAllUsersActiveTournamentFlag()
-    {
-        $data = [
-            'PlaysTheActiveTournament' => false,
-        ];
+{
+    $data = [
+        'PlaysTheActiveTournament' => false,
+    ];
 
-        return $this->update(null, $data); // Załóżmy, że 'id' to klucz główny
-    }
+    return $this->where('id !=', 0)->update(null, $data); // Przykładowa klauzula where
+}
 
        // Może być też funkcja do masowego ustawiania flagi dla użytkowników przypisanych do turnieju
 public function setActiveTournamentFlagForUsers($userIds)
