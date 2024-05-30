@@ -12,16 +12,16 @@ use App\Models\ClubMembersModel;
 use App\Services\MeczService;
 use App\Libraries\Common;
 
-$logger = \Config\Services::logger();
 
 class AdminDash extends BaseController
 {
 
 protected $_key;
     protected $_secret;
-
+    
     public $connection = null;
     protected $_baseUrl = "https://livescore-api.com/api-client/";
+    
 
 
         public function __construct()
@@ -100,6 +100,8 @@ protected $_key;
     $turniejModel = model(TurniejeModel::class);
     $ktoWCoGraModel = model(KtoWCoGraModel::class);
     $userModel = model(UserModel::class);
+    $logger = \Config\Services::logger();
+
 
 
     // Pobranie ID turnieju z formularza (lub innego źródła, zależnie od implementacji)
