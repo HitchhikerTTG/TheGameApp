@@ -50,7 +50,6 @@ $(document).ready(async function() {
     } catch (error) {
         console.error(`Error loading match (ID: ${mecz.Id}, Home: ${mecz.HomeTeam}, Away: ${mecz.AwayTeam}) data:`, error);
     }
-}
         
     }
 
