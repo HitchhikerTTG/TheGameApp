@@ -194,6 +194,34 @@ $(document).ready(async function() {
         } catch (error) {
             console.error(`Error loading match (ID: ${mecz.Id}, Home: ${mecz.HomeTeam}, Away: ${mecz.AwayTeam}) data:`, error);
         }
+        
+        for (const mecz of mecze) {
+    if (!mecz || !mecz.ApiID) {
+        console.error(`Nieprawidłowy obiekt meczu:`, mecz);
+        continue; // Przejdź do następnego meczu
+    }
+
+    const jsonUrl = `/mecze/${turniejId}/${mecz.ApiID}`;
+    console.log(`Probuje wczytac dane meczu ID: ${mecz.Id} z URL: ${jsonUrl}`);
+
+    try {
+        const response = await fetch(jsonUrl);
+        console.log('Response received:', response);
+        const text = await response.text();
+        console.log('Response text:', text);
+        const data = JSON.parse(text);
+        console.log('Dane meczu:', data);
+
+        if (!data.home_team || !data.away_team) {
+            throw new Error(`Brak danych drużyn w meczu ID: ${mecz.Id}`);
+        }
+
+        // Reszta kodu, który przetwarza dane
+    } catch (error) {
+        console.error(`Error loading match (ID: ${mecz.Id}, Home: ${mecz.HomeTeam}, Away: ${mecz.AwayTeam}) data:`, error);
+    }
+}
+
     }
 
 
