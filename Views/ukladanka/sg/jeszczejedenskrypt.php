@@ -82,15 +82,14 @@ $(document).ready(async function() {
     </div>
 ` : '';    
         
-
+        console.log(`Fetching data from URL: ${jsonUrl}`);
         try {
             const response = await fetch(jsonUrl);
             if (!response.ok) {
                 throw new Error(`Network response was not ok for ${jsonUrl}`);
-                console.log('bug bug bug:');
             }
             const data = await response.json();
-            console.log('Dane meczu:', data);
+            
             if (lastDate !== data.date) {
                 container.append(`<div class="row"><div class="col-12"><strong> Data meczu: ${data.date}, ${formattedTime}</strong></div></div>`);
                 lastDate = data.date;
