@@ -15,7 +15,7 @@ $(document).ready(async function() {
 
     for (const mecz of mecze) {
         const jsonUrl = `/mecze/${turniejId}/${mecz.ApiID}`;
-        console.log('Probuje wczytac', jsonUrl);
+        //console.log('Probuje wczytac', jsonUrl);
         const typyUrl = `/typy/${mecz.Id}`;
         const isExpanded = localStorage.getItem(`details-${mecz.ApiID}`) === 'true'; // Pobieranie stanu rozwinięcia z localStorage
 
@@ -90,7 +90,7 @@ $(document).ready(async function() {
                 throw new Error(`Network response was not ok for ${jsonUrl}`);
             }
             const data = await response.json();
-
+            condole.log('plik został wczytany', data);
             if (lastDate !== data.date) {
                 container.append(`<div class="row"><div class="col-12"><strong> Data meczu: ${data.date}, ${formattedTime}</strong></div></div>`);
                 lastDate = data.date;
