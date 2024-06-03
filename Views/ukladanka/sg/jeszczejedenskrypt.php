@@ -85,6 +85,7 @@ $(document).ready(async function() {
 
         try {
             const response = await fetch(jsonUrl);
+            console.log('Response received:', response);
             if (!response.ok) {
                 throw new Error(`Network response was not ok for ${jsonUrl}`);
             }
