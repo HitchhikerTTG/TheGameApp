@@ -28,7 +28,6 @@ $(document).ready(async function() {
         const text = await response.text();
         console.log('Response text:', text);
 
-        // Wyodrębnij czysty JSON, jeśli odpowiedź zawiera HTML
         let jsonString;
         try {
             jsonString = JSON.parse(text);
@@ -49,6 +48,7 @@ $(document).ready(async function() {
         // Reszta kodu, który przetwarza dane
     } catch (error) {
         console.error(`Error loading match (ID: ${mecz.Id}, Home: ${mecz.HomeTeam}, Away: ${mecz.AwayTeam}) data:`, error);
+    }
     }
         
     }
