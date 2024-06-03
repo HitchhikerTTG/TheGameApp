@@ -156,7 +156,7 @@ class TheGame extends BaseController
                .view('ukladanka/sg/pytania',$pytania)
                .view('ukladanka/sg/chat')
                .view('tabela/tabela', $daneTurniejowe)
-               .view('ukladanka/sg/jeszczejedenskrypt')
+               .view('ukladanka/sg/SkryptTypowania')
                .view('typowanie/footer');
 
         
