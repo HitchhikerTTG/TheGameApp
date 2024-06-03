@@ -15,6 +15,7 @@ $(document).ready(async function() {
 
     for (const mecz of mecze) {
         const jsonUrl = `/mecze/${turniejId}/${mecz.ApiID}`;
+        console.log('Probuje wczytac', jsonUrl);
         const typyUrl = `/typy/${mecz.Id}`;
         const isExpanded = localStorage.getItem(`details-${mecz.ApiID}`) === 'true'; // Pobieranie stanu rozwinięcia z localStorage
 
