@@ -120,6 +120,8 @@ class TheGame extends BaseController
     $wstep = [
         'title'=> $turniejName
     ];
+    
+    $pytania=[];
 
     return view('typowanie/header', $wstep)
            .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
