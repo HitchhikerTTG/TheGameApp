@@ -1,7 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", async function() {
-    const jsonUrl = '/mecze/2/1676019';
+    const jsonUrl = 'https://jakiwynik.com/mecze/2/1676019';
     const container = document.getElementById('jsonContent');
 
     try {
