@@ -2,7 +2,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            const fileUrl = '/path/to/your/data.txt'; // Zmień ścieżkę na odpowiednią
+            const fileUrl = '/data.txt'; // Zmień ścieżkę na odpowiednią
 
             // Logowanie pełnej ścieżki URL
             const fullUrl = new URL(fileUrl, window.location.href).href;
