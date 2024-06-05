@@ -13,7 +13,7 @@
                 $('#fileContent').text(data);
             }).fail(function() {
                 console.error('Error fetching the file from:', fullUrl);
-                $('#fileContent').text('Error loading file data.');
+                $('#fileContent').text(fullUrl);
             });
         });
     </script>
