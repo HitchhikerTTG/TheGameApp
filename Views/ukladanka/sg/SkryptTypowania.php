@@ -1,20 +1,3 @@
-    <div id="matchesAccordion">
-        <?php foreach ($matches as $match): ?>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading<?= $match['ApiID']; ?>">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
-                        <?= $match['home_team']; ?> vs <?= $match['away_team']; ?> | Wytypuj
-                    </button>
-                </h2>
-                <div id="collapse<?= $match['ApiID']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $match['ApiID']; ?>">
-                    <div class="accordion-body">
-                        <!-- Dynamic content loaded via AJAX -->
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-
     <script>
         $(document).ready(function() {
             const tournamentID = <?= json_encode($tournamentID); ?>;
