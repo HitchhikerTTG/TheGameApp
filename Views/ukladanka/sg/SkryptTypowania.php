@@ -2,7 +2,7 @@
 
     <script>
         $(document).ready(function() {
-            const fileUrl = '/data.txt';
+            const fileUrl = 'https://winiwoni.pl/data.txt';
             
             // Logowanie pełnej ścieżki URL
             const fullUrl = new URL(fileUrl, window.location.href).href;
