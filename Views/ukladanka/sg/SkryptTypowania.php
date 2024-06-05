@@ -1,16 +1,8 @@
-<script>
-    if (typeof jQuery === 'undefined') {
-        console.error('jQuery is not loaded');
-    } else {
-        console.log('jQuery is loaded');
-    }
-</script>
-
     <div id="fileContent"></div>
 
     <script>
         $(document).ready(function() {
-            const fileUrl = 'https://winiwoni.pl/data.txt';
+            const fileUrl = '/data.txt';
             
             // Logowanie pełnej ścieżki URL
             const fullUrl = new URL(fileUrl, window.location.href).href;
