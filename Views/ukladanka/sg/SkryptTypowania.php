@@ -11,9 +11,10 @@
             $.get(fileUrl, function(data) {
                 console.log('Data fetched:', data);
                 $('#fileContent').text(data);
-            }).fail(function() {
+            }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.error('Error fetching the file from:', fullUrl);
-                $('#fileContent').text(fullUrl);
+                console.error('Error details:', textStatus, errorThrown);
+                $('#fileContent').text('Error loading file data.');
             });
         });
     </script>
