@@ -15,11 +15,11 @@ $(document).ready(async function() {
     for (const mecz of mecze) {
         const jsonUrl = `/mecze/${turniejId}/${mecz.ApiID}`;
         const fullJsonUrl = new URL(jsonUrl, window.location.href).href;
-        console.log('Attempting to fetch file from URL:', fullUrl);
+        console.log('Attempting to fetch file from URL:', fullJsonUrl);
 
         const typyUrl = `/typy/${mecz.Id}`;
         const fullTypyUrl = new URL(typyUrl, window.location.href).href;
-        console.log('Attempting to fetch file from URL:', fullUrl);
+        console.log('Attempting to fetch file from URL:', fullTypyUrl);
 
         const isExpanded = localStorage.getItem(`details-${mecz.ApiID}`) === 'true'; // Pobieranie stanu rozwinięcia z localStorage
 
