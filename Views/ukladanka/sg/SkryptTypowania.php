@@ -1,20 +1,21 @@
 <div id="fileContent"></div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const fileUrl = '/data.txt'; // Zmień ścieżkę na odpowiednią
+        document.addEventListener("DOMContentLoaded", async function() {
+            const fileUrl = 'https://winiwoni.pl/data.txt';
+            const container = document.getElementById('fileContent');
 
-            // Logowanie pełnej ścieżki URL
-            const fullUrl = new URL(fileUrl, window.location.href).href;
-            console.log('Attempting to fetch file from URL:', fullUrl);
-
-            $.get(fileUrl, function(data) {
-                console.log('Data fetched:', data);
-                $('#fileContent').text(data);
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                console.error('Error fetching the file from:', fullUrl);
-                console.error('Error details:', textStatus, errorThrown);
-                $('#fileContent').text('Error loading file data.');
-            });
+            try {
+                const response = await fetch(fileUrl);
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok for ${fileUrl}`);
+                }
+                const text = await response.text();
+                console.log('Data fetched:', text);
+                container.textContent = text;
+            } catch (error) {
+                console.error('Error fetching the file:', error);
+                container.textContent = 'Error loading file data.';
+            }
         });
-    </script>
+    </script> 
+    
