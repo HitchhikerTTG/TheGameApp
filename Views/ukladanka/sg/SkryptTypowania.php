@@ -1,7 +1,7 @@
 <div id="fileContent"></div>
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
-            const fileUrl = 'https://winiwoni.pl/data.txt';
+            const fileUrl = 'https://winiwoni.pl/mecze/2/1676019';
             const container = document.getElementById('fileContent');
 
             try {
