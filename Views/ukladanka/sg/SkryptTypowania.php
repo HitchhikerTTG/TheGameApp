@@ -1,6 +1,6 @@
     <script>
         $(document).ready(function() {
-            const tournamentID = <?= json_encode($tournamentID); ?>;
+            const tournamentID = <?= json_encode($turniejID); ?>;
             const userID = <?= json_encode($userID); ?>;
             const usedGoldenBall = <?= json_encode($usedGoldenBall); ?>;
 
