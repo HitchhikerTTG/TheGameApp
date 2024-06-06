@@ -39,9 +39,13 @@ class ShoutboxController extends BaseController
         $clubHash = session()->get('club_hash');
         $message = $this->request->getPost('message');
 
+        // Sanitacja danych
+        $message = strip_tags($message); // Usuwa HTML i PHP tagi
+        $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); // Konwertuje specjalne znaki na encje HTML
+
         foreach ($forbiddenWords as $word) {
             if (stripos($message, $word) !== false) {
-                $emojiCount = ceil(strlen($word) / 3);
+                $emojiCount = ceil(strlen($word) / 3)+1;
                 $replacement = '';
                 for ($i = 0; $i < $emojiCount; $i++) {
                     $replacement .= $emojis[array_rand($emojis)];
