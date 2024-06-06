@@ -81,6 +81,9 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('akordeon', 'TheGame::akordeon');
     $routes->get('archiwumturnieju', 'TheGame::archiwum');
     $routes->post('/jaktypowali/(:num)', 'TheGame::wygenerujTypyDlaMeczu/$1');
+    $routes->get('shoutbox', 'ShoutboxController::index');
+    $routes->get('shoutbox/getMessages', 'ShoutboxController::getMessages');
+    $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');
 });
 
 
