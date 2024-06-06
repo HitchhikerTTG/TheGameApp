@@ -347,7 +347,7 @@ class Auth extends BaseController
                 } else {
                         $userId = $userInfo['uniID'];
                         session()->set('loggedInUser', $userId);
-                        session()->set('username', $userInfo['username']);
+                        session()->set('username', $userInfo['nick']);
                         // Sprawdzenie, czy użytkownik użył "GoldenBall"
                         $typyModel = new TypyModel();
                         $usedGoldenBall = $typyModel->usedGoldenBall($userId);
