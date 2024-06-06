@@ -41,7 +41,7 @@ class ClubMembersModel extends Model{
         return $this->select('kluby.Nazwa, kluby.id as klubID, clubMembers.*')
                 ->join('kluby', 'kluby.id = clubMembers.klubID')
                 ->where('clubMembers.uniID', $uniID)
-                ->findAll();
+                ->first();
     }
 
     public function isActiveMember($userID, $clubID) {
