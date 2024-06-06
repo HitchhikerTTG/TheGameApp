@@ -11,9 +11,8 @@ class ShoutboxController extends BaseController
             'title' => 'Testowanie shoutboxu'
         ];
 
-        return $this->response
-            ->setHeader('Content-Type', 'text/html; charset=UTF-8')
-            ->setBody(view('typowanie/header', $wstep) . view('ukladanka/sg/chat'));
+        return view('typowanie/header', $wstep)
+               .view('ukladanka/sg/chat');
     }
 
     public function getMessages()
@@ -21,15 +20,19 @@ class ShoutboxController extends BaseController
         $clubHash = session()->get('club_hash');
         $model = new ShoutboxModel();
         $messages = $model->getMessages($clubHash);
-        return $this->response
-            ->setHeader('Content-Type', 'application/json; charset=UTF-8')
-            ->setJSON($messages);
+
+        // Decode HTML entities
+        foreach ($messages as &$message) {
+            $message['message'] = html_entity_decode($message['message']);
+        }
+
+        return $this->response->setJSON($messages);
     }
 
     public function postMessage()
     {
         $forbiddenWords = include APPPATH . 'Config/forbidden_words.php';
-       $emojis = ['🦴', '🐲', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏','🍿','🥐','💬','👀','🦥','🫵🏻','🙈'];
+        $emojis = ['&#x1F955;', '&#x1F33D;', '&#x1F345;', '&#x1F346;', '&#x1F966;', '&#x1F344;', '&#x1F354;', '&#x1F347;', '&#x1F349;', '&#x1F352;', '&#x1F353;', '&#x1F351;', '&#x1F34D;', '&#x1F34C;', '&#x1F34F;'];
 
         $userId = session()->get('user_id');
         $username = session()->get('username');
@@ -47,6 +50,9 @@ class ShoutboxController extends BaseController
             }
         }
 
+        // Convert to HTML entities
+        $message = htmlentities($message);
+
         $data = [
             'user_id' => $userId,
             'username' => $username,
@@ -57,8 +63,6 @@ class ShoutboxController extends BaseController
         $model = new ShoutboxModel();
         $model->addMessage($data);
 
-        return $this->response
-            ->setHeader('Content-Type', 'application/json; charset=UTF-8')
-            ->setJSON(['status' => 'success']);
+        return $this->response->setJSON(['status' => 'success']);
     }
 }
