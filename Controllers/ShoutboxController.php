@@ -8,9 +8,8 @@ class ShoutboxController extends BaseController
     public function index()
     {           
         $wstep = [
-            'title'=> 'Testowanie shoutboxu'
+            'title' => 'Testowanie shoutboxu'
         ];
-
 
         return view('typowanie/header', $wstep)
                .view('ukladanka/sg/chat');
@@ -26,9 +25,9 @@ class ShoutboxController extends BaseController
 
     public function postMessage()
     {
-        $forbiddenWords = ['badword1', 'badword2'];
-        $emojis = ['🥕', '🌽', '🍅', '🍆'];
-        
+        $forbiddenWords = include APPPATH . 'Config/forbidden_words.php';
+        $emojis = ['🥕', '🌽', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏'];
+
         $userId = session()->get('user_id');
         $username = session()->get('username');
         $clubHash = session()->get('club_hash');
@@ -36,7 +35,12 @@ class ShoutboxController extends BaseController
 
         foreach ($forbiddenWords as $word) {
             if (stripos($message, $word) !== false) {
-                $message = str_ireplace($word, $emojis[array_rand($emojis)], $message);
+                $emojiCount = ceil(strlen($word) / 3);
+                $replacement = '';
+                for ($i = 0; $i < $emojiCount; $i++) {
+                    $replacement .= $emojis[array_rand($emojis)];
+                }
+                $message = str_ireplace($word, $replacement, $message);
             }
         }
 
