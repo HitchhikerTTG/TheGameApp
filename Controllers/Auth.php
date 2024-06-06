@@ -9,7 +9,7 @@ use App\Libraries\Hash;
 use App\Libraries\Token;
 use App\Models\UserModel;
 use App\Models\TypyModel;
-
+use App\Models\ClubMembersModel;
 
 class Auth extends BaseController
 {
@@ -351,6 +351,9 @@ class Auth extends BaseController
                         // Sprawdzenie, czy użytkownik użył "GoldenBall"
                         $typyModel = new TypyModel();
                         $usedGoldenBall = $typyModel->usedGoldenBall($userId);
+                        
+                        $clubMembers = new ClubMembersModel();
+                        $userClub = $clubMembers->getClubsByUser($userInfo['uniID'];
 
                         // Zapisanie informacji w sesji
                         session()->set('usedGoldenBall', $usedGoldenBall);

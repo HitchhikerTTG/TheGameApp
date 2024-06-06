@@ -9,7 +9,7 @@ class ClubMembersModel extends Model{
     protected $allowedFields = [				
 			'id',
 			'ClubID',
-			'UserID',
+			'uniID',
 			'memberSince'
     ];
 
@@ -19,10 +19,10 @@ class ClubMembersModel extends Model{
 
     public function addUserToClub($userID, $clubID) {
     // Sprawdzenie, czy użytkownik już jest w klubie
-    if (!$this->where('klubID', $clubID)->where('userID', $userID)->first()) {
+    if (!$this->where('klubID', $clubID)->where('uniID', $userID)->first()) {
         return $this->save([
             'klubID' => $clubID,
-            'userID' => $userID
+            'uniID' => $userID
 //            'data_dolaczenia' => date('Y-m-d H:i:s') // Opcjonalnie
         ]);
     }
@@ -30,23 +30,23 @@ class ClubMembersModel extends Model{
     }
 
     public function removeUserFromClub($userID, $clubID) {
-    $record = $this->where('klubID', $clubID)->where('userID', $userID)->first();
+    $record = $this->where('klubID', $clubID)->where('uniID', $userID)->first();
     if ($record) {
         return $this->delete($record['id']);
     }
     return false; // Nie znaleziono rekordu
 }
 
-    public function getClubsByUser($userID) {
+    public function getClubsByUser($uniID) {
         return $this->select('kluby.Nazwa, kluby.id as klubID, club_members.*')
                 ->join('kluby', 'kluby.id = club_members.klubID')
-                ->where('club_members.userID', $userID)
+                ->where('club_members.uniID', $uniID)
                 ->findAll();
     }
 
     public function isActiveMember($userID, $clubID) {
     $record = $this->where('klubID', $clubID)
-                   ->where('userID', $userID)
+                   ->where('uniID', $userID)
                    ->first();
 
     return !is_null($record);
