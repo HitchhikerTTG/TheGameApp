@@ -355,9 +355,13 @@ class Auth extends BaseController
                         $clubMembers = new ClubMembersModel();
                         $userClub = $clubMembers->getClubsByUser($userInfo['uniID']);
 
+                        if(!$userClub) {
+                           $userClub="Poczekalnia";
+                           }
+
                         // Zapisanie informacji w sesji
                         session()->set('usedGoldenBall', $usedGoldenBall);
-                        session()->set('club_hash', hash('sha256', 'club_name'));
+                        session()->set('club_hash', hash('sha256', $userClub));
                         session()->set('club',$userClub);
 
                         if ($this->request->getPost('remember') == '1') {
