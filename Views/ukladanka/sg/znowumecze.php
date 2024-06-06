@@ -26,7 +26,7 @@
                 <div class="accordion-body">
                     <div class="row match form-row text-center">
                         <div class="col">
-                            <form action="https://jakiwynik.com/theGame/nowyZapisTypu" method="post">
+                            <form action="/theGame/nowyZapisTypu" method="post">
                                 <input type="hidden" name="userUID" value="<?= $userID; ?>">
                                 <input type="hidden" name="gameID" value="<?= $match['Id']; ?>">
                                 <input type="hidden" name="turniejID" value="<?= $turniejID; ?>">
