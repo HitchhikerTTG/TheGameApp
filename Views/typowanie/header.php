@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <base href="https://jakiwynik.com/">
+    <base href="<?= base_url(); ?>">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Typer Mistrzostw Świata w Katarze</title>
