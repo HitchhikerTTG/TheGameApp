@@ -35,7 +35,7 @@ $('body').on('submit', 'form', function(event) {
 
     // Wypisanie danych formularza w konsoli
     var formData = new FormData(form[0]);
-    console.log("Dane formularza:");
+    // console.log("Dane formularza:");
     for (var pair of formData.entries()) {
         console.log(pair[0]+ ': ' + pair[1]);
     }
@@ -59,7 +59,16 @@ $('body').on('submit', 'form', function(event) {
             console.error('Wystąpił błąd: ', error);
             console.error('Status: ', status);
             console.error('Odpowiedź serwera: ', xhr.responseText);
-            alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+//            alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+            
+            var newTypText = 'Nie udało się przesłać formularza :(';
+            var button = form.closest('.accordion-item').find('.accordion-button');
+            var oldText = button.text();
+            var newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText); // Zakładając, że format tekstu to "Drużyna 1 vs Drużyna 2 | Twój typ: x:x"
+            button.text(newText);
+            
+            button.css('background-color', 'lightred');
+            setTimeout(function() { button.css('background-color', ''); }, 1000); // Reset koloru tła po 3 sekundach
         }
     });
 
@@ -69,15 +78,6 @@ $('body').on('submit', 'form', function(event) {
     localStorage.setItem(`details-${accordionId}`, 'false');
 });
 
-        $('body').on('submit', 'form', function(event) {
-            event.preventDefault();
-            const form = $(this);
-            $.post(form.attr('action'), form.serialize(), function(response) {
-                alert('Form submitted successfully');
-            }).fail(function() {
-                alert('Form submission failed');
-            });
-        });
 
         $('body').on('click', '.plus', function(event) {
             event.preventDefault(); // Prevent form submission
