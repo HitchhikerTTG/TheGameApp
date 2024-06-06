@@ -1,36 +1,73 @@
 <script>
     $(document).ready(function() {
-        const tournamentID = <?= json_encode($turniejID); ?>;
-        const userID = <?= json_encode($userID); ?>;
-        const usedGoldenBall = <?= json_encode($usedGoldenBall); ?>;
+$('.accordion-collapse').on('shown.bs.collapse', function () {
+    let id = this.id;
+    localStorage.setItem(`details-${id}`, 'true');
+});
 
-        $('.accordion-button').on('click', function() {
-            const matchID = $(this).data('id');
-            const accordionBody = $(this).closest('.accordion-item').find('.accordion-body');
+$('.accordion-collapse').on('hidden.bs.collapse', function () {
+    let id = this.id;
+    localStorage.setItem(`details-${id}`, 'false');
+});
 
-            if (!accordionBody.html().trim()) {
-                const jsonUrl = `/mecze/${tournamentID}/${matchID}`;
+$('.accordion-collapse').each(function () {
+    let id = this.id;
+    let isOpen = localStorage.getItem(`details-${id}`) === 'true';
+    if (isOpen) {
+        $(`#${id}`).addClass('show');
+    } else {
+        $(`#${id}`).removeClass('show');
+    }
+});
 
-                $.get(jsonUrl, function(data) {
-                    const matchDate = new Date(data.date + 'T' + data.time + 'Z');
-                    const formattedTime = matchDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-                    let detailsHTML = `
-                        <form action="/submit" method="post">
-                            <!-- Form fields -->
-                            <button type="submit" class="btn btn-primary">Typuję!</button>
-                        </form>
-                        <div class="odds-container">
-                            <div class="odds">1: ${data.odds['1'] || 'N/A'}</div>
-                            <div class="odds">X: ${data.odds['X'] || 'N/A'}</div>
-                            <div class="odds">2: ${data.odds['2'] || 'N/A'}</div>
-                        </div>
-                    `;
-                    accordionBody.html(detailsHTML);
-                }).fail(function() {
-                    accordionBody.html('Error loading data.');
-                });
-            }
-        });
+$('body').on('submit', 'form', function(event) {
+    const form = $(this);
+    const accordionId = form.closest('.accordion-collapse').attr('id');
+    $(`#collapse${accordionId}`).collapse('hide'); // Zwijanie akordeonu
+    localStorage.setItem(`details-${accordionId}`, 'false'); // Aktualizacja localStorage
+});
+
+$('body').on('submit', 'form', function(event) {
+    event.preventDefault(); // Zapobiega standardowej wysyłce formularza
+
+    var form = $(this);
+    var url = form.attr('action'); // URL z atrybutu action formularza
+
+    // Wypisanie danych formularza w konsoli
+    var formData = new FormData(form[0]);
+    console.log("Dane formularza:");
+    for (var pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: form.serialize(), // Serializacja danych formularza
+        success: function(response) {
+            var newTypText = response.newTypText;
+            var button = form.closest('.accordion-item').find('.accordion-button');
+            var oldText = button.text();
+            var newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText); // Zakładając, że format tekstu to "Drużyna 1 vs Drużyna 2 | Twój typ: x:x"
+            button.text(newText);
+
+            // Animacja podświetlenia na zielono
+            button.css('background-color', 'lightgreen');
+            setTimeout(function() { button.css('background-color', ''); }, 1000); // Reset koloru tła po 3 sekundach
+        },
+        error: function(xhr, status, error) {
+            console.error('Wystąpił błąd: ', error);
+            console.error('Status: ', status);
+            console.error('Odpowiedź serwera: ', xhr.responseText);
+            alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+        }
+    });
+
+    // Dodatkowo zwinąć akordeon po przesłaniu formularza
+    var accordionId = form.closest('.accordion-collapse').attr('id');
+    $(`#${accordionId}`).collapse('hide');
+    localStorage.setItem(`details-${accordionId}`, 'false');
+});
 
         $('body').on('submit', 'form', function(event) {
             event.preventDefault();
