@@ -236,8 +236,8 @@ class MeczService {
         // Pobiera typy użytkownika dla listy meczów
         foreach ($mecze as &$mecz) {
             $mecz['typy'] = $this->typyModel->getTypyByMeczIdAndUserId($mecz['Id'], $userUniID) ?? 'Brak typów';
-            $mecz['isGoldenGame'] = $this->typyModel->czyGraczUzylJokeraWTymMeczu($mecz['Id'], $userUniID) ?? "Nie";
-            $mecz['hasGoldenGame'] = $this->typyModel->czyGraczMozeJeszczeUzycJokera($turniejID, $userUniID) ?? 'Nie';
+            /*$mecz['isGoldenGame'] = $this->typyModel->czyGraczUzylJokeraWTymMeczu($mecz['Id'], $userUniID) ?? "Nie";
+            $mecz['hasGoldenGame'] = $this->typyModel->czyGraczMozeJeszczeUzycJokera($turniejID, $userUniID) ?? 'Nie';*/
         }
         return $mecze;
     }
