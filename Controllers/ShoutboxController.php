@@ -7,7 +7,13 @@ class ShoutboxController extends BaseController
 {
     public function index()
     {
-        return view('ukladanka/sg/chat');
+        $wstep = [
+            'title'=> 'Testowanie shoutboxu'
+        ];
+
+
+        return view('typowanie/header', $wstep)
+               .view('ukladanka/sg/chat');
     }
 
     public function getMessages()
