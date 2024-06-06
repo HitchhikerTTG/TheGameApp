@@ -67,6 +67,10 @@ public function setActiveTournamentFlagForUsers($userIds)
                     ->where('uniID', $userUniId)
                     ->first();
     }
+    // Nowa metoda do pobierania użytkownika na podstawie nicku
+    public function getUserByNick($nick) {
+        return $this->where('nick', $nick)->first();
+    }
 
 }
 

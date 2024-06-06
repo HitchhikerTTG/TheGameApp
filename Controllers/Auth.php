@@ -325,8 +325,8 @@ class Auth extends BaseController
 
 
             $userModel = new UserModel();
-            $userInfo = $userModel->where('nick', $nick)->first();
-
+            //$userInfo = $userModel->where('nick', $nick)->first();
+            $userInfo=$userModel->getUserByNick($nick);
 
             $checkPassword = Hash::check($password, $userInfo['passhash']);
 
@@ -347,7 +347,7 @@ class Auth extends BaseController
                 } else {
                         $userId = $userInfo['uniID'];
                         session()->set('loggedInUser', $userId);
-
+                        session()->set('username', $userInfo['username']);
                         // Sprawdzenie, czy użytkownik użył "GoldenBall"
                         $typyModel = new TypyModel();
                         $usedGoldenBall = $typyModel->usedGoldenBall($userId);

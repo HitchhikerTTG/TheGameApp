@@ -6,7 +6,7 @@ use CodeIgniter\Controller;
 class ShoutboxController extends BaseController
 {
     public function index()
-    {
+    {           
         $wstep = [
             'title'=> 'Testowanie shoutboxu'
         ];

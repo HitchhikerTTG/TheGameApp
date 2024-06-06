@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 class ShoutboxModel extends Model
 {
     protected $table = 'shoutbox_messages';
-    protected $allowedFields = ['user_id', 'username', 'message', 'club_hash', 'created_at'];
+    protected $allowedFields = ['uniID', 'username', 'message', 'club_hash', 'created_at'];
 
     public function getMessages($clubHash)
     {
