@@ -6,13 +6,14 @@ use CodeIgniter\Controller;
 class ShoutboxController extends BaseController
 {
     public function index()
-    {           
+    {
         $wstep = [
             'title' => 'Testowanie shoutboxu'
         ];
 
-        return view('typowanie/header', $wstep)
-               .view('ukladanka/sg/chat');
+        return $this->response
+            ->setHeader('Content-Type', 'text/html; charset=UTF-8')
+            ->setBody(view('typowanie/header', $wstep) . view('ukladanka/sg/chat'));
     }
 
     public function getMessages()
@@ -20,13 +21,15 @@ class ShoutboxController extends BaseController
         $clubHash = session()->get('club_hash');
         $model = new ShoutboxModel();
         $messages = $model->getMessages($clubHash);
-        return $this->response->setJSON($messages);
+        return $this->response
+            ->setHeader('Content-Type', 'application/json; charset=UTF-8')
+            ->setJSON($messages);
     }
 
     public function postMessage()
     {
         $forbiddenWords = include APPPATH . 'Config/forbidden_words.php';
-        $emojis = ['🦴', '🐲', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏','🍿','🥐','💬','👀','🦥','🫵🏻','🙈'];
+       $emojis = ['🦴', '🐲', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏','🍿','🥐','💬','👀','🦥','🫵🏻','🙈'];
 
         $userId = session()->get('user_id');
         $username = session()->get('username');
@@ -54,6 +57,8 @@ class ShoutboxController extends BaseController
         $model = new ShoutboxModel();
         $model->addMessage($data);
 
-        return $this->response->setJSON(['status' => 'success']);
+        return $this->response
+            ->setHeader('Content-Type', 'application/json; charset=UTF-8')
+            ->setJSON(['status' => 'success']);
     }
 }
