@@ -7,7 +7,7 @@ class ShoutboxController extends BaseController
 {
     public function index()
     {
-        return view('shoutbox');
+        return view('ukladanka/sg/chat');
     }
 
     public function getMessages()

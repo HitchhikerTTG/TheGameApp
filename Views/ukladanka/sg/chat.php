@@ -31,4 +31,4 @@
         loadMessages();
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
-</script>
+</script>   
