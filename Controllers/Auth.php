@@ -353,7 +353,7 @@ class Auth extends BaseController
                         $usedGoldenBall = $typyModel->usedGoldenBall($userId);
                         
                         $clubMembers = new ClubMembersModel();
-                        $userClub = $clubMembers->getClubsByUser($userInfo['uniID'];
+                        $userClub = $clubMembers->getClubsByUser($userInfo['uniID']);
 
                         // Zapisanie informacji w sesji
                         session()->set('usedGoldenBall', $usedGoldenBall);
