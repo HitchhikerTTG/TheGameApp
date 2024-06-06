@@ -358,7 +358,7 @@ class Auth extends BaseController
                         // Zapisanie informacji w sesji
                         session()->set('usedGoldenBall', $usedGoldenBall);
                         session()->set('club_hash', hash('sha256', 'club_name'));
-
+                        session()->set('club',$userClub);
 
                         if ($this->request->getPost('remember') == '1') {
                             $response = $this->setRememberMeCookie($userInfo['uniID'], $this->request->getUserAgent());
