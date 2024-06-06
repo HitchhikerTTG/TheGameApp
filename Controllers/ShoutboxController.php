@@ -26,7 +26,7 @@ class ShoutboxController extends BaseController
     public function postMessage()
     {
         $forbiddenWords = include APPPATH . 'Config/forbidden_words.php';
-        $emojis = ['🥕', '🌽', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏'];
+        $emojis = ['🦴', '🐲', '🍅', '🍆', '🥦', '🍄', '🥔', '🍇', '🍉', '🍒', '🍓', '🍑', '🍍', '🍌', '🍏','🍿','🥐','💬','👀','🦥','🫵🏻','🙈'];
 
         $userId = session()->get('user_id');
         $username = session()->get('username');
