@@ -48,6 +48,8 @@ return [
     'palant',
     'tuman',
     'szmaciarz',
-    'zjebany'
+    'zjebany', 
+    'jebać',
+    'bucu' 
 ];
 ?>
