@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" <?= $match['isGoldenGame'] ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
+                                        <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" <?= $match['Id'] == $usedGoldenBall ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
                                         <label for="goldenGame<?= $match['Id']; ?>">Golden Game</label>
                                     </div>
                                 </div>
