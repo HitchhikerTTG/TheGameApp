@@ -302,7 +302,7 @@ public function loadClubs(){
             return redirect()->to('hell');
         }
 
-        return view('hell');
+        return redirect()->to('/hell');
     }
 
     public function dodajPytanie()
@@ -326,12 +326,13 @@ public function loadClubs(){
 
         if ($pytanieModel->addQuestion($data)) {
             session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
+            return redirect()->to('hell');
         } else {
             session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
         }
     }
 
-    return view('hell');
+    return redirect()->to('/hell');
 }
 
 
