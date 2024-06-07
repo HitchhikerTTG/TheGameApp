@@ -366,6 +366,30 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
+        public function getTourmanentQuestions($turniejID){
+        $pytaniaModel = new PytaniaModel();
+        return $pytaniaModel->getPytanieByTurniejID($turniejID);
+    }
+
+    public function updateQuestionStatus()
+    {
+        $pytaniaModel = new PytaniaModel();
+        $activeQuestions = $this->request->getPost('aktywny');
+
+        // Reset all questions to inactive
+        $pytaniaModel->set(['aktywny' => 0])->update();
+
+        // Update selected questions to active
+        if (!empty($activeQuestions)) {
+            foreach ($activeQuestions as $id) {
+                $pytaniaModel->updateQuestionStatus($id, 1);
+            }
+        }
+
+        session()->setFlashdata('success', 'Statusy pytań zostały zaktualizowane.');
+        return redirect()->to('/hell');
+    }
+
 
     public function index() {
         // Wczytanie z pliku konfiguracyjnego json:
@@ -386,12 +410,15 @@ public function loadClubs(){
             'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
             'turnieje' => $tournaments,
             'kluby' => $kluby,
-            'config' => $config
+            'config' => $config,
+            'pytania' => $this->getTourmanentQuestions($config['activeTournamentId']),
         ];
 
         $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
                  ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
                  : [];
+
+               
 
         return view('administracja/index', $data)
                .view('administracja/listaTurniejow', $data)
@@ -399,9 +426,12 @@ public function loadClubs(){
                .view('administracja/dodajKlub', $data)
                .view('administracja/listaKlubow', $data)
                .view('administracja/listaMeczow', ['mecze' => $mecze])
+               .view('administracja/zarzadzajPytaniami', $data);
                .view('administracja/dodajPytanie');
+               
     }
 
 
 }
+
 

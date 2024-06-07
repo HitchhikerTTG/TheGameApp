@@ -12,7 +12,8 @@ class PytaniaModel extends Model{
         'wazneDo',
         'odpowiedz',
         'zamkniete',
-        'TurniejID'
+        'TurniejID',
+        'aktywne'
     ];
 
     public function getPytanieById(int $id)
@@ -29,6 +30,12 @@ class PytaniaModel extends Model{
     {
         return $this->insert($data);
     }
+    
+        public function updateQuestionStatus($id, $status)
+    {
+        return $this->update($id, ['aktywne' => $status]);
+    }
 }
+
 
 
