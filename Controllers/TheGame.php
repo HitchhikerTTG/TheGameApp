@@ -322,13 +322,23 @@ class TheGame extends BaseController
     }
 }
     
-     public function zapiszOdpowiedzNaPytanie()
+    public function zapiszOdpowiedzNaPytanie()
     {
-        $odpowiedzModel = new OdpowiedziModel();
+        $odpowiedzModel = model(OdpowiedziModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
-            'odpowiedz' => 'required|max_length[255]',
-        ])) {
+        $validationRules = [
+            'odpowiedz' => [
+                'rules' => 'required|max_length[255]',
+                'errors' => [
+                    'required' => 'Treść odpowiedzi jest wymagana.',
+                    'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
+                ]
+            ],
+            'pytanieID' => 'required|is_natural_no_zero',
+            'uniid' => 'required'
+        ];
+
+        if ($this->validate($validationRules)) {
             $data = [
                 'idPyt' => $this->request->getPost('pytanieID'),
                 'odp' => $this->request->getPost('odpowiedz'),
@@ -336,19 +346,21 @@ class TheGame extends BaseController
                 'kiedyModyfikowana' => date('Y-m-d H:i:s'),
             ];
 
-            if ($ktoraOdpowiedz = $this->request->getPost('idOdpowiedzi')) {
-                $data['id'] = $ktoraOdpowiedz;
+            if ($this->request->getPost('idOdpowiedzi')) {
+                $data['id'] = $this->request->getPost('idOdpowiedzi');
             }
 
-            $odpowiedzModel->save($data);
-
-            session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
-            return redirect()->back();
+            if ($odpowiedzModel->save($data)) {
+                session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
+            } else {
+                session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
+            }
+        } else {
+            session()->setFlashData('error', 'Walidacja nie powiodła się: ' . implode(', ', $this->validator->getErrors()));
         }
 
-        session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
         return redirect()->back();
-        }
+    }
 
 }
 ?>
