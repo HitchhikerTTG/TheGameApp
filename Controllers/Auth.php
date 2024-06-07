@@ -289,95 +289,89 @@ class Auth extends BaseController
       * User login method.
       */
       public function loginUser()
-      {
-        // Validating user input.
+{
+    // Validating user input.
+    $validated = $this->validate([
+        'username'=> [
+            'rules' => 'required|is_not_unique[uzytkownicy.nick]',
+            'errors' => [
+                'required' => 'Your email is required', 
+                'is_not_unique' => 'Upewnij się, że wprowadzasz dobrą nazwę użytkownika',
+            ]
+        ],
+        'password'=> [
+            'rules' => 'required',
+            'errors' => [
+                'required' => 'Jeśli chcesz się zalogować, musisz podać hasło', 
+            ]
+        ],
+    ]);
 
+    if(!$validated)
+    {
+        return view('auth/login', ['validation' => $this->validator]);
+    }
+    else
+    {
+        // Checking user details in database.
+        $nick = $this->request->getPost('username');
+        $password = $this->request->getPost('password');
 
-        $validated = $this->validate([
-            'username'=> [
-                'rules' => 'required|is_not_unique[uzytkownicy.nick]',
-                'errors' => [
-                    'required' => 'Your email is required', 
-                    'is_not_unique' => 'Upewnij się, że wprowadzasz dobrą nazwę użytkownika',
-                ]
-            ],
-            'password'=> [
-                'rules' => 'required',
-                'errors' => [
-                    'required' => 'Jeśli chcesz się zalogować, musisz podać hasło', 
-                ]
-            ],
-        ]);
+        $userModel = new UserModel();
+        $userInfo = $userModel->getUserByNick($nick);
 
+        $checkPassword = Hash::check($password, $userInfo['passhash']);
 
-
-        if(!$validated)
+        if(!$checkPassword)
         {
-            return view('auth/login', ['validation' => $this->validator]);
+            session()->setFlashData('fail', 'Podajesz błędny nick lub hasło');
+            return redirect()->to('auth');
         }
         else
         {
-            // Checking user details in database.
-
-
-            $nick = $this->request->getPost('username');
-            $password = $this->request->getPost('password');
-
-
-            $userModel = new UserModel();
-            //$userInfo = $userModel->where('nick', $nick)->first();
-            $userInfo=$userModel->getUserByNick($nick);
-
-            $checkPassword = Hash::check($password, $userInfo['passhash']);
-
-
-            if(!$checkPassword)
-            {
-                session()->setFlashData('fail', 'Podajesz błędny nick lub hasło');
+            // w tym miejscu powinienem sprawdzić, czy udało mu się aktywować konto, czy nie. Jeśli tak - się logujesz, jeśli nie - się nie logujesz.     
+            if (!$userInfo['activated']) {
+                session()->setFlashData('fail', 'Musisz najpierw aktywować konto - sprawdź skrzynkę i kliknij w link');
                 return redirect()->to('auth');
-            }
-            else
-            {
-                // w tym miejscu powinienem sprawdzić, czy udało mu się aktywować konto, czy nie. Jeśli tak - się logujesz, jeśli nie - się nie logujesz.     
-            
-                if (!$userInfo['activated']) {
-                    session()->setFlashData('fail', 'Musisz najpierw aktywować konto - sprawdź skrzynkę i kliknij w link');
-                    return redirect()->to('auth');
-                    
-                } else {
-                        $userId = $userInfo['uniID'];
-                        session()->set('loggedInUser', $userId);
-                        session()->set('username', $userInfo['nick']);
-                        // Sprawdzenie, czy użytkownik użył "GoldenBall"
-                        $typyModel = new TypyModel();
-                        $usedGoldenBall = $typyModel->usedGoldenBall($userId);
-                        
-                        $clubMembers = new ClubMembersModel();
-                        $userClub = $clubMembers->getClubsByUser($userInfo['uniID']);
+            } else {
+                $userId = $userInfo['uniID'];
+                session()->set('loggedInUser', $userId);
+                session()->set('username', $userInfo['nick']);
+                // Sprawdzenie, czy użytkownik użył "GoldenBall"
+                $typyModel = new TypyModel();
+                $usedGoldenBall = $typyModel->usedGoldenBall($userId);
 
-                        if(!$userClub) {
-                           $userClub="Poczekalnia";
-                           }
+                $clubMembers = new ClubMembersModel();
+                $userClub = $clubMembers->getClubsByUser($userInfo['uniID']);
 
-                        // Zapisanie informacji w sesji
-                        session()->set('usedGoldenBall', $usedGoldenBall);
-                        session()->set('club_hash', hash('sha256', $userClub));
-                        session()->set('club',$userClub);
-
-                        if ($this->request->getPost('remember') == '1') {
-                            $response = $this->setRememberMeCookie($userInfo['uniID'], $this->request->getUserAgent());
-                            return $response->redirect('/profil'); // Zwróć odpowiedź z przekierowaniem
-                            }
-
-                        return redirect()->to('/profil');
+                if(!$userClub) {
+                    $userClub = "Poczekalnia";
                 }
 
-            
+                // Zapisanie informacji w sesji
+                session()->set('usedGoldenBall', $usedGoldenBall);
+                session()->set('club_hash', hash('sha256', $userClub));
+                session()->set('club', $userClub);
 
+                if ($this->request->getPost('remember') == '1') {
+                    $response = $this->setRememberMeCookie($userInfo['uniID'], $this->request->getUserAgent());
+                    if ($userInfo['PlaysTheActiveTournament'] == 1) {
+                        return $response->redirect('nowytest'); // Zwróć odpowiedź z przekierowaniem
+                    } else {
+                        return $response->redirect('/profil'); // Zwróć odpowiedź z przekierowaniem
+                    }
+                }
 
+                // Przekierowanie w zależności od wartości PlaysTheActiveTournament
+                if ($userInfo['PlaysTheActiveTournament'] == 1) {
+                    return redirect()->to('nowytest');
+                } else {
+                    return redirect()->to('/profil');
+                }
             }
         }
-      }
+    }
+}
       
       /**
        * Log out the user.
