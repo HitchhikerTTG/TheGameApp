@@ -31,7 +31,11 @@ class PytaniaModel extends Model{
         $db = \Config\Database::connect();
         $lastQuery = $db->getLastQuery();
         log_message('debug', 'Last Query: ' . $lastQuery);
-        echo $lastQuery;
+        // Twoja treść do zalogowania
+        $logMessage = "To jest wiadomość do zalogowania w konsoli przeglądarki";
+
+    // Echo skryptu JavaScript do logowania wiadomości
+        echo "<script>console.log('PHP log: " . addslashes($logMessage) . "');</script>";
         return $this->insertID();
     }
 }
