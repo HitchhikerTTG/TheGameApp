@@ -1,5 +1,5 @@
 <div id="shoutbox">
-    <div id="messages"></div>
+    <div id="messages" style="height: 300px; overflow-y: auto;"></div>
     <form id="shoutboxForm">
         <input type="text" id="message" name="message" placeholder="Enter your message" required>
         <button type="submit">Send</button>
@@ -12,8 +12,8 @@
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
                 $('#messages').empty();
-                $.each(data, function(index, message) {
-                    $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
+                data.slice(-100).reverse().forEach(function(message) { // Get last 100 messages and reverse order
+                    $('#messages').prepend('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
             });
         }
@@ -31,4 +31,4 @@
         loadMessages();
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
-</script>   
+</script>
