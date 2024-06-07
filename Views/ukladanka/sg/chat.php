@@ -1,17 +1,18 @@
 <div id="shoutbox">
     <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
-        <span id="lastMessageText"></span>
-        <button id="joinChat">Dołącz do rozmowy</button>
+        <span id="lastMessageText" style="flex: 4;"></span>
+        <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
     </div>
     <div id="messagesContainer" style="display: none;">
         <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
-        <form id="shoutboxForm">
-            <input type="text" id="message" name="message" placeholder="Enter your message" required>
-            <button type="submit">➤</button>
+        <form id="shoutboxForm" style="display: flex;">
+            <input type="text" id="message" name="message" placeholder="Enter your message" required style="flex: 4;">
+            <button type="submit" style="flex: 1;">➤</button>
         </form>
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         function loadMessages() {
@@ -25,6 +26,7 @@
                 data.forEach(function(message) {
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
+                $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
             });
         }
 
@@ -53,4 +55,4 @@
         loadMessages();
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
-</script>   
+</script>
