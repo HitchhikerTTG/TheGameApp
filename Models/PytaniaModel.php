@@ -30,5 +30,5 @@ class PytaniaModel extends Model{
         return $this->insert($data);
     }
 }
-}
+
 
