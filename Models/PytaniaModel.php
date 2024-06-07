@@ -38,12 +38,8 @@ class PytaniaModel extends Model{
 
     public function resetAllQuestionStatuses()
     {
-        return $this->set(['aktywne' => 0])->update(null, ['aktywne' => 0]);
+        return $this->where('id !=', 0)->set(['aktywne' => 0])->update();
     }
 }
-
-
-
-
 
 
