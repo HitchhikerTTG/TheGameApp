@@ -31,11 +31,19 @@ class PytaniaModel extends Model{
         return $this->insert($data);
     }
     
-        public function updateQuestionStatus($id, $status)
+    public function updateQuestionStatus($id, $status)
     {
-        return $this->update($id, ['aktywne' => $status]);
+        return $this->where('id', $id)->set(['aktywne' => $status])->update();
+    }
+
+    public function resetAllQuestionStatuses()
+    {
+        return $this->set(['aktywne' => 0])->update(null, ['aktywne' => 0]);
     }
 }
+
+
+
 
 
 

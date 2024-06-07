@@ -371,13 +371,13 @@ public function loadClubs(){
         return $pytaniaModel->getPytanieByTurniejID($turniejID);
     }
 
-    public function updateQuestionStatus()
+        public function updateQuestionStatus()
     {
         $pytaniaModel = new PytaniaModel();
         $activeQuestions = $this->request->getPost('aktywne');
 
         // Reset all questions to inactive
-        $pytaniaModel->set(['aktywne' => 0])->update();
+        $pytaniaModel->resetAllQuestionStatuses();
 
         // Update selected questions to active
         if (!empty($activeQuestions)) {
@@ -433,5 +433,11 @@ public function loadClubs(){
 
 
 }
+
+
+
+
+
+
 
 
