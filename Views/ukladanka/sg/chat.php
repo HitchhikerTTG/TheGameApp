@@ -3,7 +3,8 @@
         <span id="lastMessageText" style="flex: 4;"></span>
         <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
     </div>
-    <div id="messagesContainer" style="display: none;">
+    <div id="messagesContainer" style="display: none; position: relative;">
+        <button id="minimizeChat" style="position: absolute; top: 10px; right: 10px;">-</button>
         <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
         <form id="shoutboxForm" style="display: flex;">
             <input type="text" id="message" name="message" placeholder="Enter your message" required style="flex: 4;">
@@ -44,6 +45,11 @@
             $('#messagesContainer').show();
         });
 
+        $('#minimizeChat').click(function() {
+            $('#messagesContainer').hide();
+            $('#lastMessage').show();
+        });
+
         $('#shoutboxForm').submit(function(event) {
             event.preventDefault();
             $.post('<?= site_url('shoutbox/postMessage'); ?>', { message: $('#message').val() }, function(response) {
@@ -68,6 +74,6 @@
 
 <style>
     .highlight {
-        background-color: yellow;
+        background-color: #a5d525;
     }
 </style>
