@@ -313,6 +313,7 @@ public function loadClubs(){
             'tresc' => 'required|min_length[3]|max_length[255]',
             'pkt' => 'required|is_natural',
             'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
+            'TurniejID' => 'required|is_natural',
         ])) {
             $data = [
                 'tresc' => $this->request->getPost('tresc'),
@@ -325,7 +326,7 @@ public function loadClubs(){
 
             if ($pytanieModel->addQuestion($data)) {
                 session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-                return redirect()->to('admindash/dodajPytanie');
+                //return redirect()->to('admindash/dodajPytanie');
             } else {
                 session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
             }
