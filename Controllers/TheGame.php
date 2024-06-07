@@ -334,22 +334,23 @@ class TheGame extends BaseController
     }
 }
     
-    public function zapiszOdpowiedzNaPytanie()
+       public function zapiszOdpowiedzNaPytanie()
     {
         $odpowiedzModel = new OdpowiedziModel();
 
-        $rules = [
-            'odpowiedz' => 'required|max_length[255]',
-        ];
-
-        $errors = [
+        $validationRules = [
             'odpowiedz' => [
-                'required' => 'Odpowiedź jest wymagana',
-                'max_length' => 'Odpowiedź nie może przekraczać 255 znaków',
+                'rules' => 'required|max_length[255]',
+                'errors' => [
+                    'required' => 'Treść odpowiedzi jest wymagana.',
+                    'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
+                ]
             ],
+            'pytanieID' => 'required|is_natural_no_zero',
+            'uniid' => 'required'
         ];
 
-        if ($this->request->getMethod() === 'post' && $this->validate($rules, $errors)) {
+        if ($this->validate($validationRules)) {
             $data = [
                 'idPyt' => $this->request->getPost('pytanieID'),
                 'odp' => $this->request->getPost('odpowiedz'),
@@ -358,7 +359,7 @@ class TheGame extends BaseController
             ];
 
             if ($odpowiedzModel->saveAnswer($data)) {
-                session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
+                session()->setFlashData('success', 'Twoja odpowiedź została zapisana.');
             } else {
                 session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
             }
@@ -371,6 +372,5 @@ class TheGame extends BaseController
 
 }
 ?>
-
 
 
