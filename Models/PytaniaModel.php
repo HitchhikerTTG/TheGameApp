@@ -43,7 +43,7 @@ class PytaniaModel extends Model{
     
     public function getActiveQuestions($turniejID)
     {
-        return $this->where(['TurniejeID' => $turniejID, 'aktywne' => 1])->findAll();
+        return $this->where(['TurniejID' => $turniejID, 'aktywne' => 1])->findAll();
     }
 }
 
