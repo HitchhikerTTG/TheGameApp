@@ -305,7 +305,7 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
-    public function dodajPytanie()
+ public function dodajPytanie()
 {
     $pytanieModel = new PytaniaModel();
 
@@ -324,12 +324,16 @@ public function loadClubs(){
             'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
         ];
 
+        log_message('debug', 'Data to be inserted: ' . json_encode($data));
+
         if ($pytanieModel->addQuestion($data)) {
             session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
             return redirect()->to('hell');
         } else {
             session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
         }
+    } else {
+        log_message('error', 'Validation failed: ' . json_encode($this->validator->getErrors()));
     }
 
     return redirect()->to('/hell');

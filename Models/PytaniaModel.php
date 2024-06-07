@@ -26,16 +26,16 @@ class PytaniaModel extends Model{
         }
 
     public function addQuestion($data)
-    {
-        $this->insert($data);
+{
+    if ($this->insert($data)) {
         $db = \Config\Database::connect();
         $lastQuery = $db->getLastQuery();
         log_message('debug', 'Last Query: ' . $lastQuery);
-        // Twoja treść do zalogowania
-        $logMessage = "To jest wiadomość do zalogowania w konsoli przeglądarki";
-
-    // Echo skryptu JavaScript do logowania wiadomości
-        echo "<script>console.log('PHP log: " . addslashes($logMessage) . "');</script>";
         return $this->insertID();
+    } else {
+        log_message('error', 'Insert failed: ' . json_encode($this->errors()));
+        return false;
     }
 }
+}
+
