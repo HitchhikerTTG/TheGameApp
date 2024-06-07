@@ -305,36 +305,62 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
-        public function dodajPytanie()
+            public function dodajPytanie()
     {
         $pytanieModel = new PytaniaModel();
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
-            'tresc' => 'required|min_length[3]|max_length[255]',
-            'pkt' => 'required|is_natural',
-            'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
-            'TurniejID' => 'required|is_natural',
-        ])) {
+        $validated = $this->validate([
+            'tresc' => [
+                'rules' => 'required|min_length[3]|max_length[255]',
+                'errors' => [
+                    'required' => 'Treść pytania jest wymagana',
+                    'min_length' => 'Treść pytania musi mieć co najmniej 3 znaki',
+                    'max_length' => 'Treść pytania nie może przekraczać 255 znaków',
+                ]
+            ],
+            'pkt' => [
+                'rules' => 'required|is_natural',
+                'errors' => [
+                    'required' => 'Liczba punktów jest wymagana',
+                    'is_natural' => 'Liczba punktów musi być liczbą naturalną',
+                ]
+            ],
+            'wazneDo' => [
+                'rules' => 'required|valid_date[Y-m-d H:i:s]',
+                'errors' => [
+                    'required' => 'Data ważności jest wymagana',
+                    'valid_date' => 'Data ważności musi mieć format YYYY-MM-DD HH:MM:SS',
+                ]
+            ],
+            'TurniejID' => [
+                'rules' => 'required|is_natural',
+                'errors' => [
+                    'required' => 'ID turnieju jest wymagane',
+                    'is_natural' => 'ID turnieju musi być liczbą naturalną',
+                ]
+            ],
+        ]);
+
+        if (!$validated) {
+            return view('administracja/dodajPytanie', ['validation' => $this->validator]);
+        } else {
             $data = [
                 'tresc' => $this->request->getPost('tresc'),
                 'pkt' => $this->request->getPost('pkt'),
                 'wazneDo' => $this->request->getPost('wazneDo'),
                 'utworzone' => date('Y-m-d H:i:s'),
-                'zamkniete' => 0, // Domyślnie pytanie jest otwarte
-                'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
+                'zamkniete' => 0,
+                'TurniejID' => $this->request->getPost('TurniejID'),
             ];
 
             log_message('debug', 'Data to be inserted: ' . json_encode($data));
 
             if ($pytanieModel->addQuestion($data)) {
                 session()->setFlashdata('success', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
+                return redirect()->to('/hell');
             } else {
                 session()->setFlashdata('error', 'Wystąpił błąd podczas dodawania pytania.');
             }
-        } else {
-            $errors = $this->validator->getErrors();
-            log_message('error', 'Validation failed: ' . json_encode($errors));
-            session()->setFlashdata('error', 'Walidacja nie powiodła się: ' . implode(', ', $errors));
         }
 
         return redirect()->to('/hell');
@@ -378,3 +404,4 @@ public function loadClubs(){
 
 
 }
+
