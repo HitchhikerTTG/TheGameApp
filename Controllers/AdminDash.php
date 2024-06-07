@@ -426,7 +426,7 @@ public function loadClubs(){
                .view('administracja/dodajKlub', $data)
                .view('administracja/listaKlubow', $data)
                .view('administracja/listaMeczow', ['mecze' => $mecze])
-               .view('administracja/zarzadzajPytaniami', $data);
+               .view('administracja/zarzadzajPytaniami', $data)
                .view('administracja/dodajPytanie');
                
     }
