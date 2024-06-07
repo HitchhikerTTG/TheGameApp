@@ -305,7 +305,7 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
-    public function dodajPytanie()
+        public function dodajPytanie()
     {
         $pytanieModel = new PytaniaModel();
 
@@ -332,8 +332,9 @@ public function loadClubs(){
                 session()->setFlashdata('error', 'Wystąpił błąd podczas dodawania pytania.');
             }
         } else {
-            log_message('error', 'Validation failed: ' . json_encode($this->validator->getErrors()));
-            session()->setFlashdata('error', 'Walidacja nie powiodła się: ' . json_encode($this->validator->getErrors()));
+            $errors = $this->validator->getErrors();
+            log_message('error', 'Validation failed: ' . json_encode($errors));
+            session()->setFlashdata('error', 'Walidacja nie powiodła się: ' . implode(', ', $errors));
         }
 
         return redirect()->to('/hell');
