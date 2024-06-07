@@ -24,7 +24,7 @@
                     <td><?= $pytanie['pkt'] ?></td>
                     <td><?= $pytanie['wazneDo'] ?></td>
                     <td>
-                        <input type="checkbox" name="aktywny[]" value="<?= $pytanie['id'] ?>" <?= $pytanie['aktywny'] ? 'checked' : '' ?>>
+                        <input type="checkbox" name="aktywny[]" value="<?= $pytanie['id'] ?>" <?= $pytanie['aktywne'] ? 'checked' : '' ?>>
                     </td>
                 </tr>
             <?php endforeach; ?>
