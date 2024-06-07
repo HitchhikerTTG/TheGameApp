@@ -40,7 +40,7 @@
     <?php if (session()->getFlashData('error')): ?>
         <p><?= session()->getFlashData('error') ?></p>
     <?php endif; ?>
-    <form method="post" action="<?= site_url('admindash/dodajPytanie') ?>">
+    <form method="post" action="<?= site_url('/hell/dodajPytanie') ?>">
         <label for="tresc">Treść:</label>
         <input type="text" id="tresc" name="tresc" required><br>
         <label for="pkt">Punkty:</label>
