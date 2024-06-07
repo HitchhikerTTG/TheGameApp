@@ -6,12 +6,22 @@ class PytaniaModel extends Model{
     protected $table = 'pytania';
     
     protected $allowedFields = [
-    		'tresc',
-			'pkt',
-			'utworzone',
-			'wazneDo',
-			'odpowiedz',
-			'zamkniete',
-			'TurniejID'
+        'tresc',
+        'pkt',
+        'utworzone',
+        'wazneDo',
+        'odpowiedz',
+        'zamkniete',
+        'TurniejID'
     ];
+
+    public function getPytanieById(int $id)
+    {
+        return $this->where(['id' => $id])->first();
+    }
+
+    public function addQuestion($data)
+    {
+        return $this->insert($data);
+    }
 }
