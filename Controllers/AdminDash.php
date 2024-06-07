@@ -331,7 +331,7 @@ public function loadClubs(){
             }
         }
 
-        return view('/hell');
+        return view('hell');
     }
 
 
