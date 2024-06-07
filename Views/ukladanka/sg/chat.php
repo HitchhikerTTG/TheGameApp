@@ -19,19 +19,19 @@
 
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
+                $('#messages').empty();
                 if (data.length > 0) {
-                    const lastMessage = data[data.length - 1];
-                    if (lastMessageId !== lastMessage.id) {
-                        lastMessageId = lastMessage.id;
-                        const truncatedMessage = lastMessage.message.length > 45 ? lastMessage.message.substring(0, 45) + '...' : lastMessage.message;
-                        $('#lastMessageText').html('<strong>' + lastMessage.username + ':</strong> ' + truncatedMessage);
+                    const newestMessage = data[0]; // Assuming data is sorted from newest to oldest
+                    if (lastMessageId !== newestMessage.id) {
+                        lastMessageId = newestMessage.id;
+                        const truncatedMessage = newestMessage.message.length > 45 ? newestMessage.message.substring(0, 45) + '...' : newestMessage.message;
+                        $('#lastMessageText').html('<strong>' + newestMessage.username + ':</strong> ' + truncatedMessage);
                         $('#lastMessage').addClass('highlight');
                         setTimeout(function() {
                             $('#lastMessage').removeClass('highlight');
                         }, 3000);
                     }
                 }
-                $('#messages').empty();
                 data.forEach(function(message) {
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
@@ -65,3 +65,9 @@
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
 </script>
+
+<style>
+    .highlight {
+        background-color: yellow;
+    }
+</style>
