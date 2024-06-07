@@ -326,13 +326,12 @@ public function loadClubs(){
 
         if ($pytanieModel->addQuestion($data)) {
             session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-            return redirect()->to('AdminDash/dodajPytanie');
         } else {
             session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
         }
     }
 
-    return view('administracja/dodajPytanie');
+    return view('hell');
 }
 
 
