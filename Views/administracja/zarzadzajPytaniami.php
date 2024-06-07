@@ -14,7 +14,7 @@
                 <th>Treść</th>
                 <th>Punkty</th>
                 <th>Ważne Do</th>
-                <th>Aktywny</th>
+                <th>Aktywne</th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@
                     <td><?= $pytanie['pkt'] ?></td>
                     <td><?= $pytanie['wazneDo'] ?></td>
                     <td>
-                        <input type="checkbox" name="aktywny[]" value="<?= $pytanie['id'] ?>" <?= $pytanie['aktywne'] ? 'checked' : '' ?>>
+                        <input type="checkbox" name="aktywne[]" value="<?= $pytanie['id'] ?>" <?= $pytanie['aktywne'] ? 'checked' : '' ?>>
                     </td>
                 </tr>
             <?php endforeach; ?>

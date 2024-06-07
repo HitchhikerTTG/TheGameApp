@@ -374,10 +374,10 @@ public function loadClubs(){
     public function updateQuestionStatus()
     {
         $pytaniaModel = new PytaniaModel();
-        $activeQuestions = $this->request->getPost('aktywny');
+        $activeQuestions = $this->request->getPost('aktywne');
 
         // Reset all questions to inactive
-        $pytaniaModel->set(['aktywny' => 0])->update();
+        $pytaniaModel->set(['aktywne' => 0])->update();
 
         // Update selected questions to active
         if (!empty($activeQuestions)) {
