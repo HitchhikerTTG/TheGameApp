@@ -24,5 +24,20 @@ class OdpowiedziModel extends Model{
 	        return $result->pkt ?? 0; // Zwraca 0 jeśli nie ma wyników
 
 	}
+	
+	   public function saveAnswer($data)
+    {
+        $existingAnswer = $this->where([
+            'idPyt' => $data['idPyt'],
+            'uniidOdp' => $data['uniidOdp']
+        ])->first();
+
+        if ($existingAnswer) {
+            $data['id'] = $existingAnswer['id'];
+        }
+
+        return $this->save($data);
+    }
 
 }
+
