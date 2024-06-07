@@ -306,34 +306,34 @@ public function loadClubs(){
     }
 
     public function dodajPytanie()
-    {
-        $pytanieModel = new PytaniaModel();
+{
+    $pytanieModel = new PytaniaModel();
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
-            'tresc' => 'required|min_length[3]|max_length[255]',
-            'pkt' => 'required|is_natural',
-            'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
-            'TurniejID' => 'required|is_natural',
-        ])) {
-            $data = [
-                'tresc' => $this->request->getPost('tresc'),
-                'pkt' => $this->request->getPost('pkt'),
-                'wazneDo' => $this->request->getPost('wazneDo'),
-                'utworzone' => date('Y-m-d H:i:s'),
-                'zamkniete' => 0, // Domyślnie pytanie jest otwarte
-                'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
-            ];
+    if ($this->request->getMethod() === 'post' && $this->validate([
+        'tresc' => 'required|min_length[3]|max_length[255]',
+        'pkt' => 'required|is_natural',
+        'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
+        'TurniejID' => 'required|is_natural',
+    ])) {
+        $data = [
+            'tresc' => $this->request->getPost('tresc'),
+            'pkt' => $this->request->getPost('pkt'),
+            'wazneDo' => $this->request->getPost('wazneDo'),
+            'utworzone' => date('Y-m-d H:i:s'),
+            'zamkniete' => 0, // Domyślnie pytanie jest otwarte
+            'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
+        ];
 
-            if ($pytanieModel->addQuestion($data)) {
-                session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-                //return redirect()->to('admindash/dodajPytanie');
-            } else {
-                session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
-            }
+        if ($pytanieModel->addQuestion($data)) {
+            session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
+            return redirect()->to('AdminDash/dodajPytanie');
+        } else {
+            session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
         }
-
-        return view('hell');
     }
+
+    return view('administracja/dodajPytanie');
+}
 
 
 
