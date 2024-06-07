@@ -305,88 +305,75 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
- public function dodajPytanie()
-{
-    $pytanieModel = new PytaniaModel();
+    public function dodajPytanie()
+    {
+        $pytanieModel = new PytaniaModel();
 
-    if ($this->request->getMethod() === 'post' && $this->validate([
-        'tresc' => 'required|min_length[3]|max_length[255]',
-        'pkt' => 'required|is_natural',
-        'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
-        'TurniejID' => 'required|is_natural',
-    ])) {
-        $data = [
-            'tresc' => $this->request->getPost('tresc'),
-            'pkt' => $this->request->getPost('pkt'),
-            'wazneDo' => $this->request->getPost('wazneDo'),
-            'utworzone' => date('Y-m-d H:i:s'),
-            'zamkniete' => 0, // Domyślnie pytanie jest otwarte
-            'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'tresc' => 'required|min_length[3]|max_length[255]',
+            'pkt' => 'required|is_natural',
+            'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
+            'TurniejID' => 'required|is_natural',
+        ])) {
+            $data = [
+                'tresc' => $this->request->getPost('tresc'),
+                'pkt' => $this->request->getPost('pkt'),
+                'wazneDo' => $this->request->getPost('wazneDo'),
+                'utworzone' => date('Y-m-d H:i:s'),
+                'zamkniete' => 0, // Domyślnie pytanie jest otwarte
+                'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
+            ];
+
+            log_message('debug', 'Data to be inserted: ' . json_encode($data));
+
+            if ($pytanieModel->addQuestion($data)) {
+                session()->setFlashdata('success', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
+            } else {
+                session()->setFlashdata('error', 'Wystąpił błąd podczas dodawania pytania.');
+            }
+        } else {
+            log_message('error', 'Validation failed: ' . json_encode($this->validator->getErrors()));
+            session()->setFlashdata('error', 'Walidacja nie powiodła się: ' . json_encode($this->validator->getErrors()));
+        }
+
+        return redirect()->to('/hell');
+    }
+
+
+    public function index() {
+        // Wczytanie z pliku konfiguracyjnego json:
+        $common = new Common();
+        $tournaments = $common->loadTournaments();
+        $kluby = $this->loadClubs();
+
+        $meczService = new MeczService;
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
+            'activeTournamentId' => 'Brak danych',
+            'activeCompetitionId' => 'Brak danych',
+            'activeTournamentName' => 'Brak danych'
         ];
 
-        log_message('debug', 'Data to be inserted: ' . json_encode($data));
+        $data = [
+            'pageTitle' => 'Twoje własne osobiste piekielko',
+            'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
+            'turnieje' => $tournaments,
+            'kluby' => $kluby,
+            'config' => $config
+        ];
 
-        if ($pytanieModel->addQuestion($data)) {
-            session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-            return redirect()->to('hell');
-        } else {
-            session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
-        }
-    } else {
-        log_message('error', 'Validation failed: ' . json_encode($this->validator->getErrors()));
+        $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
+                 ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
+                 : [];
+
+        return view('administracja/index', $data)
+               .view('administracja/listaTurniejow', $data)
+               .view('administracja/dodajTurniej', $data)
+               .view('administracja/dodajKlub', $data)
+               .view('administracja/listaKlubow', $data)
+               .view('administracja/listaMeczow', ['mecze' => $mecze])
+               .view('administracja/dodajPytanie');
     }
 
-    return redirect()->to('/hell');
-}
-
-
-
-
-public function index() {
-    // Wczytanie z pliku konfiguracyjnego json:
-    $common = new Common();
-    $tournaments = $common->loadTournaments();
-    $kluby = $this->loadClubs();
-
-    $meczService = new MeczService;
-
-    $configPath = WRITEPATH . 'ActiveTournament.json';
-
-    $config = [];
-    if (file_exists($configPath)) {
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-    } else {
-        // Ustawianie domyślnych wartości jeśli plik nie istnieje
-        $config['activeTournamentId'] = 'Brak danych';
-        $config['activeCompetitionId'] = 'Brak danych';
-        $config['activeTournamentName'] = 'Brak danych';
-    }
-
-    $data = [
-        'pageTitle' => 'Twoje własne osobiste piekielko',
-        'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
-        'turnieje' => $tournaments,
-        'kluby' => $kluby,
-        'config' => $config
-    ];
-
-    $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
-             ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
-             : [];
-
-    return view('administracja/index', $data)
-           .view('administracja/listaTurniejow', $data)
-           .view('administracja/dodajTurniej', $data)
-           .view('administracja/dodajKlub', $data)
-           .view('administracja/listaKlubow', $data)
-           .view('administracja/listaMeczow', ['mecze' => $mecze])
-           .view('administracja/dodajPytanie');
-}
-
-
-
 
 }
-
-?>

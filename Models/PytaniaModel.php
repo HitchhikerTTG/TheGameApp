@@ -26,15 +26,8 @@ class PytaniaModel extends Model{
         }
 
     public function addQuestion($data)
-{
-    if ($this->insert($data)) {
-        $db = \Config\Database::connect();
-        $lastQuery = $db->getLastQuery();
-        log_message('debug', 'Last Query: ' . $lastQuery);
-        return $this->insertID();
-    } else {
-        log_message('error', 'Insert failed: ' . json_encode($this->errors()));
-        return false;
+    {
+        return $this->insert($data);
     }
 }
 }
