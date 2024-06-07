@@ -1,22 +1,37 @@
 <div id="shoutbox">
-    <div id="messages" style="height: 300px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
-    <form id="shoutboxForm">
-        <input type="text" id="message" name="message" placeholder="Enter your message" required>
-        <button type="submit">Send</button>
-    </form>
+    <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="lastMessageText"></span>
+        <button id="joinChat">Dołącz do rozmowy</button>
+    </div>
+    <div id="messagesContainer" style="display: none;">
+        <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
+        <form id="shoutboxForm">
+            <input type="text" id="message" name="message" placeholder="Enter your message" required>
+            <button type="submit">➤</button>
+        </form>
+    </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
                 $('#messages').empty();
+                if (data.length > 0) {
+                    const lastMessage = data[data.length - 1];
+                    const truncatedMessage = lastMessage.message.length > 45 ? lastMessage.message.substring(0, 45) + '...' : lastMessage.message;
+                    $('#lastMessageText').html('<strong>' + lastMessage.username + ':</strong> ' + truncatedMessage);
+                }
                 data.forEach(function(message) {
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
             });
         }
+
+        $('#joinChat').click(function() {
+            $('#lastMessage').hide();
+            $('#messagesContainer').show();
+        });
 
         $('#shoutboxForm').submit(function(event) {
             event.preventDefault();
@@ -28,7 +43,14 @@
             }, 'json');
         });
 
+        $('#message').keypress(function(event) {
+            if (event.which == 13) {
+                event.preventDefault();
+                $('#shoutboxForm').submit();
+            }
+        });
+
         loadMessages();
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
-</script>
+</script>   

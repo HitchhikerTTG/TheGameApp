@@ -99,7 +99,7 @@ class TheGame extends BaseController
     $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
-    $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "do_rozegrania");
+    $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "najblizsze");
 
     // Fetch JSON data for each match
     foreach ($mecze4 as &$mecz) {
@@ -125,6 +125,7 @@ class TheGame extends BaseController
 
     return view('typowanie/header', $wstep)
            .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
+           .view('ukladanka/sg/chat')
            .view('ukladanka/sg/znowumecze', [
                'mecze' => $mecze4,
                'turniejID' => $turniejID,
@@ -132,7 +133,7 @@ class TheGame extends BaseController
                'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']
            ])
            .view('ukladanka/sg/pytania', $pytania)
-           .view('ukladanka/sg/chat')
+           
            .view('tabela/tabela', $daneTurniejowe)
            .view('ukladanka/sg/SkryptTypowania')
            .view('typowanie/footer');
