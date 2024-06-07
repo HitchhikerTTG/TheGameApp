@@ -40,6 +40,11 @@ class PytaniaModel extends Model{
     {
         return $this->where('id !=', 0)->set(['aktywne' => 0])->update();
     }
+    
+    public function getActiveQuestions($turniejID)
+    {
+        return $this->where(['TurniejeID' => $turniejID, 'aktywne' => 1])->findAll();
+    }
 }
 
 

@@ -10,6 +10,7 @@ use App\Models\TypyModel;
 use App\Models\TabelaModel;
 use App\Models\KtoWCoGraModel;
 use App\Services\MeczService;
+use App\Models\PytaniaModel;
 $session = \Config\Services::session();
 
 class TheGame extends BaseController
@@ -120,8 +121,8 @@ class TheGame extends BaseController
     $wstep = [
         'title'=> $turniejName
     ];
-    
-    $pytania=[];
+    $pytaniaModel= new PytaniaModel();
+    $pytania = $pytaniaModel->getActiveQuestions($turniejID);
 
     return view('typowanie/header', $wstep)
            .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
@@ -132,8 +133,7 @@ class TheGame extends BaseController
                'userID' => $loggedInUserId,
                'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']
            ])
-           .view('ukladanka/sg/pytania', $pytania)
-           
+           .view('ukladanka/sg/pytania', ['pytania'=>$pytania])
            .view('tabela/tabela', $daneTurniejowe)
            .view('ukladanka/sg/SkryptTypowania')
            .view('typowanie/footer');
@@ -320,7 +320,34 @@ class TheGame extends BaseController
         return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
     }
 }
+    
+     public function zapiszOdpowiedzNaPytanie()
+    {
+        $odpowiedzModel = new OdpowiedziModel();
 
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'odpowiedz' => 'required|max_length[255]',
+        ])) {
+            $data = [
+                'idPyt' => $this->request->getPost('pytanieID'),
+                'odp' => $this->request->getPost('odpowiedz'),
+                'uniidOdp' => $this->request->getPost('uniid'),
+                'kiedyModyfikowana' => date('Y-m-d H:i:s'),
+            ];
+
+            if ($ktoraOdpowiedz = $this->request->getPost('idOdpowiedzi')) {
+                $data['id'] = $ktoraOdpowiedz;
+            }
+
+            $odpowiedzModel->save($data);
+
+            session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
+            return redirect()->back();
+        }
+
+        session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
+        return redirect()->back();
+        }
 
 }
 ?>
