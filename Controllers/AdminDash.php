@@ -374,7 +374,7 @@ public function index() {
            .view('administracja/dodajTurniej', $data)
            .view('administracja/dodajKlub', $data)
            .view('administracja/listaKlubow', $data)
-           .view('administracja/listaMeczow', ['mecze' => $mecze]),
+           .view('administracja/listaMeczow', ['mecze' => $mecze])
            .view('administracja/dodajPytanie');
 }
 
