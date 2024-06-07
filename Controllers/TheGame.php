@@ -338,9 +338,18 @@ class TheGame extends BaseController
     {
         $odpowiedzModel = new OdpowiedziModel();
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        $rules = [
             'odpowiedz' => 'required|max_length[255]',
-        ])) {
+        ];
+
+        $errors = [
+            'odpowiedz' => [
+                'required' => 'Odpowiedź jest wymagana',
+                'max_length' => 'Odpowiedź nie może przekraczać 255 znaków',
+            ],
+        ];
+
+        if ($this->request->getMethod() === 'post' && $this->validate($rules, $errors)) {
             $data = [
                 'idPyt' => $this->request->getPost('pytanieID'),
                 'odp' => $this->request->getPost('odpowiedz'),
@@ -362,9 +371,6 @@ class TheGame extends BaseController
 
 }
 ?>
-
-
-
 
 
 
