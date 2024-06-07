@@ -123,7 +123,19 @@ class TheGame extends BaseController
         'title'=> $turniejName
     ];
     $pytaniaModel= new PytaniaModel();
+    $odpowiedzModel = new OdpowiedziModel();
     $pytania = $pytaniaModel->getActiveQuestions($turniejID);
+    
+    foreach ($pytania as &$pytanie) {
+        $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
+                                    ->where('uniidOdp', $loggedInUserId)
+                                    ->first();
+        if ($odpowiedz) {
+            $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
+        }
+    }
+
+    
 
     return view('typowanie/header', $wstep)
            .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
@@ -323,44 +335,48 @@ class TheGame extends BaseController
 }
     
     public function zapiszOdpowiedzNaPytanie()
-    {
-        $odpowiedzModel = model(OdpowiedziModel::class);
+{
+    $odpowiedzModel = model(OdpowiedziModel::class);
 
-        $validationRules = [
-            'odpowiedz' => [
-                'rules' => 'required|max_length[255]',
-                'errors' => [
-                    'required' => 'Treść odpowiedzi jest wymagana.',
-                    'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
-                ]
-            ],
-            'pytanieID' => 'required|is_natural_no_zero',
-            'uniid' => 'required'
+    $validationRules = [
+        'odpowiedz' => [
+            'rules' => 'required|max_length[255]',
+            'errors' => [
+                'required' => 'Treść odpowiedzi jest wymagana.',
+                'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
+            ]
+        ],
+        'pytanieID' => 'required|is_natural_no_zero',
+        'uniid' => 'required'
+    ];
+
+    if ($this->validate($validationRules)) {
+        $data = [
+            'idPyt' => $this->request->getPost('pytanieID'),
+            'odp' => $this->request->getPost('odpowiedz'),
+            'uniidOdp' => $this->request->getPost('uniid'),
+            'kiedyModyfikowana' => date('Y-m-d H:i:s'),
         ];
 
-        if ($this->validate($validationRules)) {
-            $data = [
-                'idPyt' => $this->request->getPost('pytanieID'),
-                'odp' => $this->request->getPost('odpowiedz'),
-                'uniidOdp' => $this->request->getPost('uniid'),
-                'kiedyModyfikowana' => date('Y-m-d H:i:s'),
-            ];
-
-            if ($this->request->getPost('idOdpowiedzi')) {
-                $data['id'] = $this->request->getPost('idOdpowiedzi');
-            }
-
-            if ($odpowiedzModel->save($data)) {
-                session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
-            } else {
-                session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
-            }
-        } else {
-            session()->setFlashData('error', 'Walidacja nie powiodła się: ' . implode(', ', $this->validator->getErrors()));
+        if ($this->request->getPost('idOdpowiedzi')) {
+            $data['id'] = $this->request->getPost('idOdpowiedzi');
         }
 
-        return redirect()->back();
+        if ($odpowiedzModel->save($data)) {
+            session()->setFlashData('success', 'Twoja odpowiedź została zapisana. Jej!');
+        } else {
+            session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
+        }
+    } else {
+        session()->setFlashData('error', 'Walidacja nie powiodła się: ' . implode(', ', $this->validator->getErrors()));
     }
+
+    return redirect()->back();
+}
 
 }
 ?>
+
+
+
+
