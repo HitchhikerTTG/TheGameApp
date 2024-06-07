@@ -7,7 +7,7 @@
             <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
             <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
             <input type="text" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" required>
-            <button type="submit">Zapisz</button>
+            <button type="submit"><?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz'?></button>
         </form>
     </div>
 <?php endforeach; ?>
