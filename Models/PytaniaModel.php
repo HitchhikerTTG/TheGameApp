@@ -19,9 +19,18 @@ class PytaniaModel extends Model{
     {
         return $this->where(['id' => $id])->first();
     }
+    
+    public function getPytanieByTurniejID(int $turniejID){
+        
+        return $this->where(['TurniejID' => $turniejID])->findAll();
+        }
 
     public function addQuestion($data)
     {
-        return $this->insert($data);
+        $this->insert($data);
+        $db = \Config\Database::connect();
+        $lastQuery = $db->getLastQuery();
+        log_message('debug', 'Last Query: ' . $lastQuery);
+        return $this->insertID();
     }
 }
