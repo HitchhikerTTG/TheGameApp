@@ -1,5 +1,5 @@
 <div id="shoutbox">
-    <div id="messages" style="height: 300px; overflow-y: auto;"></div>
+    <div id="messages" style="height: 300px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
     <form id="shoutboxForm">
         <input type="text" id="message" name="message" placeholder="Enter your message" required>
         <button type="submit">Send</button>
@@ -12,10 +12,9 @@
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
                 $('#messages').empty();
-                data.slice(-100).forEach(function(message) { // Get last 100 messages
+                data.forEach(function(message) {
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
-                $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
             });
         }
 
