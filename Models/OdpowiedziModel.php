@@ -27,6 +27,14 @@ class OdpowiedziModel extends Model{
 	
 	   public function saveAnswer($data)
     {
+        $pytanieModel = new \App\Models\PytaniaModel();
+        $pytanie = $pytanieModel->find($data['idPyt']);
+        
+        // Sprawdzenie, czy aktualny czas nie przekracza daty „ważneDo"
+        if (strtotime($pytanie['wazneDo']) < time()) {
+            return false; // Nie można zapisać odpowiedzi po upływie czasu ważności pytania
+        }
+
         $existingAnswer = $this->where([
             'idPyt' => $data['idPyt'],
             'uniidOdp' => $data['uniidOdp']
