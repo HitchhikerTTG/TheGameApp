@@ -1,4 +1,3 @@
-<div class="container mt-3 px-0 mx-0">
 
 <h3>Najbliższe mecze<h3>
 
