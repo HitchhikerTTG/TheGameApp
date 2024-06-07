@@ -31,6 +31,7 @@ class PytaniaModel extends Model{
         $db = \Config\Database::connect();
         $lastQuery = $db->getLastQuery();
         log_message('debug', 'Last Query: ' . $lastQuery);
+        echo $lastQuery;
         return $this->insertID();
     }
 }
