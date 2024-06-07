@@ -1,4 +1,7 @@
 <div class="container mt-3 px-0 mx-0">
+
+<h3>Najbliższe mecze<h3>
+
 <div id="matchesAccordion">
     <?php 
     $lastDate = null;
@@ -120,5 +123,13 @@
         </div>
     <?php endforeach; ?>
     </div> <!-- Close the last date group -->
+</div>
+<div class="row">
+<div class="col">
+typuj wszystkie &raquo;
+</div>
+<div class="col">
+rozegrane mecze &raquo;
+</div>
 </div>
 </div>
