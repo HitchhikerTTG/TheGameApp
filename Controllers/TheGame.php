@@ -11,6 +11,7 @@ use App\Models\TabelaModel;
 use App\Models\KtoWCoGraModel;
 use App\Services\MeczService;
 use App\Models\PytaniaModel;
+use App\Models\OdpowiedziModel;
 $session = \Config\Services::session();
 
 class TheGame extends BaseController
