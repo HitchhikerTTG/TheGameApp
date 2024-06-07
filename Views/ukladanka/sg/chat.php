@@ -15,14 +15,23 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        let lastMessageId = null;
+
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
-                $('#messages').empty();
                 if (data.length > 0) {
                     const lastMessage = data[data.length - 1];
-                    const truncatedMessage = lastMessage.message.length > 45 ? lastMessage.message.substring(0, 45) + '...' : lastMessage.message;
-                    $('#lastMessageText').html('<strong>' + lastMessage.username + ':</strong> ' + truncatedMessage);
+                    if (lastMessageId !== lastMessage.id) {
+                        lastMessageId = lastMessage.id;
+                        const truncatedMessage = lastMessage.message.length > 45 ? lastMessage.message.substring(0, 45) + '...' : lastMessage.message;
+                        $('#lastMessageText').html('<strong>' + lastMessage.username + ':</strong> ' + truncatedMessage);
+                        $('#lastMessage').addClass('highlight');
+                        setTimeout(function() {
+                            $('#lastMessage').removeClass('highlight');
+                        }, 3000);
+                    }
                 }
+                $('#messages').empty();
                 data.forEach(function(message) {
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
