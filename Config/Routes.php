@@ -84,7 +84,6 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('shoutbox', 'ShoutboxController::index');
     $routes->get('shoutbox/getMessages', 'ShoutboxController::getMessages');
     $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');
-    $routes->post('hell/dodajPytanie','AdminDash::dodajPytanie');
 });
 
 
