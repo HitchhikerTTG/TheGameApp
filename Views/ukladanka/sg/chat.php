@@ -12,9 +12,10 @@
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
                 $('#messages').empty();
-                data.slice(-100).reverse().forEach(function(message) { // Get last 100 messages and reverse order
-                    $('#messages').prepend('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
+                data.slice(-100).forEach(function(message) { // Get last 100 messages
+                    $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
                 });
+                $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
             });
         }
 
