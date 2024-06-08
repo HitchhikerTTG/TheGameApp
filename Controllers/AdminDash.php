@@ -410,12 +410,11 @@ public function loadClubs(){
         // Walidacja danych
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'userID' => 'required|integer|is_not_unique[uzytkownicy.uniID]',
+            'userID' => 'required|is_not_unique[uzytkownicy.uniID]',
             'clubID' => 'required|integer|is_not_unique[kluby.id]'
         ], [
             'userID' => [
                 'required' => 'Użytkownik jest wymagany.',
-                'integer' => 'ID użytkownika musi być liczbą całkowitą.',
                 'is_not_unique' => 'Wybrany użytkownik nie istnieje.'
             ],
             'clubID' => [
