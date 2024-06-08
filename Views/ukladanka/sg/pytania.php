@@ -1,6 +1,9 @@
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<div class="section mb-2">
+<h4>Tu odpowiadamy na pytania</h4>
 
 <div class="container mt-3 px-0 mx-0">
+
+
     <?php foreach ($pytania as $pytanie): ?>
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -33,5 +36,6 @@
         <p><a href="/archiwumPytan">Wszystkie dotychczasowe pytania &raquo;</a></p>
     </div>
     
+</div>
 </div>
 </div>

@@ -1,5 +1,7 @@
+<div class="section mb-2">
+<h4>Tu typujemy najblizsze mecze</h4>
 <div class="container mt-3 px-0 mx-0">
-    <h3>Najbliższe mecze</h3>
+
     <div id="matchesAccordion" class="accordion">
         <?php 
         $lastDate = null;
@@ -140,10 +142,11 @@
 <div class="container mt-3 px-0 mx-0">
 <div class="row">
     <div class="col">
-        <p><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></p>
+        <button type="button" class="btn btn-outline-secondary"><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></button>
     </div>
     <div class="col">
         <p><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></p>
     </div>
+</div>
 </div>
 </div>
