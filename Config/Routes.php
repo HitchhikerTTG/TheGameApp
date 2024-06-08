@@ -77,7 +77,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('/tabela', 'Tabela::index');
     $routes->get('/tabela/(:num)', 'Tabela::index/$1');
     //$routes->get('testujemy', 'TheGame::index');
-    $routes->get('nowytest', 'TheGame::testIndex');
+    $routes->get('typowanie', 'TheGame::testIndex');
     //$routes->get('akordeon', 'TheGame::akordeon');
     $routes->get('archiwumturnieju', 'TheGame::archiwum');
     $routes->post('/jaktypowali/(:num)', 'TheGame::wygenerujTypyDlaMeczu/$1');

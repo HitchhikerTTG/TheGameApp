@@ -356,7 +356,7 @@ class Auth extends BaseController
                 if ($this->request->getPost('remember') == '1') {
                     $response = $this->setRememberMeCookie($userInfo['uniID'], $this->request->getUserAgent());
                     if ($userInfo['PlaysTheActiveTournament'] == 1) {
-                        return $response->redirect('nowytest'); // Zwróć odpowiedź z przekierowaniem
+                        return $response->redirect('typowanie'); // Zwróć odpowiedź z przekierowaniem
                     } else {
                         return $response->redirect('/profil'); // Zwróć odpowiedź z przekierowaniem
                     }
@@ -364,7 +364,7 @@ class Auth extends BaseController
 
                 // Przekierowanie w zależności od wartości PlaysTheActiveTournament
                 if ($userInfo['PlaysTheActiveTournament'] == 1) {
-                    return redirect()->to('nowytest');
+                    return redirect()->to('typowanie');
                 } else {
                     return redirect()->to('/profil');
                 }

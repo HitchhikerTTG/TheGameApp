@@ -33,7 +33,7 @@ echo "</pre>";
                 <h5 class="card-title"><?= $gdzieGram['active']['CompetitionName']; ?></h5>
                 <p class="card-text">I tu by było fajnie ogarnąć jakąś logikę</p>
                 <?php if ($gdzieGram['isActiveParticipant']): ?>
-                <a href="/nowytest" class="btn btn-primary">Ić typować &raquo;</a> <?php else: ?> <a href="/Profil/dodajMnieDoTurnieju/<?= esc($userInfo['id']) ?>/<?= esc($gdzieGram['active']['ID'])?>" class="btn btn-primary">Chcę dołączyć</a> <?php  endif; ?> 
+                <a href="/typowanie" class="btn btn-primary">Ić typować &raquo;</a> <?php else: ?> <a href="/Profil/dodajMnieDoTurnieju/<?= esc($userInfo['id']) ?>/<?= esc($gdzieGram['active']['ID'])?>" class="btn btn-primary">Chcę dołączyć</a> <?php  endif; ?> 
             </div>
         </div>
     </div>
