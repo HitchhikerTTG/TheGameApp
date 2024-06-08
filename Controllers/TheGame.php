@@ -371,7 +371,7 @@ class TheGame extends BaseController
     $goldenGame = $this->request->getPost('goldenGame');
 
     if (!$goldenGame){
-        $goldenGame=0;
+        $goldenGame = 0;
     }
 
     $data = [
@@ -387,11 +387,16 @@ class TheGame extends BaseController
     log_message('info', 'Odbierane dane: ' . print_r($data, true));
 
     $typyModel = model(TypyModel::class);
+
     if ($typyModel->zapiszTyp($data)) {
-        if ($goldenGame === 0) {
+        $currentGoldenGame = session()->get('usedGoldenBall');
+        if ($currentGoldenGame == $gameID && $goldenGame == 0) {
             $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
             session()->set('usedGoldenBall', 0);
+        } elseif ($goldenGame == 1) {
+            session()->set('usedGoldenBall', $gameID);
         }
+
         return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
     } else {
         return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
