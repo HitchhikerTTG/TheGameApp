@@ -8,7 +8,7 @@ class ClubMembersModel extends Model{
     
     protected $allowedFields = [				
 			'id',
-			'ClubID',
+			'klubID',
 			'uniID',
 			'memberSince'
     ];
