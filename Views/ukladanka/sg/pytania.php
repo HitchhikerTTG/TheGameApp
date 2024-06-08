@@ -1,4 +1,4 @@
-<div class="section my-3">
+<div class="section my-3 pt-3">
 <h4>Tu odpowiadamy na pytania</h4>
 
 <div class="container mt-3 px-0 mx-0">
