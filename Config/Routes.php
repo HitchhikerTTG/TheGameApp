@@ -61,7 +61,7 @@ $routes->get('/cookie', 'Kalkulator::dejCookie');
     
 $routes->group('', ['filter'=>'authcheck'],function($routes){
     //$routes->get('typowanie', 'Typer::theGame');
-    $routes->get('wszystkieMecze', 'theGame::wszystkieMecze');
+    $routes->get('wszystkieMecze', 'TheGame::wszystkieMecze');
     //$routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');
     //$routes->get('theGame', 'Typer::theGame');
     $routes->get('mojepunkty','ExperimentalTyper::mojePunkty');
