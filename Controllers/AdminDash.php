@@ -391,26 +391,50 @@ public function loadClubs(){
     }
 
 
-     public function assignUserToClub()
-{
+    public function assignUserToClub() {
     $clubMembersModel = model(ClubMembersModel::class);
     $userModel = model(UserModel::class);
     $klubyModel = model(KlubyModel::class);
 
-    if ($this->request->getMethod() === 'post' && $this->validate([
-        'userID' => 'required|is_natural',
-        'clubID' => 'required|is_natural',
-    ])) {
-        $userID = $this->request->getPost('userID');
-        $clubID = $this->request->getPost('clubID');
+    // Walidacja danych
+    $validation = \Config\Services::validation();
+    $validation->setRules([
+        'userID' => 'required|integer|is_not_unique[uzytkownicy.uniID]',
+        'clubID' => 'required|integer|is_not_unique[kluby.id]'
+    ], [
+        'userID' => [
+            'required' => 'Użytkownik jest wymagany.',
+            'integer' => 'ID użytkownika musi być liczbą całkowitą.',
+            'is_not_unique' => 'Wybrany użytkownik nie istnieje.'
+        ],
+        'clubID' => [
+            'required' => 'Klub jest wymagany.',
+            'integer' => 'ID klubu musi być liczbą całkowitą.',
+            'is_not_unique' => 'Wybrany klub nie istnieje.'
+        ]
+    ]);
 
-        if ($clubMembersModel->addUserToClub($userID, $clubID)) {
-            session()->setFlashData('success', 'Użytkownik został przypisany do klubu.');
-        } else {
-            session()->setFlashData('fail', 'Użytkownik jest już przypisany do tego klubu.');
-        }
-        return redirect()->to('/AdminDash/assignUserToClub');
+    if (!$validation->withRequest($this->request)->run()) {
+        session()->setFlashdata('error', $validation->listErrors());
+        return redirect()->back()->withInput();
     }
+
+    $userID = $this->request->getPost('userID');
+    $clubID = $this->request->getPost('clubID');
+
+    if ($clubMembersModel->addUserToClub($userID, $clubID)) {
+        session()->setFlashdata('success', 'Użytkownik został przypisany do klubu.');
+    } else {
+        session()->setFlashdata('error', 'Nie udało się przypisać użytkownika do klubu.');
+    }
+
+    return redirect()->to('/AdminDash/assignUserToClubView');
+}
+
+public function assignUserToClubView() {
+    $userModel = new UserModel();
+    $klubyModel = new KlubyModel();
+    $clubMembersModel = new ClubMembersModel();
 
     $users = $userModel->findAll();
     $clubs = $klubyModel->findAll();
@@ -420,7 +444,7 @@ public function loadClubs(){
     // Filter out users who are already in any club
     $users = array_filter($users, function($user) use ($usersInAnyClub) {
         foreach ($usersInAnyClub as $userInClub) {
-            if ($user['id'] == $userInClub['uniID']) {
+            if ($user['uniID'] == $userInClub['uniID']) {
                 return false;
             }
         }
@@ -431,9 +455,11 @@ public function loadClubs(){
         'users' => $users,
         'clubs' => $clubs,
         'clubMembers' => $clubMembers,
-        'validation' => $this->validator
+        'validation' => \Config\Services::validation()
     ]);
 }
+    
+     
 
     public function removeUserFromClub()
     {
