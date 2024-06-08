@@ -11,7 +11,7 @@
                 if ($lastDate !== null): ?>
                     </div> <!-- Close previous date group -->
                 <?php endif; ?>
-                <div class="row"><div class="col-12"><strong> Data meczu: <?= $matchDate; ?>, <?= $matchTime; ?></strong></div></div>
+                <div class="row"><div class="col-12"><strong> Data meczu: <?= $matchDate; ?>,</strong></div></div>
                 <div class="date-group">
             <?php 
             $lastDate = $matchDate;
@@ -20,7 +20,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading<?= $match['ApiID']; ?>">
                     <button class="accordion-button collapsed px-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
-                        <?= $match['details']['home_team']['name'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['name'] ?? 'Unknown'; ?> | <?= isset($match['typy']['HomeTyp']) ? "Twój typ: {$match['typy']['HomeTyp']}:{$match['typy']['AwayTyp']}" : 'Wytypuj'; ?>
+                        <?= $matchTime; ?> | <?= $match['details']['home_team']['name'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['name'] ?? 'Unknown'; ?> | <?= isset($match['typy']['HomeTyp']) ? "Twój typ: {$match['typy']['HomeTyp']}:{$match['typy']['AwayTyp']}" : 'Wytypuj'; ?>
                     </button>
                 </h2>
                 <div id="collapse<?= $match['ApiID']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $match['ApiID']; ?>">
