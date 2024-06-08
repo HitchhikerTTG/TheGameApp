@@ -459,7 +459,7 @@ public function loadClubs(){
             'validation' => \Config\Services::validation()
         ]);
     }
-}
+
 
 
     public function removeUserFromClub()
