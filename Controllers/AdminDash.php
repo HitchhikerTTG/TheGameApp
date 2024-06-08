@@ -392,13 +392,13 @@ public function loadClubs(){
 
     /* TU ZARZĄDZAMY KLUBAMI I UŻYTKOWNIKAMI */
     
-    public function listClubMembers()
+    /*public function listClubMembers()
     {
         $clubMembersModel = new ClubMembersModel();
         $clubMembers = $clubMembersModel->getAllClubMembers();
         
         return view('administracja/assignUserToClub', ['clubMembers' => $clubMembers]);
-    }
+    }*/
 
 
     public function assignUserToClub()
