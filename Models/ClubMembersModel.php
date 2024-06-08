@@ -53,5 +53,16 @@ class ClubMembersModel extends Model{
 }
 
 
+    public function getAllClubMembers() {
+    return $this->select('users.username, kluby.Nazwa as clubName')
+                ->join('users', 'users.id = clubMembers.uniID')
+                ->join('kluby', 'kluby.id = clubMembers.ClubID')
+                ->findAll();
+}
+
+    public function getUsersInAnyClub() {
+    return $this->select('uniID')->findAll();
+}
+
 }
 ?>

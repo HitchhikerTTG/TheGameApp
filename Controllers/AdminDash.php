@@ -392,35 +392,48 @@ public function loadClubs(){
 
 
      public function assignUserToClub()
-    {
-        $clubMembersModel = model(ClubMembersModel::class);
-        $userModel = model(UserModel::class);
-        $klubyModel = model(KlubyModel::class);
+{
+    $clubMembersModel = model(ClubMembersModel::class);
+    $userModel = model(UserModel::class);
+    $klubyModel = model(KlubyModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
-            'userID' => 'required|is_natural',
-            'clubID' => 'required|is_natural',
-        ])) {
-            $userID = $this->request->getPost('userID');
-            $clubID = $this->request->getPost('clubID');
+    if ($this->request->getMethod() === 'post' && $this->validate([
+        'userID' => 'required|is_natural',
+        'clubID' => 'required|is_natural',
+    ])) {
+        $userID = $this->request->getPost('userID');
+        $clubID = $this->request->getPost('clubID');
 
-            if ($clubMembersModel->addUserToClub($userID, $clubID)) {
-                session()->setFlashData('success', 'Użytkownik został przypisany do klubu.');
-            } else {
-                session()->setFlashData('fail', 'Użytkownik jest już przypisany do tego klubu.');
-            }
-            return redirect()->to('/AdminDash/assignUserToClub');
+        if ($clubMembersModel->addUserToClub($userID, $clubID)) {
+            session()->setFlashData('success', 'Użytkownik został przypisany do klubu.');
+        } else {
+            session()->setFlashData('fail', 'Użytkownik jest już przypisany do tego klubu.');
         }
-
-        $users = $userModel->findAll();
-        $clubs = $klubyModel->findAll();
-
-        return view('administracja/assignUserToClub', [
-            'users' => $users,
-            'clubs' => $clubs,
-            'validation' => $this->validator
-        ]);
+        return redirect()->to('/AdminDash/assignUserToClub');
     }
+
+    $users = $userModel->findAll();
+    $clubs = $klubyModel->findAll();
+    $clubMembers = $clubMembersModel->getAllClubMembers();
+    $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
+
+    // Filter out users who are already in any club
+    $users = array_filter($users, function($user) use ($usersInAnyClub) {
+        foreach ($usersInAnyClub as $userInClub) {
+            if ($user['id'] == $userInClub['uniID']) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    return view('administracja/assignUserToClub', [
+        'users' => $users,
+        'clubs' => $clubs,
+        'clubMembers' => $clubMembers,
+        'validation' => $this->validator
+    ]);
+}
 
     public function removeUserFromClub()
     {
