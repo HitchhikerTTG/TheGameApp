@@ -1,6 +1,6 @@
 <div class="container mt-3 px-0 mx-0">
     <h3>Najbliższe mecze</h3>
-    <div id="matchesAccordion">
+    <div id="matchesAccordion" class="accordion">
         <?php 
         $lastDate = null;
         foreach ($mecze as $match): 
