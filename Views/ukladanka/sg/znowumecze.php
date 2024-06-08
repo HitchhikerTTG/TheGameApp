@@ -69,8 +69,23 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" <?= $match['Id'] == $usedGoldenBall ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
-                                            <label for="goldenGame_<?= $match['Id']; ?>">Golden Game</label>
+<?php
+    $labelText = '';
+
+    if ($usedGoldenBall == 0) {
+        $labelText = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
+    } elseif ($usedGoldenBall == $match['Id']) {
+        $labelText = 'To mój szczęśliwy mecz (pkt x2)';
+    } else {
+        $labelText = 'Inny mecz wybrałem jako szczęśliwy';
+    }
+?>
+<div class="row">
+    <div class="col">
+        <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" <?= $match['Id'] == $usedGoldenBall ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
+        <label for="goldenGame_<?= $match['Id']; ?>"><?= $labelText; ?></label>
+    </div>
+</div>
                                         </div>
                                     </div>
                                     <div class="row text-center">
