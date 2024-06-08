@@ -137,3 +137,13 @@
         <?php endforeach; ?>
     </div> <!-- Close the last date group -->
 </div>
+<div class="container mt-3 px-0 mx-0">
+<div class="row">
+    <div class="col">
+        <p><a href="/wszystkiemecze">Twoje typy na wszystkie mecze &raquo;</a></p>
+    </div>
+    <div class="col">
+        <p><a href="/archiwum">Wyniki rozegranych meczów &raquo;</a></p>
+    </div>
+</div>
+</div>
