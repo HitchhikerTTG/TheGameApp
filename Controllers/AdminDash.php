@@ -449,23 +449,33 @@ public function loadClubs(){
         return redirect()->to('/AdminDash/assignUserToClubView');
     }
 
-    public function assignUserToClubView()
-    {
-        $userModel = model(UserModel::class);
-        $klubyModel = model(KlubyModel::class);
-        $clubMembersModel = model(ClubMembersModel::class);
+    public function assignUserToClubView() {
+    $userModel = model(UserModel::class);
+    $clubMembersModel = model(ClubMembersModel::class);
+    $klubyModel = model(KlubyModel::class);
 
-        $users = $userModel->findAll();
-        $clubs = $klubyModel->findAll();
-        $clubMembers = $clubMembersModel->getAllClubMembers();
+    $users = $userModel->findAll();
+    $clubs = $klubyModel->findAll();
+    $clubMembers = $clubMembersModel->getAllClubMembers();
+    $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
 
-        return view('administracja/assignUserToClub', [
-            'users' => $users,
-            'clubs' => $clubs,
-            'clubMembers' => $clubMembers,
-            'validation' => \Config\Services::validation()
-        ]);
-    }
+    // Filtracja użytkowników, którzy są już w klubach
+    $users = array_filter($users, function($user) use ($usersInAnyClub) {
+        foreach ($usersInAnyClub as $userInClub) {
+            if ($user['uniID'] == $userInClub['uniID']) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    return view('administracja/assignUserToClub', [
+        'users' => $users,
+        'clubs' => $clubs,
+        'clubMembers' => $clubMembers,
+        'validation' => \Config\Services::validation()
+    ]);
+}
 
 
 
