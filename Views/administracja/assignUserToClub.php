@@ -29,7 +29,7 @@ if ($sukces) {
     <label for="userID">Użytkownik:</label>
     <select name="userID">
         <?php foreach ($users as $user): ?>
-            <option value="<?= $user['id'] ?>"><?= $user['nick'] ?></option>
+            <option value="<?= $user['uniID'] ?>"><?= $user['nick'] ?></option>
         <?php endforeach; ?>
     </select>
     <br /><br />
