@@ -361,7 +361,7 @@ class TheGame extends BaseController
         print_r($_COOKIE);
         echo "</pre>";
     }
-
+    
     public function nowyZapisTypu() {
     $userUniId = $this->request->getPost('userUID');
     $gameID = $this->request->getPost('gameID');
@@ -386,15 +386,21 @@ class TheGame extends BaseController
     // Logowanie odbieranych danych
     log_message('info', 'Odbierane dane: ' . print_r($data, true));
 
-
-//    $typyModel = new \App\Models\TypyModel();
     $typyModel = model(TypyModel::class);
     if ($typyModel->zapiszTyp($data)) {
+        if ($goldenGame === 0) {
+            $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
+            session()->set('usedGoldenBall', 0);
+        }
         return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
     } else {
         return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
     }
 }
+    
+    
+    
+    
     
        public function zapiszOdpowiedzNaPytanie()
     {

@@ -104,6 +104,9 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
     return $result ? $result['GameID'] : 0; // Zwraca numer meczu, jeśli użytkownik wykorzystał "GoldenBall", w przeciwnym razie 0
 }
 
+    
+
+
     public function liczbaTypowDlaMeczu($meczID) {
     $builder = $this->builder();
     $builder->where('GameID', $meczID);
@@ -131,5 +134,20 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
             return $this->insert($data);
         }
     }
+
+
+
+    public function removeGoldenGame($userUniId, $gameID, $turniejID)
+    {
+        return $this->where([
+            'uniID' => $userUniId,
+            'GameID' => $gameID,
+            'TurniejID' => $turniejID
+        ])->set(['GoldenGame' => 0])->update();
+        
+        
+    }
+
+
 
 }
