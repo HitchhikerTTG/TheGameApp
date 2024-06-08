@@ -404,17 +404,16 @@ public function loadClubs(){
     public function assignUserToClub()
     {
         $clubMembersModel = model(ClubMembersModel::class);
-        $userModel = model(UserModel::class);
-        $klubyModel = model(KlubyModel::class);
 
         // Walidacja danych
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'userID' => 'required|is_not_unique[uzytkownicy.uniID]',
+            'userID' => 'required|alpha_numeric|is_not_unique[uzytkownicy.uniID]',
             'clubID' => 'required|integer|is_not_unique[kluby.id]'
         ], [
             'userID' => [
                 'required' => 'Użytkownik jest wymagany.',
+                'alpha_numeric' => 'ID użytkownika musi być ciągiem alfanumerycznym.',
                 'is_not_unique' => 'Wybrany użytkownik nie istnieje.'
             ],
             'clubID' => [
@@ -431,6 +430,15 @@ public function loadClubs(){
 
         $userID = $this->request->getPost('userID');
         $clubID = $this->request->getPost('clubID');
+
+        // Sprawdzenie, czy uniID istnieje w tabeli uzytkownicy
+        $userModel = model(UserModel::class);
+        $user = $userModel->where('uniID', $userID)->first();
+
+        if (!$user) {
+            session()->setFlashdata('error', 'Wybrany użytkownik nie istnieje.');
+            return redirect()->back()->withInput();
+        }
 
         if ($clubMembersModel->addUserToClub($userID, $clubID)) {
             session()->setFlashdata('success', 'Użytkownik został przypisany do klubu.');
@@ -458,6 +466,7 @@ public function loadClubs(){
             'validation' => \Config\Services::validation()
         ]);
     }
+
 
 
 
