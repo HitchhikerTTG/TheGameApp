@@ -143,7 +143,7 @@
         <p><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></p>
     </div>
     <div class="col">
-        <p><a href="/archiwum">Wyniki rozegranych meczów &raquo;</a></p>
+        <p><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></p>
     </div>
 </div>
 </div>
