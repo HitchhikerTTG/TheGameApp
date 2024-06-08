@@ -11,3 +11,12 @@
         </form>
     </div>
 <?php endforeach; ?>
+
+<div class="container mt-3 px-0 mx-0">
+<div class="row">
+    <div class="col">
+        <p><a href="/archiwumPytan">Wszystkie dotychczasowe pytania &raquo;</a></p>
+    </div>
+    
+</div>
+</div>

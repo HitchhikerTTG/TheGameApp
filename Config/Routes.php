@@ -44,7 +44,7 @@ $routes->get('/komentarzDoTypera', 'Typer::komentarz');
 $routes->get('/nowykomentarz', 'Komentarz::post');
 $routes->get('/zasady', 'Typer::pokazZasady');
 $routes->get('/', 'LiveScore::index');
-$routes->get('archiwum', 'Archiwum::index');
+$routes->get('archiwum', 'theGame::archiwum');
 $routes->get('eksperyment', 'LiveScore::eksperyment');
 $routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
 $routes->get('przeliczMecz/(:num)','Serwisant::policzPunktyDlaMeczu/$1');
@@ -61,7 +61,7 @@ $routes->get('/cookie', 'Kalkulator::dejCookie');
     
 $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('typowanie', 'Typer::theGame');
-    $routes->get('wszystkieMecze', 'Typer::wszystkieMecze');
+    $routes->get('wszystkieMecze', 'theGame::wszystkieMecze');
     $routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');
     $routes->get('theGame', 'Typer::theGame');
     $routes->get('mojepunkty','ExperimentalTyper::mojePunkty');

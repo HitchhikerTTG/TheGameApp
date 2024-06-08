@@ -241,6 +241,205 @@ class TheGame extends BaseController
     }
 
 
+    public function index($turniejID = null){
+
+        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
+        $jsonString = file_get_contents($configPath);
+        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            
+        if ($turniejID === null) {
+            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
+            $turniejID = $config['activeTournamentId'];
+            $turniejName = $config['activeTournamentName'];
+            } else {
+                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+            }
+
+        $loggedInUserId = session()->get('loggedInUser');
+
+
+        $model = model(TabelaModel::class);
+        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+
+        $userModel = model(UserModel::class);
+        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+
+        $mecze = $this->meczService->getMeczeUzytkownikaWTurnieju($loggedInUserId, $turniejID);
+       // $mecze = $this->meczService->prepareMeczeTurnieju($turniejID);    
+        $pytania = [];
+
+        // Przekazanie danych do widoku
+        $daneTurniejowe = [
+            'tabelaDanych' => $tabelaDanych,
+            'turniejID' => $turniejID,
+            'userID' => session()->get('loggedInUser')
+            //'title' => 'Wit pastwi się nad tabelą'
+            ];
+        
+        $wstep = [
+            'title'=> $turniejName
+        ];
+
+
+        return view('typowanie/header', $wstep)
+                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
+                .view('ukladanka/sg/mecze',['mecze' => $mecze,'turniejID'=>$turniejID])
+                .view('ukladanka/sg/pytania',$pytania)
+                .view('ukladanka/sg/chat')
+                .view('tabela/tabela', $daneTurniejowe)
+                .view('ukladanka/sg/skrypty')
+                .view('typowanie/footer');
+                
+    }
+
+    public function wszystkieMecze($turniejID = null) {
+    $configPath = WRITEPATH . 'ActiveTournament.json'; 
+    $jsonString = file_get_contents($configPath);
+    $config = json_decode($jsonString, true);
+
+    if ($turniejID === null) {
+        $turniejID = $config['activeTournamentId'];
+        $turniejName = $config['activeTournamentName'];
+        $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+    } else {
+        $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+    }
+
+    $loggedInUserId = session()->get('loggedInUser');
+
+    $model = model(TabelaModel::class);
+    $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+
+    $userModel = model(UserModel::class);
+    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+    $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "do_rozegrania");
+
+    // Fetch JSON data for each match
+    foreach ($mecze4 as &$mecz) {
+        $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
+        } else {
+            $mecz['details'] = null;
+        }
+    }
+
+    $daneTurniejowe = [
+        'tabelaDanych' => $tabelaDanych,
+        'turniejID' => $turniejID,
+        'userID' => session()->get('loggedInUser')
+    ];
+    
+    $wstep = [
+        'title'=> $turniejName
+    ];
+    
+
+    return view('typowanie/header', $wstep)
+           .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
+           .view('ukladanka/sg/znowumecze', [
+               'mecze' => $mecze4,
+               'turniejID' => $turniejID,
+               'userID' => $loggedInUserId,
+               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']
+           ])
+           .view('ukladanka/sg/SkryptTypowania')
+           .view('typowanie/footer');
+}
+
+        public function akordeon($turniejID = null){
+        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
+        $jsonString = file_get_contents($configPath);
+        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            
+        if ($turniejID === null) {
+            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
+            $turniejID = $config['activeTournamentId'];
+            $turniejName = $config['activeTournamentName'];
+            $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+            } else {
+                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+            }
+
+        $loggedInUserId = session()->get('loggedInUser');
+
+
+        $model = model(TabelaModel::class);
+        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+
+        $userModel = model(UserModel::class);
+        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        // Pobranie informacji o "GoldenBall" z sesji
+
+        $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+
+#        $mecze = $this->meczService->getMeczeDnia($turniejID);
+       // $mecze = $this->meczService->prepareMeczeTurnieju($turniejID);    
+
+/*       echo "<pre>";
+        print_r($mecze);
+        echo "</pre>";
+
+        $mecze2 = $this->meczService->getMeczeTurnieju($turniejID);
+
+        echo "<p>Aaaa. bo Ty o wszystkie pytałeś:</p><pre>";
+        print_r($mecze2);
+        echo "</pre>";
+
+        $mecze3 = $this->meczService->getMeczeTurniejuDoRozegrania($turniejID);
+
+        echo "<p>A tak po prawdzie, to jeszcze bym chciał wszystkie, które jeszcze nie zostały rozegrane:</p><pre>";
+        print_r($mecze3);
+        echo "</pre>";
+*/
+        $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju,"do_rozegrania");
+
+/*      echo "<p>jeszcze sie okaże, że będę śpiewał hallelujah:</p><pre>";
+        print_r($mecze4);
+        echo "</pre>";
+*/
+/*
+        echo "<p>Jeśli widzisz ten kod, to jest duża szansa</p><pre>";
+        $this->meczService->zapiszDaneDoJson($turniejID, $zewnetrzneIDTurnieju);
+        echo "</pre><p>że pojawiły sie nowe katalogi z odpowiednimi danymi... sprawdź i trzymaj kciuki, a w razie czego chwal pana i wołaj Alleluja</p>";
+*/
+    
+
+
+        $pytania = [];
+        /*
+        //Przekazanie danych do widoku?*/
+
+        $daneTurniejowe = [
+            'tabelaDanych' => $tabelaDanych,
+            'turniejID' => $turniejID,
+            'userID' => session()->get('loggedInUser')
+            //'title' => 'Wit pastwi się nad tabelą'
+            ];
+        
+        $wstep = [
+            'title'=> $turniejName
+        ];
+
+        $userModel = model(UserModel::class);
+        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+
+        return view('typowanie/header', $wstep)
+               .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
+               .view('ukladanka/sg/znowumecze',['mecze' => $mecze4,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])               .view('ukladanka/sg/meczenanowo',['mecze' => $mecze4,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])
+               .view('ukladanka/sg/jeszczejedenskrypt')
+               .view('typowanie/footer');
+
+        
+
+    }
+
+
+
+
     public function archiwum($turniejID=null){
 
         $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
