@@ -1,4 +1,4 @@
-<div class="section mb-2">
+<div class="section my-3">
 <h4>Tu typujemy najblizsze mecze</h4>
 <div class="container mt-3 px-0 mx-0">
 
@@ -145,7 +145,7 @@
         <button type="button" class="btn btn-outline-secondary"><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></button>
     </div>
     <div class="col">
-        <p><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></p>
+        <button type="button" class="btn btn-outline-secondary"><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></button>
     </div>
 </div>
 </div>
