@@ -428,14 +428,6 @@ public function loadClubs(){
         session()->setFlashdata('error', 'Nie udało się przypisać użytkownika do klubu.');
     }
 
-    return redirect()->to('/AdminDash/assignUserToClubView');
-}
-
-public function assignUserToClubView() {
-    $userModel = new UserModel();
-    $klubyModel = new KlubyModel();
-    $clubMembersModel = new ClubMembersModel();
-
     $users = $userModel->findAll();
     $clubs = $klubyModel->findAll();
     $clubMembers = $clubMembersModel->getAllClubMembers();
@@ -458,6 +450,7 @@ public function assignUserToClubView() {
         'validation' => \Config\Services::validation()
     ]);
 }
+
     
      
 
