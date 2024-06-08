@@ -30,12 +30,12 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
-<div class="container mt-3 px-0 mx-0">
+<!--<div class="container mt-3 px-0 mx-0">
 <div class="row">
     <div class="col">
         <p><a href="/archiwumPytan">Wszystkie dotychczasowe pytania &raquo;</a></p>
     </div>
     
 </div>
-</div>
+</div>-->
 </div>
