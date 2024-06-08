@@ -241,57 +241,6 @@ class TheGame extends BaseController
     }
 
 
-    public function index($turniejID = null){
-
-        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-            
-        if ($turniejID === null) {
-            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
-            $turniejID = $config['activeTournamentId'];
-            $turniejName = $config['activeTournamentName'];
-            } else {
-                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
-            }
-
-        $loggedInUserId = session()->get('loggedInUser');
-
-
-        $model = model(TabelaModel::class);
-        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
-
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
-
-        $mecze = $this->meczService->getMeczeUzytkownikaWTurnieju($loggedInUserId, $turniejID);
-       // $mecze = $this->meczService->prepareMeczeTurnieju($turniejID);    
-        $pytania = [];
-
-        // Przekazanie danych do widoku
-        $daneTurniejowe = [
-            'tabelaDanych' => $tabelaDanych,
-            'turniejID' => $turniejID,
-            'userID' => session()->get('loggedInUser')
-            //'title' => 'Wit pastwi się nad tabelą'
-            ];
-        
-        $wstep = [
-            'title'=> $turniejName
-        ];
-
-
-        return view('typowanie/header', $wstep)
-                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
-                .view('ukladanka/sg/mecze',['mecze' => $mecze,'turniejID'=>$turniejID])
-                .view('ukladanka/sg/pytania',$pytania)
-                .view('ukladanka/sg/chat')
-                .view('tabela/tabela', $daneTurniejowe)
-                .view('ukladanka/sg/skrypty')
-                .view('typowanie/footer');
-                
-    }
-
     public function wszystkieMecze($turniejID = null) {
     $configPath = WRITEPATH . 'ActiveTournament.json'; 
     $jsonString = file_get_contents($configPath);
