@@ -401,6 +401,67 @@ public function loadClubs(){
     }
 
 
+    public function assignUserToClub()
+    {
+        $clubMembersModel = model(ClubMembersModel::class);
+        $userModel = model(UserModel::class);
+        $klubyModel = model(KlubyModel::class);
+
+        // Walidacja danych
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'userID' => 'required|integer|is_not_unique[uzytkownicy.uniID]',
+            'clubID' => 'required|integer|is_not_unique[kluby.id]'
+        ], [
+            'userID' => [
+                'required' => 'Użytkownik jest wymagany.',
+                'integer' => 'ID użytkownika musi być liczbą całkowitą.',
+                'is_not_unique' => 'Wybrany użytkownik nie istnieje.'
+            ],
+            'clubID' => [
+                'required' => 'Klub jest wymagany.',
+                'integer' => 'ID klubu musi być liczbą całkowitą.',
+                'is_not_unique' => 'Wybrany klub nie istnieje.'
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            session()->setFlashdata('error', $validation->listErrors());
+            return redirect()->back()->withInput();
+        }
+
+        $userID = $this->request->getPost('userID');
+        $clubID = $this->request->getPost('clubID');
+
+        if ($clubMembersModel->addUserToClub($userID, $clubID)) {
+            session()->setFlashdata('success', 'Użytkownik został przypisany do klubu.');
+        } else {
+            session()->setFlashdata('error', 'Nie udało się przypisać użytkownika do klubu.');
+        }
+
+        return redirect()->to('/AdminDash/assignUserToClubView');
+    }
+
+    public function assignUserToClubView()
+    {
+        $userModel = model(UserModel::class);
+        $klubyModel = model(KlubyModel::class);
+        $clubMembersModel = model(ClubMembersModel::class);
+
+        $users = $userModel->findAll();
+        $clubs = $klubyModel->findAll();
+        $clubMembers = $clubMembersModel->getAllClubMembers();
+
+        return view('administracja/assignUserToClub', [
+            'users' => $users,
+            'clubs' => $clubs,
+            'clubMembers' => $clubMembers,
+            'validation' => \Config\Services::validation()
+        ]);
+    }
+}
+
+
     public function removeUserFromClub()
     {
         $clubMembersModel = model(ClubMembersModel::class);
