@@ -83,7 +83,9 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('/jaktypowali/(:num)', 'TheGame::wygenerujTypyDlaMeczu/$1');
     $routes->get('shoutbox', 'ShoutboxController::index');
     $routes->get('shoutbox/getMessages', 'ShoutboxController::getMessages');
-    $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');   
+    $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');  
+    $routes->match(['get', 'post'], 'hell/przypiszUdoK', 'AdminDash::assignUserToClub');
+    $routes->match(['get', 'post'], 'hell/usunUzK', 'AdminDash::removeUserFromClub'); 
 });
 
 

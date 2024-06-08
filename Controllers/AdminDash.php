@@ -391,6 +391,61 @@ public function loadClubs(){
     }
 
 
+     public function assignUserToClub()
+    {
+        $clubMembersModel = model(ClubMembersModel::class);
+        $userModel = model(UserModel::class);
+        $klubyModel = model(KlubyModel::class);
+
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'userID' => 'required|is_natural',
+            'clubID' => 'required|is_natural',
+        ])) {
+            $userID = $this->request->getPost('userID');
+            $clubID = $this->request->getPost('clubID');
+
+            if ($clubMembersModel->addUserToClub($userID, $clubID)) {
+                session()->setFlashData('success', 'Użytkownik został przypisany do klubu.');
+            } else {
+                session()->setFlashData('fail', 'Użytkownik jest już przypisany do tego klubu.');
+            }
+            return redirect()->to('/AdminDash/assignUserToClub');
+        }
+
+        $users = $userModel->findAll();
+        $clubs = $klubyModel->findAll();
+
+        return view('administracja/assignUserToClub', [
+            'users' => $users,
+            'clubs' => $clubs,
+            'validation' => $this->validator
+        ]);
+    }
+
+    public function removeUserFromClub()
+    {
+        $clubMembersModel = model(ClubMembersModel::class);
+
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'userID' => 'required|is_natural',
+            'clubID' => 'required|is_natural',
+        ])) {
+            $userID = $this->request->getPost('userID');
+            $clubID = $this->request->getPost('clubID');
+
+            if ($clubMembersModel->removeUserFromClub($userID, $clubID)) {
+                session()->setFlashData('success', 'Użytkownik został usunięty z klubu.');
+            } else {
+                session()->setFlashData('fail', 'Nie znaleziono użytkownika w tym klubie.');
+            }
+            return redirect()->to('/AdminDash/removeUserFromClub');
+        }
+
+        return view('administracja/removeUserFromClub', [
+            'validation' => $this->validator
+        ]);
+    }
+
     public function index() {
         // Wczytanie z pliku konfiguracyjnego json:
         $common = new Common();
@@ -436,6 +491,9 @@ public function loadClubs(){
 
 
 
+
+   
+?>
 
 
 
