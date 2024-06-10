@@ -7,7 +7,7 @@
         <button id="minimizeChat" style="position: absolute; top: 10px; right: 10px;">-</button>
         <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
         <form id="shoutboxForm" style="display: flex;">
-            <input type="text" id="message" name="message" placeholder="Enter your message" required style="flex: 4;">
+            <input type="text" id="message" name="message" placeholder="Twoja wiadomość" required style="flex: 4;">
             <button type="submit" style="flex: 1;">➤</button>
         </form>
     </div>

@@ -289,10 +289,20 @@ public function loadClubs(){
     public function dodajKlub()
     {
     $klubModel = model(KlubyModel::class);
-
-        if ($this->request->getMethod() === 'post' && $this->validate([
-            'nazwa' => 'required|min_length[3]|max_length[255]',
-        ])) {
+    
+        $validated = $this->validate([
+            'nazwa' => [
+                'rules'=>'required|min_length[3]|max_length[255]',
+            'errors' =>[
+                'required' =>'Musisz podać nazwę klubu',
+                'min_length' => 'Nazwa klubu mieć co najmniej 3 znaki',
+                'max_length' => 'nazwa klubu nie może przekraczać 255 znaków',
+                ]
+                ],
+                ]);
+        if (!$validated) {
+            return view('administracja/dodajKlub', ['validation' => $this->validator]);
+        } else {
             $daneDoZapisu=[
                 'Nazwa' => $this->request->getPost('nazwa'),
                 'Opis'  => $this->request->getPost('opis'),
@@ -302,7 +312,6 @@ public function loadClubs(){
             return redirect()->to('hell');
         }
 
-        return redirect()->to('/hell');
     }
 
             public function dodajPytanie()
