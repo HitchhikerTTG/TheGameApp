@@ -16,6 +16,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        var emoji = new EmojiConvertor();
+        emoji.img_sets.apple.path = 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/13.0.1/72x72/';
+
         let lastMessageId = null;
 
         function loadMessages() {
@@ -26,7 +29,7 @@
                     if (lastMessageId !== newestMessage.id) {
                         lastMessageId = newestMessage.id;
                         const truncatedMessage = newestMessage.message.length > 45 ? newestMessage.message.substring(0, 45) + '...' : newestMessage.message;
-                        $('#lastMessageText').html('<strong>' + newestMessage.username + ':</strong> ' + truncatedMessage);
+                       $('#lastMessageText').html('<strong>' + newestMessage.username + ':</strong> ' + emoji.replace_colons(truncatedMessage));
                         $('#lastMessage').addClass('highlight');
                         setTimeout(function() {
                             $('#lastMessage').removeClass('highlight');
@@ -34,7 +37,7 @@
                     }
                 }
                 data.forEach(function(message) {
-                    $('#messages').append('<div><strong>' + message.username + ':</strong> ' + message.message + '</div>');
+                    $('#messages').append('<div><strong>' + message.username + ':</strong> ' + emoji.replace_colons(message.message) + '</div>');
                 });
                 $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
             });
@@ -71,9 +74,3 @@
         setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
     });
 </script>
-
-<style>
-    .highlight {
-        background-color: #a5d525;
-    }
-</style>
