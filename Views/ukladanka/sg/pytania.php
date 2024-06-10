@@ -12,13 +12,19 @@
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
                         <div class="form-group">
-                            <label for="odpowiedz_<?= $pytanie['id'] ?>" class="odpowiedz-label">
-                                Twoja odpowiedź: <?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
-                            </label>
-                            <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="display: none;" required>
+                            <?php if (isset($pytanie['dotychczasowa_odpowiedz']) && $pytanie['dotychczasowa_odpowiedz'] != ''): ?>
+                                <label for="odpowiedz_<?= $pytanie['id'] ?>" class="odpowiedz-label">
+                                    Twoja odpowiedź: <?= esc($pytanie['dotychczasowa_odpowiedz']) ?>
+                                </label>
+                                <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= esc($pytanie['dotychczasowa_odpowiedz']) ?>" style="display: none;" required>
+                                <button type="button" class="btn btn-secondary zmien-btn">Zmień</button>
+                                <button type="submit" class="btn btn-primary" style="display: none;">Zapisz</button>
+                            <?php else: ?>
+                                <label for="odpowiedz_<?= $pytanie['id'] ?>">Twoja odpowiedź:</label>
+                                <input type="text" class="form-control" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="" required>
+                                <button type="submit" class="btn btn-primary">Zapisz</button>
+                            <?php endif; ?>
                         </div>
-                        <button type="button" class="btn btn-secondary zmien-btn"><?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Edytuj' ?></button>
-                        <button type="submit" class="btn btn-primary" style="display: none;">Zapisz</button>
                     </form>
                 </div>
                 <div class="card-footer text-muted">
@@ -48,10 +54,9 @@
                         var newAnswer = $form.find('.odpowiedz-input').val();
                         $form.find('.odpowiedz-label').text('Twoja odpowiedź: ' + newAnswer).show();
                         $form.find('.odpowiedz-input').hide();
-                        $form.find('.zmien-btn').text('Zmień').show();
+                        $form.find('.zmien-btn').show();
                         $form.find('[type="submit"]').hide();
                     } else {
-                        // Handle error case
                         alert('Błąd przy zapisywaniu odpowiedzi.');
                     }
                 }, 'json');
