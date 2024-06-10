@@ -1,6 +1,6 @@
 <div class="section my-3 pt-3">
     <h4>Tu odpowiadamy na pytania</h4>
-    <div class="container mt-3 px-0 mx-0">
+    <div class="container mt-3 px-0 mx-0 question-section">
         <?php foreach ($pytania as $pytanie): ?>
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -38,7 +38,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.zmien-btn').click(function() {
+            $('.question-section').on('click', '.zmien-btn', function() {
                 var $form = $(this).closest('form');
                 $form.find('.odpowiedz-label').hide();
                 $form.find('.odpowiedz-input').show();
@@ -46,7 +46,7 @@
                 $form.find('[type="submit"]').show();
             });
 
-            $('.question-form').submit(function(event) {
+            $('.question-section').on('submit', '.question-form', function(event) {
                 event.preventDefault();
                 var $form = $(this);
                 $.post($form.attr('action'), $form.serialize(), function(response) {
@@ -54,7 +54,7 @@
                         var newAnswer = $form.find('.odpowiedz-input').val();
                         $form.find('.odpowiedz-label').text('Twoja odpowiedź: ' + newAnswer).show();
                         $form.find('.odpowiedz-input').hide();
-                        $form.find('.zmien-btn').text('Edytuj').show();
+                        $form.find('.zmien-btn').show();
                         $form.find('[type="submit"]').hide();
                     } else {
                         alert('Błąd przy zapisywaniu odpowiedzi.');
