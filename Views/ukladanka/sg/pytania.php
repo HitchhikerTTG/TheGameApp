@@ -8,7 +8,7 @@
                     <span class="badge badge-primary"><?= esc($pytanie['pkt']) ?> pkt</span>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>">
+                    <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
                         <div class="form-group">
@@ -17,11 +17,11 @@
                                     Twoja odpowiedź: <?= esc($pytanie['dotychczasowa_odpowiedz']) ?>
                                 </label>
                                 <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= esc($pytanie['dotychczasowa_odpowiedz']) ?>" style="display: none;" required>
-                                <button type="button" class="btn btn-secondary zmien-btn">Zmień</button>
+                                <button type="button" class="btn btn-secondary zmien-btn">Edytuj</button>
                                 <button type="submit" class="btn btn-primary" style="display: none;">Zapisz</button>
                             <?php else: ?>
-                                <label for="odpowiedz_<?= $pytanie['id'] ?>">Twoja odpowiedź:</label>
-                                <input type="text" class="form-control" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="" required>
+                                <label for="odpowiedz_<?= $pytanie['id'] ?>" class="odpowiedz-label" style="display: none;">Twoja odpowiedź:</label>
+                                <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="" required>
                                 <button type="submit" class="btn btn-primary">Zapisz</button>
                             <?php endif; ?>
                         </div>
@@ -46,7 +46,7 @@
                 $form.find('[type="submit"]').show();
             });
 
-            $('form').submit(function(event) {
+            $('.question-form').submit(function(event) {
                 event.preventDefault();
                 var $form = $(this);
                 $.post($form.attr('action'), $form.serialize(), function(response) {
@@ -54,7 +54,7 @@
                         var newAnswer = $form.find('.odpowiedz-input').val();
                         $form.find('.odpowiedz-label').text('Twoja odpowiedź: ' + newAnswer).show();
                         $form.find('.odpowiedz-input').hide();
-                        $form.find('.zmien-btn').show();
+                        $form.find('.zmien-btn').text('Edytuj').show();
                         $form.find('[type="submit"]').hide();
                     } else {
                         alert('Błąd przy zapisywaniu odpowiedzi.');
