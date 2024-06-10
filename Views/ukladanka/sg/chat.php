@@ -1,6 +1,6 @@
 <div id="shoutbox">
     <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
-        <span id="lastMessageText" style="flex: 4;"></span>
+        <span id="lastMessageText" style="flex: 8;"></span>
         <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
     </div>
     <div id="messagesContainer" style="display: none; position: relative;">
