@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
 <script>
     $(document).ready(function() {
         var emoji = new EmojiConvertor();
