@@ -40,7 +40,7 @@ class Database extends Config
         /*'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',*/
         'charset'  => 'utf8',
-        'DBCollat' => 'utf8_general_ci',
+        'DBCollat' => 'utf8mb4_general_ci',
         'swapPre'      => '',
         'encrypt'      => false,
         'compress'     => false,
