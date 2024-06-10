@@ -46,9 +46,9 @@
                 });
                 $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Wystąpił błąd: " + textStatus);
-                console.log("Status: " + jqXHR.status);
-                console.log("Odpowiedź serwera: " + jqXHR.responseText);
+                console.error("Wystąpił błąd: " + textStatus);
+                console.error("Status: " + jqXHR.status);
+                console.error("Odpowiedź serwera: " + jqXHR.responseText);
             });
             initialLoad = false; // Set initial load flag to false after first load
         }
@@ -66,16 +66,20 @@
         $('#shoutboxForm').submit(function(event) {
             event.preventDefault();
             $.post('<?= site_url('shoutbox/postMessage'); ?>', { message: $('#message').val() }, function(response) {
-                if (response.status === 'success') {
-                    $('#message').val('');
-                    loadMessages();
-                } else {
-                    console.log("Failed to send message: " + response.message);
+                try {
+                    if (response.status === 'success') {
+                        $('#message').val('');
+                        loadMessages();
+                    } else {
+                        console.error("Failed to send message: " + response.message);
+                    }
+                } catch (e) {
+                    console.error("Failed to parse JSON response: " + e);
                 }
-            }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Wystąpił błąd: " + textStatus);
-                console.log("Status: " + jqXHR.status);
-                console.log("Odpowiedź serwera: " + jqXHR.responseText);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error("Wystąpił błąd: " + textStatus);
+                console.error("Status: " + jqXHR.status);
+                console.error("Odpowiedź serwera: " + jqXHR.responseText);
             });
         });
 
