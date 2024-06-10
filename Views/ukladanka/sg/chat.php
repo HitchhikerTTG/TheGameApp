@@ -1,17 +1,17 @@
-        <div id="shoutbox">
-            <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="lastMessageText" style="flex: 10;"></span>
-                <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
+            <div id="shoutbox">
+                <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="lastMessageText" style="flex: 12;"></span>
+                    <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
+                </div>
+                <div id="messagesContainer" style="display: none; position: relative;">
+                    <button id="minimizeChat" style="position: absolute; top: 10px; right: 10px;">-</button>
+                    <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
+                    <form id="shoutboxForm" style="display: flex;">
+                        <input type="text" id="message" name="message" placeholder="Twoja wiadomość" required style="flex: 10;">
+                        <button type="submit" style="flex: 1;">➤</button>
+                    </form>
+                </div>
             </div>
-            <div id="messagesContainer" style="display: none; position: relative;">
-                <button id="minimizeChat" style="position: absolute; top: 10px; right: 10px;">-</button>
-                <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
-                <form id="shoutboxForm" style="display: flex;">
-                    <input type="text" id="message" name="message" placeholder="Twoja wiadomość" required style="flex: 4;">
-                    <button type="submit" style="flex: 1;">➤</button>
-                </form>
-            </div>
-        </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
 <script>
@@ -20,7 +20,7 @@
         emoji.img_sets.apple.path = 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/13.0.1/72x72/';
 
         let lastMessageId = null;
-        let initialLoad = true; // Flag to check initial load
+        let initialLoad = true; // Flag to check if it's the initial load
 
         function loadMessages() {
             $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
@@ -31,7 +31,9 @@
                         lastMessageId = newestMessage.id;
                         const truncatedMessage = newestMessage.message.length > 45 ? newestMessage.message.substring(0, 45) + '...' : newestMessage.message;
                         $('#lastMessageText').html('<strong>' + newestMessage.username + ':</strong> ' + emoji.replace_colons(truncatedMessage));
-                        if (!initialLoad) { // Apply highlight only if not initial load
+                        
+                        // Highlight only if not the initial load
+                        if (!initialLoad) {
                             $('#lastMessage').addClass('highlight');
                             setTimeout(function() {
                                 $('#lastMessage').removeClass('highlight');
@@ -43,9 +45,12 @@
                     $('#messages').append('<div><strong>' + message.username + ':</strong> ' + emoji.replace_colons(message.message) + '</div>');
                 });
                 $('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
-
-                initialLoad = false; // Set the flag to false after initial load
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Wystąpił błąd: " + textStatus);
+                console.log("Status: " + jqXHR.status);
+                console.log("Odpowiedź serwera: " + jqXHR.responseText);
             });
+            initialLoad = false; // Set initial load flag to false after first load
         }
 
         $('#joinChat').click(function() {
@@ -64,8 +69,14 @@
                 if (response.status === 'success') {
                     $('#message').val('');
                     loadMessages();
+                } else {
+                    console.log("Failed to send message: " + response.message);
                 }
-            }, 'json');
+            }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Wystąpił błąd: " + textStatus);
+                console.log("Status: " + jqXHR.status);
+                console.log("Odpowiedź serwera: " + jqXHR.responseText);
+            });
         });
 
         $('#message').keypress(function(event) {
