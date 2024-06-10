@@ -407,41 +407,39 @@ class TheGame extends BaseController
     
     
     
-       public function zapiszOdpowiedzNaPytanie()
-    {
-        $odpowiedzModel = new OdpowiedziModel();
+     public function zapiszOdpowiedzNaPytanie()
+{
+    $odpowiedzModel = new OdpowiedziModel();
 
-        $validationRules = [
-            'odpowiedz' => [
-                'rules' => 'required|max_length[255]',
-                'errors' => [
-                    'required' => 'Treść odpowiedzi jest wymagana.',
-                    'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
-                ]
-            ],
-            'pytanieID' => 'required|is_natural_no_zero',
-            'uniid' => 'required'
+    $validationRules = [
+        'odpowiedz' => [
+            'rules' => 'required|max_length[255]',
+            'errors' => [
+                'required' => 'Treść odpowiedzi jest wymagana.',
+                'max_length' => 'Treść odpowiedzi nie może przekraczać 255 znaków.'
+            ]
+        ],
+        'pytanieID' => 'required|is_natural_no_zero',
+        'uniid' => 'required'
+    ];
+
+    if ($this->validate($validationRules)) {
+        $data = [
+            'idPyt' => $this->request->getPost('pytanieID'),
+            'odp' => $this->request->getPost('odpowiedz'),
+            'uniidOdp' => $this->request->getPost('uniid'),
+            'kiedyModyfikowana' => date('Y-m-d H:i:s'),
         ];
 
-        if ($this->validate($validationRules)) {
-            $data = [
-                'idPyt' => $this->request->getPost('pytanieID'),
-                'odp' => $this->request->getPost('odpowiedz'),
-                'uniidOdp' => $this->request->getPost('uniid'),
-                'kiedyModyfikowana' => date('Y-m-d H:i:s'),
-            ];
-
-            if ($odpowiedzModel->saveAnswer($data)) {
-                session()->setFlashData('success', 'Twoja odpowiedź została zapisana.');
-            } else {
-                session()->setFlashData('error', 'Wystąpił błąd podczas zapisywania odpowiedzi.');
-            }
+        if ($odpowiedzModel->saveAnswer($data)) {
+            return $this->response->setJSON(['status' => 'success']);
         } else {
-            session()->setFlashData('error', 'Wystąpił błąd podczas walidacji odpowiedzi.');
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Wystąpił błąd podczas zapisywania odpowiedzi.']);
         }
-
-        return redirect()->back();
+    } else {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Wystąpił błąd podczas walidacji odpowiedzi.']);
     }
+}
 
 }
 ?>
