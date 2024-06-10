@@ -39,7 +39,7 @@ class Database extends Config
         'DBDebug'      => true,
         /*'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',*/
-        'charset'  => 'utf8',
+        'charset'  => 'utf8mb4',
         'DBCollat' => 'utf8mb4_general_ci',
         'swapPre'      => '',
         'encrypt'      => false,
