@@ -288,21 +288,20 @@ class Auth extends BaseController
      /**
       * User login method.
       */
-      public function loginUser()
+     public function loginUser()
 {
     // Validating user input.
     $validated = $this->validate([
         'username'=> [
-            'rules' => 'required|is_not_unique[uzytkownicy.nick]',
+            'rules' => 'required',
             'errors' => [
-                'required' => 'Your email is required', 
-                'is_not_unique' => 'Upewnij się, że wprowadzasz dobrą nazwę użytkownika',
+                'required' => 'Musisz podać nazwę użytkownika.', 
             ]
         ],
         'password'=> [
             'rules' => 'required',
             'errors' => [
-                'required' => 'Jeśli chcesz się zalogować, musisz podać hasło', 
+                'required' => 'Musisz podać hasło.', 
             ]
         ],
     ]);
@@ -320,18 +319,23 @@ class Auth extends BaseController
         $userModel = new UserModel();
         $userInfo = $userModel->getUserByNick($nick);
 
+        if(!$userInfo) {
+            session()->setFlashData('fail', 'Użytkownik o podanej nazwie nie istnieje.');
+            return redirect()->to('auth');
+        }
+
         $checkPassword = Hash::check($password, $userInfo['passhash']);
 
         if(!$checkPassword)
         {
-            session()->setFlashData('fail', 'Podajesz błędny nick lub hasło');
+            session()->setFlashData('fail', 'Podajesz błędny nick lub hasło.');
             return redirect()->to('auth');
         }
         else
         {
-            // w tym miejscu powinienem sprawdzić, czy udało mu się aktywować konto, czy nie. Jeśli tak - się logujesz, jeśli nie - się nie logujesz.     
+            // Sprawdzenie aktywacji konta
             if (!$userInfo['activated']) {
-                session()->setFlashData('fail', 'Musisz najpierw aktywować konto - sprawdź skrzynkę i kliknij w link');
+                session()->setFlashData('fail', 'Musisz najpierw aktywować konto - sprawdź skrzynkę i kliknij w link.');
                 return redirect()->to('auth');
             } else {
                 $userId = $userInfo['uniID'];
@@ -372,7 +376,6 @@ class Auth extends BaseController
         }
     }
 }
-      
       /**
        * Log out the user.
        */
