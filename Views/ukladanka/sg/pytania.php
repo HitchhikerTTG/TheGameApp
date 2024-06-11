@@ -25,8 +25,7 @@
     display: none;
 }
 
-.zmien-btn,
-.zapisz-btn {
+.action-btn {
     margin-left: 10px;
 }
 </style>
