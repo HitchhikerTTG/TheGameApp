@@ -1,7 +1,6 @@
 <div class="section my-3 pt-3">
-<h4>Tu typujemy najblizsze mecze</h4>
+<h4>Tu typujemy najbliższe mecze</h4>
 <div class="container mt-3 px-0 mx-0">
-
     <div id="matchesAccordion" class="accordion">
         <?php 
         $lastDate = null;
@@ -29,7 +28,7 @@
                     <div class="accordion-body">
                         <div class="row match form-row text-center">
                             <div class="col">
-                                <form action="/theGame/nowyZapisTypu" method="post">
+                                <form action="/theGame/nowyZapisTypu" method="post" class="betting-form">
                                     <input type="hidden" name="userUID" value="<?= $userID; ?>">
                                     <input type="hidden" name="gameID" value="<?= $match['Id']; ?>">
                                     <input type="hidden" name="turniejID" value="<?= $turniejID; ?>">
@@ -71,23 +70,23 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-<?php
-    $labelText = '';
+                                            <?php
+                                                $labelText = '';
 
-    if ($usedGoldenBall == 0) {
-        $labelText = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
-    } elseif ($usedGoldenBall == $match['Id']) {
-        $labelText = 'To mój szczęśliwy mecz (pkt x2)';
-    } else {
-        $labelText = 'Inny mecz wybrałem jako szczęśliwy';
-    }
-?>
-<div class="row">
-    <div class="col">
-        <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" <?= $match['Id'] == $usedGoldenBall ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
-        <label for="goldenGame_<?= $match['Id']; ?>"><?= $labelText; ?></label>
-    </div>
-</div>
+                                                if ($usedGoldenBall == 0) {
+                                                    $labelText = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
+                                                } elseif ($usedGoldenBall == $match['Id']) {
+                                                    $labelText = 'To mój szczęśliwy mecz (pkt x2)';
+                                                } else {
+                                                    $labelText = 'Inny mecz wybrałem jako szczęśliwy';
+                                                }
+                                            ?>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <input type="checkbox" id="goldenGame<?= $match['Id']; ?>" name="goldenGame" value="1" class="golden-game-checkbox" data-game-id="<?= $match['Id']; ?>" <?= $match['Id'] == $usedGoldenBall ? 'checked' : ''; ?> <?= $usedGoldenBall !== 0 && $usedGoldenBall !== $match['Id'] ? 'disabled' : ''; ?>>
+                                                    <label for="goldenGame_<?= $match['Id']; ?>"><?= $labelText; ?></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row text-center">
