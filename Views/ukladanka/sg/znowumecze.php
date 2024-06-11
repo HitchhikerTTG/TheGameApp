@@ -14,6 +14,7 @@
                 $matchDate = date('Y-m-d', strtotime($match['details']['date']));
                 $matchTime = date('H:i', strtotime($match['details']['time']));
                 $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
+                $isGoldenGame = $match['Id'] == $usedGoldenBall;
                 if ($lastDate !== $matchDate): 
                     if ($lastDate !== null): ?>
                         </div> <!-- Close previous date group -->
@@ -26,7 +27,7 @@
                 
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading<?= $match['ApiID']; ?>">
-                        <button class="accordion-button collapsed px-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
+                        <button class="accordion-button collapsed px-1 <?= $isGoldenGame ? 'golden-header' : ''; ?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
                             <?= $naszCzas; ?> | <?= $match['details']['home_team']['name'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['name'] ?? 'Unknown'; ?> | <?= isset($match['typy']['HomeTyp']) ? "Twój typ: {$match['typy']['HomeTyp']}:{$match['typy']['AwayTyp']}" : 'Wytypuj'; ?>
                         </button>
                     </h2>
