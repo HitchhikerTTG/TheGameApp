@@ -47,13 +47,14 @@
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
                         <div class="form-group">
                             <label class="static-label">Twoja odpowiedź</label>
-                            <div class="input-group d-flex">
+                            <div class="input-group d-flex align-items-center">
                                 <label class="odpowiedz-label flex-grow-1 form-control-plaintext" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
                                     <?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
                                 </label>
                                 <input type="text" class="form-control odpowiedz-input flex-grow-1" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
-                                <button type="button" class="btn btn-outline-secondary zmien-btn flex-shrink-0" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">Zmień</button>
-                                <button type="submit" class="btn btn-outline-secondary zapisz-btn flex-shrink-0" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
+                                <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0">
+                                    <?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?>
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -68,12 +69,18 @@
 
 <script>
 $(document).ready(function() {
-    $('.question-section').on('click', '.zmien-btn', function() {
-        var $form = $(this).closest('form');
-        $form.find('.odpowiedz-label').hide();
-        $form.find('.odpowiedz-input').show().removeClass('form-control-plaintext').addClass('form-control');
-        $(this).hide();
-        $form.find('.zapisz-btn').show();
+    $('.question-section').on('click', '.action-btn', function() {
+        var $btn = $(this);
+        var $form = $btn.closest('form');
+        var isEditing = $btn.text() === 'Zmień';
+
+        if (isEditing) {
+            $form.find('.odpowiedz-label').hide();
+            $form.find('.odpowiedz-input').show().removeClass('form-control-plaintext').addClass('form-control');
+            $btn.text('Zapisz');
+        } else {
+            $form.submit();
+        }
     });
 
     $('.question-section').on('submit', '.question-form', function(event) {
@@ -85,8 +92,7 @@ $(document).ready(function() {
                 var newAnswer = $form.find('.odpowiedz-input').val();
                 $form.find('.odpowiedz-label').text(newAnswer).show();
                 $form.find('.odpowiedz-input').hide().addClass('form-control-plaintext').removeClass('form-control');
-                $form.find('.zmien-btn').show();
-                $form.find('.zapisz-btn').hide();
+                $form.find('.action-btn').text('Zmień');
             } else {
                 alert('Błąd przy zapisywaniu odpowiedzi.');
             }
