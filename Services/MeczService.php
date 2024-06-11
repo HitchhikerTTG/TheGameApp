@@ -373,6 +373,8 @@ function processMatchesData($matchesData) {
                 'name' => $match['away_name']
             ],
             'competition' => $match['competition']['name'],
+            'date' => $match['date'],
+            'time' => $match['time'],
             'naszCzas' => $localTime, // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
