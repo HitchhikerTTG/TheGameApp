@@ -1,4 +1,14 @@
 <style>
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
 .form-control-plaintext {
     display: block;
     width: 100%;
@@ -13,6 +23,11 @@
 
 .odpowiedz-input {
     display: none;
+}
+
+.zmien-btn,
+.zapisz-btn {
+    margin-left: 10px;
 }
 </style>
 
@@ -32,13 +47,13 @@
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
                         <div class="form-group">
                             <label class="static-label">Twoja odpowiedź</label>
-                            <div class="input-group">
-                                <label class="odpowiedz-label form-control-plaintext" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
+                            <div class="input-group d-flex">
+                                <label class="odpowiedz-label flex-grow-1 form-control-plaintext" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
                                     <?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
                                 </label>
-                                <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
-                                <button type="button" class="btn btn-outline-secondary zmien-btn" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">Zmień</button>
-                                <button type="submit" class="btn btn-outline-secondary zapisz-btn" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
+                                <input type="text" class="form-control odpowiedz-input flex-grow-1" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
+                                <button type="button" class="btn btn-outline-secondary zmien-btn flex-shrink-0" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">Zmień</button>
+                                <button type="submit" class="btn btn-outline-secondary zapisz-btn flex-shrink-0" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
                             </div>
                         </div>
                     </form>
@@ -52,7 +67,6 @@
 </div>
 
 <script>
-
 $(document).ready(function() {
     $('.question-section').on('click', '.zmien-btn', function() {
         var $form = $(this).closest('form');
