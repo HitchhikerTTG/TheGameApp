@@ -45,10 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
+            const button = document.querySelector(`#heading${gameId} .accordion-button`);
             if (this.checked) {
-                document.querySelector(`#heading${gameId} .accordion-button`).classList.add('golden-header');
+                button.classList.add('golden-header');
             } else {
-                document.querySelector(`#heading${gameId} .accordion-button`).classList.remove('golden-header');
+                button.classList.remove('golden-header');
             }
         });
 
