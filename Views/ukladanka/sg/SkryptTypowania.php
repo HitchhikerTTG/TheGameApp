@@ -1,7 +1,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const forms = document.querySelectorAll('.betting-form');
-    
+
     forms.forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     button.style.backgroundColor = 'lightgreen';
                     setTimeout(() => { button.style.backgroundColor = ''; }, 1000);
+
+                    // Zamknięcie akordeonu po zapisaniu wyniku meczu
+                    const collapse = accordionItem.querySelector('.accordion-collapse');
+                    collapse.classList.remove('show');
                 } else {
                     alert('Błąd przy zapisywaniu danych');
                 }
@@ -38,10 +42,23 @@ document.addEventListener('DOMContentLoaded', function() {
         checkbox.addEventListener('change', function() {
             const gameId = this.dataset.gameId;
             const allCheckboxes = document.querySelectorAll('.golden-game-checkbox');
-            
+
             allCheckboxes.forEach(cb => {
                 if (cb.dataset.gameId !== gameId) {
                     cb.disabled = this.checked;
+                    const label = document.querySelector(`label[for="goldenGame_${cb.dataset.gameId}"]`);
+                    if (this.checked) {
+                        label.textContent = 'Inny mecz wybrałem jako szczęśliwy';
+                    } else {
+                        label.textContent = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
+                    }
+                } else {
+                    const label = document.querySelector(`label[for="goldenGame_${cb.dataset.gameId}"]`);
+                    if (this.checked) {
+                        label.textContent = 'To mój szczęśliwy mecz (pkt x2)';
+                    } else {
+                        label.textContent = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
+                    }
                 }
             });
 
