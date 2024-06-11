@@ -1,3 +1,4 @@
+<script>
 $(document).ready(function() {
     // Obsługa kliknięć przycisków "+" i "-"
     $('body').on('click', '.plus', function(event) {
@@ -106,3 +107,4 @@ $(document).ready(function() {
         }
     });
 });
+</script>
