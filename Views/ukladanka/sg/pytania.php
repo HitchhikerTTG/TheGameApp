@@ -1,3 +1,20 @@
+<style>
+.form-control-plaintext {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0;
+    margin-bottom: 0;
+    line-height: 1.5;
+    color: #212529;
+    background-color: transparent;
+    border: solid transparent;
+    border-width: 1px 0;
+}
+
+.odpowiedz-input {
+    display: none;
+}
+</style>
 <div class="section my-3 pt-3 question-section">
     <h4>Tu odpowiadamy na pytania</h4>
 
@@ -15,12 +32,12 @@
                         <div class="form-group">
                             <label class="static-label">Twoja odpowiedź</label>
                             <div class="input-group">
-                                <label class="odpowiedz-label form-control" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
+                                <label class="odpowiedz-label form-control-plaintext" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
                                     <?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
                                 </label>
                                 <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
                                 <button type="button" class="btn btn-outline-secondary zmien-btn" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">Zmień</button>
-                                <button type="submit" class="btn btn-outline-secondary" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>"><?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zapisz' : 'Zapisz' ?></button>
+                                <button type="submit" class="btn btn-outline-secondary" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
                             </div>
                         </div>
                     </form>
@@ -33,13 +50,11 @@
     </div>
 </div>
 
-
-<script>
 $(document).ready(function() {
     $('.question-section').on('click', '.zmien-btn', function() {
         var $form = $(this).closest('form');
         $form.find('.odpowiedz-label').hide();
-        $form.find('.odpowiedz-input').show();
+        $form.find('.odpowiedz-input').show().removeClass('form-control-plaintext').addClass('form-control');
         $(this).hide();
         $form.find('[type="submit"]').show();
     });
@@ -48,11 +63,11 @@ $(document).ready(function() {
         event.preventDefault();
         var $form = $(this);
         $.post($form.attr('action'), $form.serialize(), function(response) {
-            console.log("Response from server:", response); // Dodajemy logowanie odpowiedzi z serwera
+            console.log("Response from server:", response);
             if (response.status === 'success') {
                 var newAnswer = $form.find('.odpowiedz-input').val();
                 $form.find('.odpowiedz-label').text(newAnswer).show();
-                $form.find('.odpowiedz-input').hide();
+                $form.find('.odpowiedz-input').hide().addClass('form-control-plaintext').removeClass('form-control');
                 $form.find('.zmien-btn').show();
                 $form.find('[type="submit"]').hide();
             } else {
@@ -65,4 +80,3 @@ $(document).ready(function() {
         });
     });
 });
-</script>
