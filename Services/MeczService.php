@@ -335,8 +335,16 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
 
 
 
-
 // Aby sparsować ten JSON i przetworzyć dane w taki sposób, aby zawierały tylko wybrane pola oraz dodatkowe informacje, a następnie zapisać je do odrębnych plików JSON dla każdego meczu, możesz użyć poniższego podejścia w PHP. Przygotowałem przykład, jak to zrobić krok po kroku:
+
+### Krok 0: Przygotowanie funkcji do aktualizacji czasu / przepisanie go na localTime;
+
+function convertToTimezone($dateTime, $timezone) {
+    $date = new DateTime($dateTime, new DateTimeZone('UTC'));
+    $date->setTimezone(new DateTimeZone($timezone));
+    return $date->format('H:i:s');
+}
+
 
 ### Krok 1: Parsowanie i filtracja danych
 
@@ -345,13 +353,17 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
 
 function processMatchesData($matchesData) {
     $processedMatches = [];
+    $userTimezone = 'Europe/Warsaw'; // Zmienna przechowująca strefę czasową użytkownika. Możesz ją dynamicznie ustawić.
 
     foreach ($matchesData as $match) {
+        // Konwersja czasu meczu z UTC na lokalny czas
+        $localTime = $this->convertToTimezone($match['date'] . ' ' . $match['time'], $userTimezone);
+
         // Wybieranie tylko niezbędnych pól
         $processedMatch = [
             'match_id' => $match['id'],
-            'status'=>'PreMecz',
-            'OstatniaAktualizacja'=>date('Y-m-d H:i:s'), // Dodanie daty i czasu ostatniej aktualizacji
+            'status' => 'PreMecz',
+            'OstatniaAktualizacja' => date('Y-m-d H:i:s'), // Dodanie daty i czasu ostatniej aktualizacji
             'home_team' => [
                 'id' => $match['home_id'],
                 'name' => $match['home_name']
@@ -361,8 +373,7 @@ function processMatchesData($matchesData) {
                 'name' => $match['away_name']
             ],
             'competition' => $match['competition']['name'],
-            'date' => $match['date'],
-            'time' => $match['time'],
+            'naszCzas' => $localTime, // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
             'additional_info' => 'Any additional info here' // Przykład dodawania nowych pól
