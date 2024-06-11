@@ -38,7 +38,7 @@
                                 </label>
                                 <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
                                 <button type="button" class="btn btn-outline-secondary zmien-btn" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">Zmień</button>
-                                <button type="submit" class="btn btn-outline-secondary" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
+                                <button type="submit" class="btn btn-outline-secondary zapisz-btn" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>">Zapisz</button>
                             </div>
                         </div>
                     </form>
@@ -50,6 +50,7 @@
         <?php endforeach; ?>
     </div>
 </div>
+
 <script>
 
 $(document).ready(function() {
@@ -58,7 +59,7 @@ $(document).ready(function() {
         $form.find('.odpowiedz-label').hide();
         $form.find('.odpowiedz-input').show().removeClass('form-control-plaintext').addClass('form-control');
         $(this).hide();
-        $form.find('[type="submit"]').show();
+        $form.find('.zapisz-btn').show();
     });
 
     $('.question-section').on('submit', '.question-form', function(event) {
@@ -71,7 +72,7 @@ $(document).ready(function() {
                 $form.find('.odpowiedz-label').text(newAnswer).show();
                 $form.find('.odpowiedz-input').hide().addClass('form-control-plaintext').removeClass('form-control');
                 $form.find('.zmien-btn').show();
-                $form.find('[type="submit"]').hide();
+                $form.find('.zapisz-btn').hide();
             } else {
                 alert('Błąd przy zapisywaniu odpowiedzi.');
             }
@@ -82,3 +83,4 @@ $(document).ready(function() {
         });
     });
 });
+</script>
