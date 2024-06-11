@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            const button = document.querySelector(`#heading${gameId} .accordion-button`);
+            const button = document.querySelector(`#collapse${gameId}`).closest('.accordion-item').querySelector('.accordion-button');
             if (this.checked) {
                 button.classList.add('golden-header');
             } else {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (checkbox.checked) {
-            document.querySelector(`#heading${checkbox.dataset.gameId} .accordion-button`).classList.add('golden-header');
+            document.querySelector(`#collapse${checkbox.dataset.gameId}`).closest('.accordion-item').querySelector('.accordion-button').classList.add('golden-header');
         }
     });
 
@@ -82,5 +82,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 </script>
