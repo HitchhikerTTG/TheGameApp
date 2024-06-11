@@ -7,6 +7,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-question-circle"></i> <?= esc($pytanie['tresc']) ?></span>
                     <span class="badge badge-primary"><?= esc($pytanie['pkt']) ?> pkt</span>
+                    <span class="badge badge-pill badge-info">Info</span>
                 </div>
                 <div class="card-body">
                     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
