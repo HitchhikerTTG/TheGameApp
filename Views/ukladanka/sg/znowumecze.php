@@ -1,6 +1,6 @@
 <style>
 .golden-header {
-    background-color: gold;
+    background-color: #FFDF6E !important;
 }
 </style>
 <div class="section my-3 pt-3">
