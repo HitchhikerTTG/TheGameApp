@@ -48,13 +48,11 @@
                         <div class="form-group">
                             <label class="static-label">Twoja odpowiedź</label>
                             <div class="input-group d-flex align-items-center">
-                                <label class="odpowiedz-label flex-grow-1 form-control-plaintext" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:block;' : 'display:none;' ?>">
-                                    <?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
-                                </label>
-                                <input type="text" class="form-control odpowiedz-input flex-grow-1" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'display:none;' : 'display:block;' ?>" required>
-                                <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0">
-                                    <?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?>
-                                </button>
+                                <span class="flex-grow-1 odpowiedz-container">
+                                    <label class="odpowiedz-label form-control-plaintext"><?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?></label>
+                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= isset($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="display: none;" required>
+                                </span>
+                                <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0"><?= isset($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?></button>
                             </div>
                         </div>
                     </form>
@@ -72,11 +70,13 @@ $(document).ready(function() {
     $('.question-section').on('click', '.action-btn', function() {
         var $btn = $(this);
         var $form = $btn.closest('form');
+        var $input = $form.find('.odpowiedz-input');
+        var $label = $form.find('.odpowiedz-label');
         var isEditing = $btn.text() === 'Zmień';
 
         if (isEditing) {
-            $form.find('.odpowiedz-label').hide();
-            $form.find('.odpowiedz-input').show().removeClass('form-control-plaintext').addClass('form-control');
+            $label.hide();
+            $input.show().focus();
             $btn.text('Zapisz');
         } else {
             $form.submit();
@@ -90,8 +90,10 @@ $(document).ready(function() {
             console.log("Response from server:", response);
             if (response.status === 'success') {
                 var newAnswer = $form.find('.odpowiedz-input').val();
-                $form.find('.odpowiedz-label').text(newAnswer).show();
-                $form.find('.odpowiedz-input').hide().addClass('form-control-plaintext').removeClass('form-control');
+                var $label = $form.find('.odpowiedz-label');
+                var $input = $form.find('.odpowiedz-input');
+                $label.text(newAnswer).show();
+                $input.hide();
                 $form.find('.action-btn').text('Zmień');
             } else {
                 alert('Błąd przy zapisywaniu odpowiedzi.');
