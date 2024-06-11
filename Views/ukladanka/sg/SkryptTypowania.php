@@ -1,131 +1,85 @@
 <script>
-$(document).ready(function() {
-    // Obsługa kliknięć przycisków "+" i "-"
-    $('body').on('click', '.plus', function(event) {
-        event.preventDefault();
-        var $scoreDisplay = $(this).closest('.team').find('.score-display');
-        var $scoreValue = $(this).closest('.team').find('.score-value');
-        var currentVal = isNaN(parseInt($scoreDisplay.text())) ? 0 : parseInt($scoreDisplay.text());
-        currentVal++;
-        $scoreDisplay.text(currentVal);
-        $scoreValue.val(currentVal);
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.betting-form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const url = this.action;
 
-    $('body').on('click', '.minus', function(event) {
-        event.preventDefault();
-        var $scoreDisplay = $(this).closest('.team').find('.score-display');
-        var $scoreValue = $(this).closest('.team').find('.score-value');
-        var currentVal = parseInt($scoreDisplay.text()) || 0;
-        if (currentVal > 0) {
-            currentVal--;
-        } else if ($scoreDisplay.text().trim() === '') {
-            currentVal = 0;
-        }
-        $scoreDisplay.text(currentVal);
-        $scoreValue.val(currentVal);
-    });
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const newTypText = data.newTypText;
+                    const accordionItem = this.closest('.accordion-item');
+                    const button = accordionItem.querySelector('.accordion-button');
+                    const oldText = button.innerText;
+                    const newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText);
+                    button.innerText = newText;
 
-    // Obsługa rozwijania i zwijania akordeonu z zachowaniem stanu w localStorage
-    $('.accordion-collapse').on('shown.bs.collapse', function () {
-        let id = this.id;
-        localStorage.setItem(`details-${id}`, 'true');
-    });
-
-    $('.accordion-collapse').on('hidden.bs.collapse', function () {
-        let id = this.id;
-        localStorage.setItem(`details-${id}`, 'false');
-    });
-
-    $('.accordion-collapse').each(function () {
-        let id = this.id;
-        let isOpen = localStorage.getItem(`details-${id}`) === 'true';
-        if (isOpen) {
-            $(`#${id}`).addClass('show');
-        } else {
-            $(`#${id}`).removeClass('show');
-        }
-    });
-
-    // Obsługa przesyłania formularza AJAX
-    $('body').on('submit', '.betting-form', function(event) {
-        event.preventDefault(); // Zapobiega standardowej wysyłce formularza
-
-        var form = $(this);
-        var url = form.attr('action'); // URL z atrybutu action formularza
-        var data = form.serialize(); // Serializacja danych formularza
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: data,
-            success: function(response) {
-                if (response.success) {
-                    var newTypText = response.newTypText;
-                    var button = form.closest('.accordion-item').find('.accordion-button');
-                    var oldText = button.text();
-                    var newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText);
-                    button.text(newText);
-
-                    // Animacja podświetlenia na zielono
-                    button.css('background-color', 'lightgreen');
-                    setTimeout(function() { button.css('background-color', ''); }, 1000);
+                    button.style.backgroundColor = 'lightgreen';
+                    setTimeout(() => { button.style.backgroundColor = ''; }, 1000);
                 } else {
-                    alert('Błąd przy zapisywaniu typu.');
+                    alert('Błąd przy zapisywaniu danych');
                 }
-            },
-            error: function(xhr, status, error) {
+            })
+            .catch(error => {
                 console.error('Wystąpił błąd: ', error);
-                alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+            });
+        });
+    });
+
+    document.querySelectorAll('.golden-game-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const gameId = this.dataset.gameId;
+            const allCheckboxes = document.querySelectorAll('.golden-game-checkbox');
+            
+            allCheckboxes.forEach(cb => {
+                if (cb.dataset.gameId !== gameId) {
+                    cb.disabled = this.checked;
+                }
+            });
+
+            if (this.checked) {
+                document.querySelector(`#heading${gameId} .accordion-button`).classList.add('golden-header');
+            } else {
+                document.querySelector(`#heading${gameId} .accordion-button`).classList.remove('golden-header');
             }
         });
 
-        // Zwinąć akordeon po przesłaniu formularza
-        var accordionId = form.closest('.accordion-collapse').attr('id');
-        $(`#${accordionId}`).collapse('hide');
-        localStorage.setItem(`details-${accordionId}`, 'false');
-    });
-
-    // Obsługa zmiany statusu "Golden Ball"
-    $('body').on('change', '.golden-game-checkbox', function() {
-        var checkbox = $(this);
-        var isChecked = checkbox.is(':checked');
-        var gameId = checkbox.data('game-id');
-        var accordionItem = checkbox.closest('.accordion-item');
-
-        if (isChecked) {
-            // Odznaczenie innych checkboxów
-            $('.golden-game-checkbox').not(checkbox).prop('checked', false).prop('disabled', true);
-
-            // Ustawienie etykiet
-            $('.golden-game-checkbox').not(checkbox).siblings('label').text('Inny mecz wybrałem jako szczęśliwy');
-            checkbox.siblings('label').text('To mój szczęśliwy mecz (pkt x2)');
-
-            // Dodanie klasy golden-header
-            $('.accordion-header').removeClass('golden-header'); // Usuń klasę z innych elementów
-            accordionItem.find('.accordion-header').addClass('golden-header');
-        } else {
-            // Przywrócenie możliwości zaznaczenia innych checkboxów
-            $('.golden-game-checkbox').prop('disabled', false);
-
-            // Ustawienie etykiet
-            $('.golden-game-checkbox').siblings('label').text('Za ten mecz chcę otrzymać 2 x więcej punktów');
-
-            // Usunięcie klasy golden-header
-            accordionItem.find('.accordion-header').removeClass('golden-header');
+        if (checkbox.checked) {
+            document.querySelector(`#heading${checkbox.dataset.gameId} .accordion-button`).classList.add('golden-header');
         }
     });
 
-    // Początkowe ustawienie klasy golden-header na podstawie stanu checkboxów
-    $('.golden-game-checkbox').each(function() {
-        var checkbox = $(this);
-        var isChecked = checkbox.is(':checked');
-        var accordionItem = checkbox.closest('.accordion-item');
+    document.querySelectorAll('.plus').forEach(button => {
+        button.addEventListener('click', function() {
+            const scoreDisplay = this.closest('.team').querySelector('.score-display');
+            const scoreValue = this.closest('.team').querySelector('.score-value');
+            let currentVal = parseInt(scoreDisplay.textContent) || 0;
+            currentVal++;
+            scoreDisplay.textContent = currentVal;
+            scoreValue.value = currentVal;
+        });
+    });
 
-        if (isChecked) {
-            accordionItem.find('.accordion-header').addClass('golden-header');
-        } else {
-            accordionItem.find('.accordion-header').removeClass('golden-header');
-        }
+    document.querySelectorAll('.minus').forEach(button => {
+        button.addEventListener('click', function() {
+            const scoreDisplay = this.closest('.team').querySelector('.score-display');
+            const scoreValue = this.closest('.team').querySelector('.score-value');
+            let currentVal = parseInt(scoreDisplay.textContent) || 0;
+            if (currentVal > 0) {
+                currentVal--;
+            }
+            scoreDisplay.textContent = currentVal;
+            scoreValue.value = currentVal;
+        });
     });
 });
+
 </script>
