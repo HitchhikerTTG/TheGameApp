@@ -1,8 +1,34 @@
 <style>
-.golden-header {
-    background-color: #FFDF6E !important;
-}
+  .custom-accordion-gold {
+    background-color: #FFDF6E;
+  }
+  .custom-accordion-button {
+    background-color: #0066cc;
+    color: white;
+  }
+  .custom-accordion-body {
+    background-color: #f2f2f2;
+  }
 </style>
+
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item custom-accordion-item">
+    <h2 class="accordion-header custom-accordion-gold" id="headingOne">
+      <button class="accordion-button custom-accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Accordion Item #1
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body custom-accordion-body">
+        This is the first item's accordion body.
+      </div>
+    </div>
+  </div>
+  <!-- Kolejne elementy akordeonu -->
+</div>
+
+
+
 <div class="section my-3 pt-3">
 <h4>Tu typujemy najbliższe mecze</h4>
 <div class="container mt-3 px-0 mx-0">
