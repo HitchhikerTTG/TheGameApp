@@ -320,7 +320,7 @@ class Auth extends BaseController
         $userInfo = $userModel->getUserByNick($nick);
 
         if(!$userInfo) {
-            session()->setFlashData('fail', 'Użytkownik o podanej nazwie nie istnieje.');
+            session()->setFlashData('fail', 'Podajesz błędny nick lub hasło.');
             return redirect()->to('auth');
         }
 
