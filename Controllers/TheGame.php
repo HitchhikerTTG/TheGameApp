@@ -256,7 +256,7 @@ class TheGame extends BaseController
 
     $loggedInUserId = session()->get('loggedInUser');
 
-    $model = model(TabelaModel::class);
+        $model = model(TabelaModel::class);
     $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
 
     $userModel = model(UserModel::class);

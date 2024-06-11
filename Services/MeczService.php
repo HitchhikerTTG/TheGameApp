@@ -340,8 +340,8 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
 ### Krok 0: Przygotowanie funkcji do aktualizacji czasu / przepisanie go na localTime;
 
 function convertToTimezone($dateTime, $timezone) {
-    $date = new DateTime($dateTime, new DateTimeZone('UTC'));
-    $date->setTimezone(new DateTimeZone($timezone));
+    $date = new \DateTime($dateTime, new \DateTimeZone('UTC'));
+    $date->setTimezone(new \DateTimeZone($timezone));
     return $date->format('H:i:s');
 }
 
