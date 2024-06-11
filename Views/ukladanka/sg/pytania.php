@@ -15,6 +15,7 @@
     display: none;
 }
 </style>
+
 <div class="section my-3 pt-3 question-section">
     <h4>Tu odpowiadamy na pytania</h4>
 
@@ -49,6 +50,7 @@
         <?php endforeach; ?>
     </div>
 </div>
+<script>
 
 $(document).ready(function() {
     $('.question-section').on('click', '.zmien-btn', function() {
@@ -80,3 +82,4 @@ $(document).ready(function() {
         });
     });
 });
+</script>
