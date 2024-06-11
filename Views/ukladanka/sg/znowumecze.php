@@ -1,3 +1,8 @@
+<style>
+.golden-header {
+    background-color: gold;
+}
+</style>
 <div class="section my-3 pt-3">
 <h4>Tu typujemy najbliższe mecze</h4>
 <div class="container mt-3 px-0 mx-0">

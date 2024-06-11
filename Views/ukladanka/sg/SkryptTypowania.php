@@ -90,6 +90,7 @@ $(document).ready(function() {
         var checkbox = $(this);
         var isChecked = checkbox.is(':checked');
         var gameId = checkbox.data('game-id');
+        var accordionItem = checkbox.closest('.accordion-item');
 
         if (isChecked) {
             // Odznaczenie innych checkboxów
@@ -98,12 +99,32 @@ $(document).ready(function() {
             // Ustawienie etykiet
             $('.golden-game-checkbox').not(checkbox).siblings('label').text('Inny mecz wybrałem jako szczęśliwy');
             checkbox.siblings('label').text('To mój szczęśliwy mecz (pkt x2)');
+
+            // Dodanie klasy golden-header
+            $('.accordion-header').removeClass('golden-header'); // Usuń klasę z innych elementów
+            accordionItem.find('.accordion-header').addClass('golden-header');
         } else {
             // Przywrócenie możliwości zaznaczenia innych checkboxów
             $('.golden-game-checkbox').prop('disabled', false);
 
             // Ustawienie etykiet
             $('.golden-game-checkbox').siblings('label').text('Za ten mecz chcę otrzymać 2 x więcej punktów');
+
+            // Usunięcie klasy golden-header
+            accordionItem.find('.accordion-header').removeClass('golden-header');
+        }
+    });
+
+    // Początkowe ustawienie klasy golden-header na podstawie stanu checkboxów
+    $('.golden-game-checkbox').each(function() {
+        var checkbox = $(this);
+        var isChecked = checkbox.is(':checked');
+        var accordionItem = checkbox.closest('.accordion-item');
+
+        if (isChecked) {
+            accordionItem.find('.accordion-header').addClass('golden-header');
+        } else {
+            accordionItem.find('.accordion-header').removeClass('golden-header');
         }
     });
 });
