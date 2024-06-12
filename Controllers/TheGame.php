@@ -363,45 +363,49 @@ class TheGame extends BaseController
     }
     
     public function nowyZapisTypu() {
-    $userUniId = $this->request->getPost('userUID');
-    $gameID = $this->request->getPost('gameID');
-    $homeScore = $this->request->getPost('H');
-    $awayScore = $this->request->getPost('A');
-    $turniejID = $this->request->getPost('turniejID');
-    $goldenGame = $this->request->getPost('goldenGame');
+        $userUniId = $this->request->getPost('userUID');
+        $gameID = $this->request->getPost('gameID');
+        $homeScore = $this->request->getPost('H');
+        $awayScore = $this->request->getPost('A');
+        $turniejID = $this->request->getPost('turniejID');
+        $goldenGame = $this->request->getPost('goldenGame');
 
-    if (!$goldenGame){
-        $goldenGame = 0;
-    }
-
-    $data = [
-        'uniID' => $userUniId,
-        'GameID' => $gameID,
-        'HomeTyp' => $homeScore,
-        'AwayTyp' => $awayScore,
-        'TurniejID' => $turniejID,
-        'GoldenGame' => $goldenGame
-    ];
-
-    // Logowanie odbieranych danych
-    log_message('info', 'Odbierane dane: ' . print_r($data, true));
-
-    $typyModel = model(TypyModel::class);
-
-    if ($typyModel->zapiszTyp($data)) {
-        $currentGoldenGame = session()->get('usedGoldenBall');
-        if ($currentGoldenGame == $gameID && $goldenGame == 0) {
-            $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
-            session()->set('usedGoldenBall', 0);
-        } elseif ($goldenGame == 1) {
-            session()->set('usedGoldenBall', $gameID);
+        if (!$goldenGame) {
+            $goldenGame = 0;
         }
 
-        return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
-    } else {
-        return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
+        $data = [
+            'uniID' => $userUniId,
+            'gameID' => $gameID,
+            'HomeTyp' => $homeScore,
+            'AwayTyp' => $awayScore,
+            'TurniejID' => $turniejID,
+            'GoldenGame' => $goldenGame
+        ];
+
+        $typyModel = model(TypyModel::class);
+
+        // Check if the typ can be saved based on the match time
+        if (!$typyModel->canSaveTyp($gameID)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
+        }
+
+        if ($typyModel->zapiszTyp($data)) {
+            $currentGoldenGame = session()->get('usedGoldenBall');
+            if ($currentGoldenGame == $gameID && $goldenGame == 0) {
+                $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
+                session()->set('usedGoldenBall', 0);
+            } elseif ($goldenGame == 1) {
+                session()->set('usedGoldenBall', $gameID);
+            }
+
+            return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
+        } else {
+            return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
+        }
     }
-}
+    
+    
     
     
     

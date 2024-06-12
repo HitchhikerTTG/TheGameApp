@@ -18,6 +18,7 @@ class TypyModel extends Model{
         'GoldenGame',
         'uniID'
     ];
+    protected $terminarzModel;
 
     public function punktyZaMecze($userId, $turniejId) {
         $builder = $this->builder();
@@ -121,7 +122,26 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
         return $builder->get()->getResultArray();
     }
 
+
+// Funkcja sprawdzajaca czy próbujemy zaktualizować typ po czasie, weryfikujac godzinę w bazie danych (utc to utc)
+
+        public function canSaveTyp($gameID)
+    {
+        $this->terminarzModel = new TerminarzModel();
+
+        $match = $this->terminarzModel->getMatchDateTime($gameID);
+        $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
+        $currentTime = time();
+
+        return $currentTime <= $matchTime;
+    }
+
     public function zapiszTyp($data) {
+       if (!$this->canSaveTyp($data['gameID'])) {
+            return false;
+        }
+        
+        
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
         $warunki->where('GameID', $data['GameID']);
@@ -151,3 +171,4 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
 
 
 }
+
