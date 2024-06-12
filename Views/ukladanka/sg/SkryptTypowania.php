@@ -1,8 +1,6 @@
-<script>
 document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('.betting-form');
-
-    forms.forEach(form => {
+    // Obsługa formularzy typowania
+    document.querySelectorAll('.betting-form').forEach(form => {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -37,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Obsługa wyboru złotego meczu
     document.querySelectorAll('.golden-game-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const gameId = this.dataset.gameId;
@@ -69,16 +68,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // Ustawienie odpowiedniego stylu dla już zaznaczonych checkboxów
         if (checkbox.checked) {
             const button = document.querySelector(`#collapse${checkbox.dataset.gameId}`).closest('.accordion-item').querySelector('.accordion-button');
             button.classList.add('golden-header');
         }
     });
 
+    // Obsługa przycisków plus
     document.querySelectorAll('.plus').forEach(button => {
         button.addEventListener('click', function() {
-            const scoreDisplay = this.closest('.team').querySelector('.score-display');
-            const scoreValue = this.closest('.team').querySelector('.score-value');
+            const teamContainer = this.closest('.team');
+            const scoreDisplay = teamContainer.querySelector('.score-display');
+            const scoreValue = teamContainer.querySelector('.score-value');
             let currentVal = parseInt(scoreDisplay.textContent) || 0;
             currentVal++;
             scoreDisplay.textContent = currentVal;
@@ -86,10 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Obsługa przycisków minus
     document.querySelectorAll('.minus').forEach(button => {
         button.addEventListener('click', function() {
-            const scoreDisplay = this.closest('.team').querySelector('.score-display');
-            const scoreValue = this.closest('.team').querySelector('.score-value');
+            const teamContainer = this.closest('.team');
+            const scoreDisplay = teamContainer.querySelector('.score-display');
+            const scoreValue = teamContainer.querySelector('.score-value');
             let currentVal = parseInt(scoreDisplay.textContent) || 0;
             if (currentVal > 0) {
                 currentVal--;
@@ -99,4 +103,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-</script>
