@@ -106,5 +106,20 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('minus');
         });
     });
+    document.addEventListener('DOMContentLoaded', function() {
+    // Obsługa przycisków plus
+    document.querySelectorAll('.zplusem button').forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('naciśnięto plus');
+        });
+    });
+
+    // Obsługa przycisków minus
+    document.querySelectorAll('.zminusem button').forEach(button => {
+        button.addEventListener('click', function() {
+            console.log('naciśnięto minus');
+        });
+    });
+});
 });
 </script>
