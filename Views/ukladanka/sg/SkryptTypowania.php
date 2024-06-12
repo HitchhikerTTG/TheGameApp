@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.style.backgroundColor = 'lightgreen';
                     setTimeout(() => { button.style.backgroundColor = ''; }, 1000);
 
-                    // Zamknięcie akordeonu po zapisaniu wyniku meczu
                     const collapse = accordionItem.querySelector('.accordion-collapse');
                     collapse.classList.remove('show');
                 } else {
