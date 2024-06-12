@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentVal++;
             scoreDisplay.textContent = currentVal;
             scoreValue.value = currentVal;
+            console.log('plus');
         });
     });
 
@@ -102,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             scoreDisplay.textContent = currentVal;
             scoreValue.value = currentVal;
+            console.log('minus');
         });
     });
 });
