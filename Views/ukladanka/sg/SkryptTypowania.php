@@ -1,3 +1,5 @@
+<script> 
+
 document.addEventListener('DOMContentLoaded', function() {
     // Obsługa formularzy typowania
     document.querySelectorAll('.betting-form').forEach(form => {
@@ -103,3 +105,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
