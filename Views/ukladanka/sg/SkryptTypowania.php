@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
             allCheckboxes.forEach(cb => {
                 if (cb.dataset.gameId !== gameId) {
                     cb.disabled = this.checked;
-                    const label = document.querySelector(`label[for="goldenGame_${cb.dataset.gameId}"]`);
+                    const label = document.querySelector(`label[for="goldenGame${cb.dataset.gameId}"]`);
                     if (this.checked) {
                         label.textContent = 'Inny mecz wybrałem jako szczęśliwy';
                     } else {
                         label.textContent = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
                     }
                 } else {
-                    const label = document.querySelector(`label[for="goldenGame_${cb.dataset.gameId}"]`);
+                    const label = document.querySelector(`label[for="goldenGame${cb.dataset.gameId}"]`);
                     if (this.checked) {
                         label.textContent = 'To mój szczęśliwy mecz (pkt x2)';
                     } else {
