@@ -121,7 +121,23 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
         return $builder->get()->getResultArray();
     }
 
+
+ public function canSaveTyp($gameID) {
+        $terminarzModel = model(TerminarzModel::class);
+        $match = $terminarzModel->getMatchDateTime($gameID);
+        $matchTime = strtotime($match['date'] . ' ' . $match['time']);
+        $currentTime = time();
+
+        return $currentTime <= $matchTime;
+    }
+
+
     public function zapiszTyp($data) {
+    
+     if (!$this->canSaveTyp($data['gameID'])) {
+            return false; // or handle as per your need
+        }
+        
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
         $warunki->where('GameID', $data['GameID']);

@@ -150,6 +150,10 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
 }
 
 
+    public function getMatchDateTime($gameID) {
+        return $this->where('Id', $gameID)->select('Date, Time')->first();
+    }
+
 }
 
 

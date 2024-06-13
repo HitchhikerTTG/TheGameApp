@@ -383,10 +383,17 @@ class TheGame extends BaseController
         'GoldenGame' => $goldenGame
     ];
 
-    // Logowanie odbieranych danych
-    log_message('info', 'Odbierane dane: ' . print_r($data, true));
+
 
     $typyModel = model(TypyModel::class);
+
+    // Check if the typ can be saved based on the match time
+        if (!$typyModel->canSaveTyp($gameID)) {
+          return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
+        }
+
+
+
 
     if ($typyModel->zapiszTyp($data)) {
         $currentGoldenGame = session()->get('usedGoldenBall');
@@ -443,5 +450,7 @@ class TheGame extends BaseController
 
 }
 ?>
+
+
 
 
