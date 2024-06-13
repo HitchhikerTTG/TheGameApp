@@ -137,10 +137,13 @@ public function canSaveTyp($gameID) {
 
     public function zapiszTyp($data) {
     
-     if (!$this->canSaveTyp($data['GameID'])) {
+    $terminarzModel = model(TerminarzModel::class);
+    
+    
+     if ($terminarzModel->czyRozpoczety($data['GameID'])) {
             return false; // or handle as per your need
         }
-        
+  u      
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
         $warunki->where('GameID', $data['GameID']);

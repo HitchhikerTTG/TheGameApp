@@ -22,7 +22,8 @@ class TerminarzModel extends Model{
 			'ScoreHome',
 			'ScoreAway',
 			'zakonczony',
-			'TurniejID'
+			'TurniejID', 
+			'Rozpoczety'
     ];
 
 	public function getMeczById($meczId) {
@@ -153,6 +154,11 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
     public function getMatchDateTime($gameID) {
         return $this->where('Id', $gameID)->select('Date, Time')->first();
     }
+
+	public function czyRozpoczety($gameID) {
+		return $this->where('Id', $gameID)->select('Rozpoczety')->first();
+	}
+	
 
 }
 
