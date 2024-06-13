@@ -106,11 +106,10 @@
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h1 class="modal-title fs-5" id="typy<?= $match['Id']; ?>Label">Typy innych</h1>
+                                                            <h1 class="modal-title fs-5" id="typy<?= $match['Id']; ?>Label">Nasze typy na ten mecz:</h1>
                                                         </div>
                                                         <div class="modal-body">
-                                                            Tu będą widoczne typy wszystkich, którzy wytypowali ten mecz
-                                                        
+                                                            
                                                         <table class="table"><thead><tr><th>Nick</th><th>Typ</th><th>Złota piłka</th></tr></thead><tbody>';
                         <?php foreach ($match['typyGraczy'] as $typ) {
                            ?>
