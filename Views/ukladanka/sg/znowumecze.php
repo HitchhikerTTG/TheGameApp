@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="row text-center">
                                         <div class="col">
-                                            <button type="submit" class="btn btn-primary">Typuję!</button>
+                                          <button type="submit" class="btn btn-primary" <?php echo ($mecz['rozpoczety']) == 1) ? 'disabled' : ''; ?>><?php echo ($mecz['rozpoczety']) == 1) ? 'Typowanie zakończone' : 'Typuję'; ?></button>
                                         </div>
                                     </div>
                                 </form>
@@ -149,18 +149,6 @@
                     </div>
                 </div>
             </div>
-            <!-- To wysadzimy --> 
-            <div>
-            <?php 
-            $matchTime = strtotime($match['details']['date'] . ' ' . $match['details']['time']);
-            $currentTime = time();
-            $delta = $currentTime<=$matchTime;         
-            echo("<p> Match time =".$matchTime." and current time = ".$currentTime." and therefore delta is ".$delta."</p>");
-            
-            
-            ?>
-            </div>
-            <!-- tu kończymy wysadzenie -->
         <?php endforeach; ?>
     </div> <!-- Close the last date group -->
 </div>
