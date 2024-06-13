@@ -91,7 +91,7 @@
                                     </div>
                                     <div class="row text-center">
                                         <div class="col">
-                                          <button type="submit" class="btn btn-primary" <?php echo ($mecz['rozpoczety']) == 1) ? 'disabled' : ''; ?>><?php echo ($mecz['rozpoczety']) == 1) ? 'Typowanie zakończone' : 'Typuję'; ?></button>
+                                          <button type="submit" class="btn btn-primary" <?php echo (($mecz['rozpoczety']) == 1) ? 'disabled' : ''; ?>><?php echo (($mecz['rozpoczety']) == 1) ? 'Typowanie zakończone' : 'Typuję'; ?></button>
                                         </div>
                                     </div>
                                 </form>
