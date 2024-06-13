@@ -393,7 +393,7 @@ class TheGame extends BaseController
           return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
         } 
 
-        session()->set('sprawdzilem godzine i wszystko gra', 'Tak;);
+        session()->set('sprawdzilem godzine i wszystko gra', 'Tak');
 
 
     if ($typyModel->zapiszTyp($data)) {
