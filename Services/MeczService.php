@@ -90,7 +90,7 @@ class MeczService {
            // Dodanie liczby typów dla każdego meczu
     foreach ($wypelniona_lista as &$mecz) {
         $mecz['liczbaTypow'] = $this->typyModel->liczbaTypowDlaMeczu($mecz['Id']);
-        $mecz['rozpoczety']=$this->terminarzModel->czyRozpoczety($mecz['Id']);
+        $mecz['rozpoczety']= $this->terminarzModel->czyRozpoczety($mecz['Id']);
         // jeśli mecz jest rozpoczęty i nie ma jeszcze pliku JSON dla tego pliku z typami, wygeneruj pliki z typami.. jeśli rozpoczęty i są typy dla tego meczu, 
         
         if ($mecz['rozpoczety']){

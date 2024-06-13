@@ -155,9 +155,10 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
         return $this->where('Id', $gameID)->select('Date, Time')->first();
     }
 
-	public function czyRozpoczety($gameID) {
-		return $this->where('Id', $gameID)->select('Rozpoczety')->first();
-	}
+public function czyRozpoczety($gameID) {
+    $result = $this->where('Id', $gameID)->select('Rozpoczety')->first();
+    return $result ? $result['Rozpoczety'] : null;
+}
 	
 
 }
