@@ -110,6 +110,21 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             Tu będą widoczne typy wszystkich, którzy wytypowali ten mecz
+                                                        
+                                                        <table class="table"><thead><tr><th>Nick</th><th>Typ</th><th>Złota piłka</th></tr></thead><tbody>';
+                        <?php foreach ($match['typyGraczy'] as $typ) {
+                           ?>
+                           <?php
+                           <tr>
+                           <td><?= $typ['username']?></td>
+                           <td><?= $typ['HomeTyp']?>:<?= $typ['AwayTyp']?></td>
+                           <td><?= $typ['GoldenGame']?></td>
+                           </tr>
+                        }
+                        ?>
+                        </tbody></table>
+                                                        
+                                                        
                                                         </div>
                                                         <div class="modal-footer"></div>
                                                     </div>
