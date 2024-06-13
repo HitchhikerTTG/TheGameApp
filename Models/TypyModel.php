@@ -134,13 +134,13 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
 
     public function zapiszTyp($data) {
     
-     if (!$this->canSaveTyp($data['gameID'])) {
+     if (!$this->canSaveTyp($data['GameID'])) {
             return false; // or handle as per your need
         }
         
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
-        $warunki->where('GameID', $data['gameID']);
+        $warunki->where('GameID', $data['GameID']);
         $czyJestTenTyp = $warunki->get()->getResultArray();
 
         if ($czyJestTenTyp) {
