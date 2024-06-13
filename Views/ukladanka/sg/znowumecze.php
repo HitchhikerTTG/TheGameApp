@@ -111,15 +111,16 @@
                                                         <div class="modal-body">
                                                             
                                                         <table class="table"><thead><tr><th>Nick</th><th>Typ</th><th>Złota piłka</th></tr></thead><tbody>';
-                        <?php foreach ($match['typyGraczy'] as $typ) {
-                           ?>
+                        <?php
+                           if ($match['rozpoczety']) {
+                              foreach ($match['typyGraczy'] as $typ) { ?>
                            <tr>
                            <td><?= $typ['username']?></td>
                            <td><?= $typ['HomeTyp']?>:<?= $typ['AwayTyp']?></td>
                            <td><?= $typ['GoldenGame']?></td>
                            </tr>
                         <?php 
-                           }
+                           } }
                         ?>
                         </tbody></table>
                                                         
