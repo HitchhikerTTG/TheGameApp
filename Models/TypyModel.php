@@ -140,7 +140,7 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
         
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
-        $warunki->where('GameID', $data['GameID']);
+        $warunki->where('GameID', $data['gameID']);
         $czyJestTenTyp = $warunki->get()->getResultArray();
 
         if ($czyJestTenTyp) {
