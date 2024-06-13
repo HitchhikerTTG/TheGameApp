@@ -94,7 +94,7 @@ class MeczService {
         
         if ($this->terminarzModel->czyRozpoczety($mecz['Id'])){
             
-                $baseDir = WRITEPATH . "typy/"; // Bazowy katalog dla plików JSON    
+                $baseDir = WRITEPATH . "typy"; // Bazowy katalog dla plików JSON    
                 $pathTypy = "{$baseDir}/{$mecz['Id']}.json";
 
         // Sprawdź, czy plik istnieje
@@ -432,7 +432,7 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
         $jsonData = json_encode($types);
 
         // Opcja 1: Zapisz jako plik
-        $baseDir = WRITEPATH . "typy/"; // Bazowy katalog dla plików JSON
+        $baseDir = WRITEPATH . "typy"; // Bazowy katalog dla plików JSON
         file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
 
     
