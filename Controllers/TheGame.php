@@ -389,7 +389,7 @@ class TheGame extends BaseController
 
     // Check if the typ can be saved based on the match time
         if (!$typyModel->canSaveTyp($gameID)) {
-          session()->set('sprawdzilem godzine i wszystko gra', 'NIE;);
+          session()->set('sprawdzilem godzine i wszystko gra', 'NIE');
           return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
         } 
 
