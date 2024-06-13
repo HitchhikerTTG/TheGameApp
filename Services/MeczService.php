@@ -424,18 +424,23 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
 
 
 
-    // Controller w PHP
-    public function wygenerujTypyDlaMeczu($matchId) {
-        $typyModel = new \App\Models\TypyModel();
-        $types = $typyModel->ktoTypujeTenMecz($matchId);
+public function wygenerujTypyDlaMeczu($matchId) {
+    $typyModel = new \App\Models\TypyModel();
+    $types = $typyModel->ktoTypujeTenMecz($matchId);
 
-        $jsonData = json_encode($types);
+    $jsonData = json_encode($types);
 
-        // Opcja 1: Zapisz jako plik
-        $baseDir = WRITEPATH . "typy"; // Bazowy katalog dla plików JSON
-        file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
+    // Bazowy katalog dla plików JSON
+    $baseDir = WRITEPATH . "typy"; 
 
-    
+    // Sprawdź, czy katalog istnieje, a jeśli nie, to go stwórz
+    if (!is_dir($baseDir)) {
+        mkdir($baseDir, 0755, true);
     }
+
+    // Zapisz dane JSON do pliku
+    file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
 }
+}
+
 ?>
