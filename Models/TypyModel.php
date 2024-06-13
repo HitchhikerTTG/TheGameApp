@@ -122,15 +122,22 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
     }
 
 
- public function canSaveTyp($gameID) {
-        $terminarzModel = model(TerminarzModel::class);
-        $match = $terminarzModel->getMatchDateTime($gameID);
-        $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
-        $currentTime = time();
+public function canSaveTyp($gameID) {
+    $terminarzModel = model(TerminarzModel::class);
+    $match = $terminarzModel->getMatchDateTime($gameID);
+    $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
+    $currentTime = time();
 
-        return $currentTime <= $matchTime;
-    }
+    // Debugging output
+    var_dump('Match time: ' . $matchTime);
+    var_dump('Current time: ' . $currentTime);
 
+    // Alternatively, you can use error_log() to log to the server error log
+     error_log('Match time: ' . $matchTime);
+     error_log('Current time: ' . $currentTime);
+
+    return $currentTime <= $matchTime;
+}
 
     public function zapiszTyp($data) {
     
