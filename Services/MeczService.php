@@ -405,7 +405,7 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
     }
 }
 
-}
+
 
     // Controller w PHP
     public function wygenerujTypyDlaMeczu($matchId) {
@@ -420,5 +420,5 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
 
     
     }
-
+}
 ?>
