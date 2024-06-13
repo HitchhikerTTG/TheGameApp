@@ -90,6 +90,23 @@ class MeczService {
            // Dodanie liczby typów dla każdego meczu
     foreach ($wypelniona_lista as &$mecz) {
         $mecz['liczbaTypow'] = $this->typyModel->liczbaTypowDlaMeczu($mecz['Id']);
+        // jeśli mecz jest rozpoczęty i nie ma jeszcze pliku JSON dla tego pliku z typami, wygeneruj pliki z typami.. jeśli rozpoczęty i są typy dla tego meczu, 
+        
+        if ($this->terminarzModel->czyRozpoczety($mecz['Id'])){
+            
+                $baseDir = WRITEPATH . "typy/"; // Bazowy katalog dla plików JSON    
+                $pathTypy = "{$baseDir}/{$mecz['Id']}.json";
+
+        // Sprawdź, czy plik istnieje
+        if (!file_exists($pathTypy)) {
+            // Jeśli plik nie istnieje, utwórz go
+            $this->wygenerujTypyDlaMeczu($mecz['Id']);
+            } 
+    
+        }
+        
+        
+        
     }
 
         return $wypelniona_lista;
