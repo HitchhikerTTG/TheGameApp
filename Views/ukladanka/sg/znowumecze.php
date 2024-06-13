@@ -140,8 +140,9 @@
             <?php 
             $matchTime = strtotime($match['details']['date'] . ' ' . $match['details']['time']);
             $currentTime = time();
-            
+            $delta =             
             echo("<p> Match time =".$matchTime." and current time = ".$currentTime."</p>");
+            
             
             ?>
             </div>
