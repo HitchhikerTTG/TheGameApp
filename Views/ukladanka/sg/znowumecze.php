@@ -112,7 +112,7 @@
                                                             
                                                         <table class="table"><thead><tr><th>Nick</th><th>Typ</th><th>Złota piłka</th></tr></thead><tbody>';
                         <?php
-                           if ($match['rozpoczety']) {
+                           if ($match['rozpoczety']==1) {
                               foreach ($match['typyGraczy'] as $typ) { ?>
                            <tr>
                            <td><?= $typ['username']?></td>
