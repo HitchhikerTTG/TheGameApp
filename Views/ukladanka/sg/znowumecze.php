@@ -109,20 +109,28 @@
                                                             <h1 class="modal-title fs-5" id="typy<?= $match['Id']; ?>Label">Nasze typy na ten mecz:</h1>
                                                         </div>
                                                         <div class="modal-body">
-                                                            
-                                                        <table class="table"><thead><tr><th>Nick</th><th>Typ</th><th>Złota piłka</th></tr></thead><tbody>';
-                        <?php
-                           if ($match['rozpoczety']==1) {
-                              foreach ($match['typyGraczy'] as $typ) { ?>
-                           <tr>
-                           <td><?= $typ['username']?></td>
-                           <td><?= $typ['HomeTyp']?>:<?= $typ['AwayTyp']?></td>
-                           <td><?= $typ['GoldenGame']?></td>
-                           </tr>
-                        <?php 
-                           } }
-                        ?>
-                        </tbody></table>
+<?php if (isset($match['rozpoczety']) && $match['rozpoczety'] == 1) { ?> 
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nick</th>
+                <th>Typ</th>
+                <th>Złota piłka</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (isset($match['typyGraczy'])) { 
+                foreach ($match['typyGraczy'] as $typ) { ?>
+                    <tr>
+                        <td><?= htmlspecialchars($typ['username']) ?></td>
+                        <td><?= htmlspecialchars($typ['HomeTyp']) ?>:<?= htmlspecialchars($typ['AwayTyp']) ?></td>
+                        <td><?= htmlspecialchars($typ['GoldenGame']) ?></td>
+                    </tr>
+                <?php } 
+            } ?>
+        </tbody>
+    </table>
+<?php } ?>
                                                         
                                                         
                                                         </div>
