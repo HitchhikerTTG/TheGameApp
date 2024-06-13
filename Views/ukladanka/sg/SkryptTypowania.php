@@ -1,5 +1,4 @@
-<script>
-$(document).ready(function() {
+<script>$(document).ready(function() {
     // Obsługa kliknięć przycisków "+" i "-"
     $('body').on('click', '.plus', function(event) {
         event.preventDefault();
@@ -70,7 +69,8 @@ $(document).ready(function() {
                     button.css('background-color', 'lightgreen');
                     setTimeout(function() { button.css('background-color', ''); }, 1000);
                 } else {
-                    alert('Błąd przy zapisywaniu typu.');
+                    // Wyświetlenie komunikatu błędu
+                    alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
