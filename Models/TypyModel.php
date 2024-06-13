@@ -125,7 +125,7 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
  public function canSaveTyp($gameID) {
         $terminarzModel = model(TerminarzModel::class);
         $match = $terminarzModel->getMatchDateTime($gameID);
-        $matchTime = strtotime($match['date'] . ' ' . $match['time']);
+        $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
         $currentTime = time();
 
         return $currentTime <= $matchTime;
