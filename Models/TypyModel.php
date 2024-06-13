@@ -143,7 +143,7 @@ public function canSaveTyp($gameID) {
      if ($terminarzModel->czyRozpoczety($data['GameID'])) {
             return false; // or handle as per your need
         }
-  u      
+             
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
         $warunki->where('GameID', $data['GameID']);
