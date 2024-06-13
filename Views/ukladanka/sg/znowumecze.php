@@ -135,6 +135,17 @@
                     </div>
                 </div>
             </div>
+            <!-- To wysadzimy --> 
+            <div>
+            <?php 
+            $matchTime = strtotime($match['details']['date'] . ' ' . $match['details']['time']);
+            $currentTime = time();
+            
+            echo("<p> Match time =".$matchTime." and current time = ".$currentTime."</p>");
+            
+            ?>
+            </div>
+            <!-- tu kończymy wysadzenie -->
         <?php endforeach; ?>
     </div> <!-- Close the last date group -->
 </div>
