@@ -128,10 +128,6 @@ public function canSaveTyp($gameID) {
     $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
     $currentTime = time();
 
-    // Debugging output
-    var_dump('Match time: ' . $matchTime);
-    var_dump('Current time: ' . $currentTime);
-
     // Alternatively, you can use error_log() to log to the server error log
      error_log('Match time: ' . $matchTime);
      error_log('Current time: ' . $currentTime);
