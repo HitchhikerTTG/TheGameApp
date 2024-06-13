@@ -25,7 +25,7 @@
   /* Style the navigation menu */
 .topnav {
   overflow: hidden;
-  background-color: rgb(249,163,0);
+  background-color: #3a606e;
   position: relative;
   margin-bottom: 10px;
 }

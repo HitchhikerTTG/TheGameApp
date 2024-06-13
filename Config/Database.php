@@ -27,12 +27,12 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname' => 'localhost',
-        'username' => 'remedium_nclr1',
+        /* 'username' => 'remedium_nclr1',
         'password' => 'P.1qv9UIHUeNeapZLDK95',
-        'database' => 'remedium_nclr1',
-        /*'username' => 'remedium_ci1',
+        'database' => 'remedium_nclr1',*/
+        'username' => 'remedium_ci1',
         'password' => 'K.gbXyPzFuvrPmm4jbP56',
-        'database' => 'remedium_ci1',*/
+        'database' => 'remedium_ci1',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

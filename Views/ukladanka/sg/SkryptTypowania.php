@@ -1,110 +1,110 @@
-<script> 
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Obsługa formularzy typowania
-    document.querySelectorAll('.betting-form').forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const url = this.action;
-
-            fetch(url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const newTypText = data.newTypText;
-                    const accordionItem = this.closest('.accordion-item');
-                    const button = accordionItem.querySelector('.accordion-button');
-                    const oldText = button.innerText;
-                    const newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText);
-                    button.innerText = newText;
-
-                    button.style.backgroundColor = 'lightgreen';
-                    setTimeout(() => { button.style.backgroundColor = ''; }, 1000);
-
-                    const collapse = accordionItem.querySelector('.accordion-collapse');
-                    collapse.classList.remove('show');
-                } else {
-                    alert('Błąd przy zapisywaniu danych');
-                }
-            })
-            .catch(error => {
-                console.error('Wystąpił błąd: ', error);
-            });
-        });
+<script>
+$(document).ready(function() {
+    // Obsługa kliknięć przycisków "+" i "-"
+    $('body').on('click', '.plus', function(event) {
+        event.preventDefault();
+        var $scoreDisplay = $(this).closest('.team').find('.score-display');
+        var $scoreValue = $(this).closest('.team').find('.score-value');
+        var currentVal = isNaN(parseInt($scoreDisplay.text())) ? 0 : parseInt($scoreDisplay.text());
+        currentVal++;
+        $scoreDisplay.text(currentVal);
+        $scoreValue.val(currentVal);
     });
 
-    // Obsługa wyboru złotego meczu
-    document.querySelectorAll('.golden-game-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const gameId = this.dataset.gameId;
-            const allCheckboxes = document.querySelectorAll('.golden-game-checkbox');
+    $('body').on('click', '.minus', function(event) {
+        event.preventDefault();
+        var $scoreDisplay = $(this).closest('.team').find('.score-display');
+        var $scoreValue = $(this).closest('.team').find('.score-value');
+        var currentVal = parseInt($scoreDisplay.text()) || 0;
+        if (currentVal > 0) {
+            currentVal--;
+        } else if ($scoreDisplay.text().trim() === '') {
+            currentVal = 0;
+        }
+        $scoreDisplay.text(currentVal);
+        $scoreValue.val(currentVal);
+    });
 
-            allCheckboxes.forEach(cb => {
-                if (cb.dataset.gameId !== gameId) {
-                    cb.disabled = this.checked;
-                    const label = document.querySelector(`label[for="goldenGame${cb.dataset.gameId}"]`);
-                    if (this.checked) {
-                        label.textContent = 'Inny mecz wybrałem jako szczęśliwy';
-                    } else {
-                        label.textContent = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
-                    }
-                } else {
-                    const label = document.querySelector(`label[for="goldenGame${cb.dataset.gameId}"]`);
-                    if (this.checked) {
-                        label.textContent = 'To mój szczęśliwy mecz (pkt x2)';
-                    } else {
-                        label.textContent = 'Za ten mecz chcę otrzymać 2 x więcej punktów';
-                    }
-                }
-            });
+    // Obsługa rozwijania i zwijania akordeonu z zachowaniem stanu w localStorage
+    $('.accordion-collapse').on('shown.bs.collapse', function () {
+        let id = this.id;
+        localStorage.setItem(`details-${id}`, 'true');
+    });
 
-            const button = this.closest('.accordion-item').querySelector('.accordion-button');
-            if (this.checked) {
-                button.classList.add('golden-header');
-            } else {
-                button.classList.remove('golden-header');
-            }
-        });
+    $('.accordion-collapse').on('hidden.bs.collapse', function () {
+        let id = this.id;
+        localStorage.setItem(`details-${id}`, 'false');
+    });
 
-        // Ustawienie odpowiedniego stylu dla już zaznaczonych checkboxów
-        if (checkbox.checked) {
-            const button = document.querySelector(`#collapse${checkbox.dataset.gameId}`).closest('.accordion-item').querySelector('.accordion-button');
-            button.classList.add('golden-header');
+    $('.accordion-collapse').each(function () {
+        let id = this.id;
+        let isOpen = localStorage.getItem(`details-${id}`) === 'true';
+        if (isOpen) {
+            $(`#${id}`).addClass('show');
+        } else {
+            $(`#${id}`).removeClass('show');
         }
     });
 
-    // Obsługa przycisków plus
-    document.querySelectorAll('.plus').forEach(button => {
-        button.addEventListener('click', function() {
-            const teamContainer = this.closest('.team');
-            const scoreDisplay = teamContainer.querySelector('.score-display');
-            const scoreValue = teamContainer.querySelector('.score-value');
-            let currentVal = parseInt(scoreDisplay.textContent) || 0;
-            currentVal++;
-            scoreDisplay.textContent = currentVal;
-            scoreValue.value = currentVal;
-            console.log('plus');
+    // Obsługa przesyłania formularza AJAX
+    $('body').on('submit', '.betting-form', function(event) {
+        event.preventDefault(); // Zapobiega standardowej wysyłce formularza
+
+        var form = $(this);
+        var url = form.attr('action'); // URL z atrybutu action formularza
+        var data = form.serialize(); // Serializacja danych formularza
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function(response) {
+                if (response.success) {
+                    var newTypText = response.newTypText;
+                    var button = form.closest('.accordion-item').find('.accordion-button');
+                    var oldText = button.text();
+                    var newText = oldText.replace(/Twój typ: [^|]+|Wytypuj/, newTypText);
+                    button.text(newText);
+
+                    // Animacja podświetlenia na zielono
+                    button.css('background-color', 'lightgreen');
+                    setTimeout(function() { button.css('background-color', ''); }, 1000);
+                } else {
+                    alert('Błąd przy zapisywaniu typu.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Wystąpił błąd: ', error);
+                alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+            }
         });
+
+        // Zwinąć akordeon po przesłaniu formularza
+        var accordionId = form.closest('.accordion-collapse').attr('id');
+        $(`#${accordionId}`).collapse('hide');
+        localStorage.setItem(`details-${accordionId}`, 'false');
     });
 
-    // Obsługa przycisków minus
-    document.querySelectorAll('.minus').forEach(button => {
-        button.addEventListener('click', function() {
-            const teamContainer = this.closest('.team');
-            const scoreDisplay = teamContainer.querySelector('.score-display');
-            const scoreValue = teamContainer.querySelector('.score-value');
-            let currentVal = parseInt(scoreDisplay.textContent) || 0;
-            if (currentVal > 0) {
-                currentVal--;
-            }
-            scoreDisplay.textContent = currentVal;
-            scoreValue.value = currentVal;
-            console.log('minus');
-        });
+    // Obsługa zmiany statusu "Golden Ball"
+    $('body').on('change', '.golden-game-checkbox', function() {
+        var checkbox = $(this);
+        var isChecked = checkbox.is(':checked');
+        var gameId = checkbox.data('game-id');
+
+        if (isChecked) {
+            // Odznaczenie innych checkboxów
+            $('.golden-game-checkbox').not(checkbox).prop('checked', false).prop('disabled', true);
+
+            // Ustawienie etykiet
+            $('.golden-game-checkbox').not(checkbox).siblings('label').text('Inny mecz wybrałem jako szczęśliwy');
+            checkbox.siblings('label').text('To mój szczęśliwy mecz (pkt x2)');
+        } else {
+            // Przywrócenie możliwości zaznaczenia innych checkboxów
+            $('.golden-game-checkbox').prop('disabled', false);
+
+            // Ustawienie etykiet
+            $('.golden-game-checkbox').siblings('label').text('Za ten mecz chcę otrzymać 2 x więcej punktów');
+        }
     });
 });
 </script>
