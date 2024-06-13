@@ -1,4 +1,5 @@
-<script>$(document).ready(function() {
+<script>
+$(document).ready(function() {
     // Obsługa kliknięć przycisków "+" i "-"
     $('body').on('click', '.plus', function(event) {
         event.preventDefault();
@@ -75,7 +76,17 @@
             },
             error: function(xhr, status, error) {
                 console.error('Wystąpił błąd: ', error);
-                alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+
+                try {
+                    var jsonResponse = JSON.parse(xhr.responseText);
+                    if (jsonResponse.message) {
+                        alert('Błąd serwera: ' + jsonResponse.message);
+                    } else {
+                        alert('Wystąpił nieoczekiwany błąd.');
+                    }
+                } catch (e) {
+                    alert('Nie udało się przesłać formularza. Sprawdź konsolę dla szczegółów.');
+                }
             }
         });
 
@@ -107,4 +118,5 @@
         }
     });
 });
+
 </script>
