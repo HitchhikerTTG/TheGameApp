@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\TerminarzModel;
+use App\Models\TypyModel;
 
 
 
