@@ -408,7 +408,7 @@ public function loadClubs(){
         
         return view('administracja/assignUserToClub', ['clubMembers' => $clubMembers]);
     }*/
-f
+
 
     public function assignUserToClub()
     {
