@@ -73,24 +73,36 @@ public function setActiveTournamentFlagForUsers($userIds)
     }
 
 
-        // Funkcja, która zwraca listę email użytkowników, którzy nie podali typu na mecz o wskazanym ID
-    public function getUsersWithoutTyp($matchID) {
+    // Funkcja, która zwraca listę email użytkowników, którzy nie podali typu na mecz o wskazanym ID
+    public function getUserWithoutTyp($matchID) {
         // Najpierw pobierzemy listę użytkowników, którzy grają w aktywnym turnieju
         $builder = $this->db->table($this->table);
-        $builder->select('users.email');
-        $builder->where('users.PlaysTheActiveTournament', 1);
-        $builder->whereNotExists(function($builder) use ($matchID) {
-            $builder->select('*')
-                    ->from('typy')
-                    ->where('typy.GameID', $matchID)
-                    ->where('typy.user_id = users.id');
+        $builder->select('id, email');
+        $builder->where('PlaysTheActiveTournament', 1);
+        $activeUsers = $builder->get()->getResultArray();
+
+        // Pobierz listę użytkowników, którzy podali typ na dany mecz
+        $typyBuilder = $this->db->table('typy');
+        $typyBuilder->select('user_id');
+        $typyBuilder->where('GameID', $matchID);
+        $typyUsers = $typyBuilder->get()->getResultArray();
+
+        // Wyodrębnij user_id z wyników zapytania o typy
+        $typyUserIds = array_column($typyUsers, 'user_id');
+
+        // Filtracja użytkowników, którzy nie podali typu
+        $usersWithoutTyp = array_filter($activeUsers, function($user) use ($typyUserIds) {
+            return !in_array($user['id'], $typyUserIds);
         });
 
-        $query = $builder->get();
-        return $query->getResultArray();
+        // Zwróć tylko emaile
+        return array_column($usersWithoutTyp, 'email');
     }
 
 }
+
+
+
 
 
 
