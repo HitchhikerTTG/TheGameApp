@@ -585,6 +585,8 @@ protected $_key;
     echo "</pre>";
     */
     
+    print_r($config['activeTournamentId']);
+    
     $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
     
     echo "<pre>";
