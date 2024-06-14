@@ -72,6 +72,26 @@ public function setActiveTournamentFlagForUsers($userIds)
         return $this->where('nick', $nick)->first();
     }
 
+
+        // Funkcja, która zwraca listę email użytkowników, którzy nie podali typu na mecz o wskazanym ID
+    public function getUserWithoutTyp($matchID) {
+        // Najpierw pobierzemy listę użytkowników, którzy grają w aktywnym turnieju
+        $builder = $this->db->table($this->table);
+        $builder->select('users.email');
+        $builder->where('users.PlaysTheActiveTournament', 1);
+        $builder->whereNotExists(function($builder) use ($matchID) {
+            $builder->select('*')
+                    ->from('typy')
+                    ->where('typy.GameID', $matchID)
+                    ->where('typy.user_id = users.id');
+        });
+
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+
 }
+
+
 
 

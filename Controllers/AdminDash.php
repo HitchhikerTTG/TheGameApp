@@ -408,7 +408,7 @@ public function loadClubs(){
         
         return view('administracja/assignUserToClub', ['clubMembers' => $clubMembers]);
     }*/
-
+f
 
     public function assignUserToClub()
     {
@@ -553,7 +553,14 @@ public function loadClubs(){
                
     }
 
-
+    public function ktoTamNieObstawil($GameID){
+        $userModel = model(UserModel::class);
+        $niewytypowali = $userModel->getUsersWithoutTyp($GameID);
+        
+        echo("<pre>");
+        print_r($niewytypowali);
+        echo("</pre>");        
+    }
 }
 
 
