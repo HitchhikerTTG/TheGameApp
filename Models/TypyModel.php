@@ -21,7 +21,7 @@ class TypyModel extends Model{
 
     public function punktyZaMecze($userId, $turniejId) {
         $builder = $this->builder();
-        $builder->where('UserId', $userId);
+        $builder->where('uniID', $userId);
         $builder->where('TurniejID', $turniejId);
         $builder->selectSum('pkt');
         $result = $builder->get()->getRow();
@@ -30,7 +30,7 @@ class TypyModel extends Model{
 
     public function dokladneTrafienia($userId, $turniejId,$exactScorePoints = 3) {
         $builder = $this->builder();
-        $builder->where('UserId', $userId);
+        $builder->where('uniID', $userId);
         $builder->where('TurniejID', $turniejId);
         $builder->where('pkt', $exactScorePoints);
         
