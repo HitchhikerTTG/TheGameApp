@@ -145,6 +145,7 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
     }
 
     return $query->findAll();
+    }
 
 	public function getRozpoczeteNieZakonczone($turniejID, $onlyIds = false) {
     // Upewnij się, że $turniejID jest prawidłowym identyfikatorem
