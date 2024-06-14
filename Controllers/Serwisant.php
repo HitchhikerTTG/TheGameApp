@@ -576,21 +576,20 @@ protected $_key;
     // Potrzebuje... pokaż mi dzisiejsze mecze
     $dzis = date("Y-m-d"); 
     $terminarzModel = model(TerminarzModel::class);
-    $terminarzZapytanie = $terminarzModel->builder();
+    /*$terminarzZapytanie = $terminarzModel->builder();
     $terminarzZapytanie->where("Date", $dzis);
     $terminarz = $terminarzZapytanie->get()->getResultArray();
     
     echo "<pre>";
     print_r($terminarz);
     echo "</pre>";
-
+    */
+    
     $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
     
     echo "<pre>";
     print_r($terminarz);
     echo "</pre>";
-    
-    $validation = \Config\Services::validation();
     
     $validationRules = [
         'H' => [
@@ -609,30 +608,33 @@ protected $_key;
         ]
     ];
 
-    if (!$this->validate($validationRules)) {
-        session()->setFlashdata('error', $validation->listErrors());
+    if ($this->request->getMethod() === 'post' && $this->validate($validationRules)) {
+        echo "<p>Będziemy się bawić tym, co przesłałeś, a przesłałeś:</p>";
+        
+        $ktoryMecz = $this->request->getPost('meczID');
+        //$indexH = $ktoryMecz . "_H";
+        //$indexA = $ktoryMecz . "_A";
+        $wynikGospodarzy = $this->request->getPost('H');
+        $wynikGosci = $this->request->getPost('A');
+        echo "<p>Chcesz zapisać mecz: {$ktoryMecz}. Gospodarzom chcesz dać wynik: {$wynikGospodarzy}, a gościom: {$wynikGosci}. Zgadza się?</p>";
+
+        $data = [
+            'Id' => $ktoryMecz,
+            'ScoreHome' => $wynikGospodarzy,
+            'ScoreAway' => $wynikGosci,
+            'zakonczony' => 1
+        ];
+
+        if ($terminarzModel->update($ktoryMecz, $data)) {
+            session()->setFlashData('sukces', 'Wynik meczu został zapisany, uruchamiam przeliczenie punktów dla tego meczu');
+            $urlPrzelicz = site_url('/przeliczMecz/' . $ktoryMecz);
+            // echo $urlPrzelicz;
+            return redirect()->to($urlPrzelicz);
+        }
+    } else {
+        // Jeśli walidacja nie powiedzie się, zwróć błędy
+        session()->setFlashdata('error', $this->validator->listErrors());
         return redirect()->back()->withInput();
-    }
-    
-    echo "<p>Będziemy się bawić tym, co przesłałeś, a przesłałeś:</p>";
-    
-    $ktoryMecz = $this->request->getPost('meczID');
-    $wynikGospodarzy = $this->request->getPost('H');
-    $wynikGosci = $this->request->getPost('A');
-    
-    echo "<p>Chcesz zapisać mecz: {$ktoryMecz}. Gospodarzom chcesz dać wynik: {$wynikGospodarzy}, a gościom: {$wynikGosci}. Zgadza się?</p>";
-
-    $data = [
-        'Id' => $ktoryMecz,
-        'ScoreHome' => $wynikGospodarzy,
-        'ScoreAway' => $wynikGosci,
-        'zakonczony' => 1
-    ];
-
-    if ($terminarzModel->update($ktoryMecz, $data)) {
-        session()->setFlashData('sukces', 'Wynik meczu został zapisany, uruchamiam przeliczenie punktów dla tego meczu');
-        $urlPrzelicz = site_url('/przeliczMecz/' . $ktoryMecz);
-        return redirect()->to($urlPrzelicz);
     }
 
     $data['terminarz'] = $terminarz;
