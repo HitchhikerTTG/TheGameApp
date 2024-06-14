@@ -567,9 +567,17 @@ protected $_key;
 
     public function zapiszWynikMeczu(int $mecz=1){
 
+            $configPath = WRITEPATH . 'ActiveTournament.json';
+        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
+            'activeTournamentId' => 'Brak danych',
+            'activeCompetitionId' => 'Brak danych',
+            'activeTournamentName' => 'Brak danych'
+        ];
+
+
 //        echo "<p>A tu bym chciał zapisać wyniki meczu</p>";
         //potrzebuje... pokaż mi dzisiejsze mecze
-        $dzis=date("Y-m-d");
+        $dzis=date("Y-m-d"); 
         $terminarzModel = model(TerminarzModel::class);
         $terminarzZapytanie=$terminarzModel->builder();
         $terminarzZapytanie->where("Date",$dzis);
@@ -578,7 +586,12 @@ protected $_key;
         print_r($terminarz);
         echo "</pre>";
 
-
+        $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
+        
+        echo "<pre>";
+        print_r($terminarz);
+        echo "</pre>";
+        
         if ($this->request->getMethod() === 'post' && $this->validate([
             'H' => 'is_natural',
             'A'=>'is_natural',

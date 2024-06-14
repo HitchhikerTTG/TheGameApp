@@ -146,8 +146,25 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
 
     return $query->findAll();
 
+	public function getRozpoczeteNieZakonczone($turniejID, $onlyIds = false) {
+    // Upewnij się, że $turniejID jest prawidłowym identyfikatorem
+    if (!is_numeric($turniejID)) {
+        throw new InvalidArgumentException('Invalid TurniejID');
+    }
 
+    // Budowanie zapytania
+    $query = $this->where('TurniejID', $turniejID)
+                  ->where('Rozpoczety', 1)
+                  ->where('zakonczony', 0)
+                  ->orderBy('Date', 'asc');
 
+    // Wybór tylko kolumn Id i ApiID, jeśli $onlyIds jest ustawione na true
+    if ($onlyIds) {
+        $query->select('Id, ApiID');
+    }
+
+    // Wykonanie zapytania i zwrócenie wyników
+    return $query->findAll();
 }
 
 
