@@ -3,6 +3,10 @@
 namespace App\Controllers;
 $session = \Config\Services::session();
 use App\Models\TabelaModel;
+use App\Models\UserModel;
+use App\Models\TypyModel;
+use App\Models\OdpowiedziModel;
+use App\Models\KtoWCoGraModel;
 
 class Tabela extends BaseController
 {
