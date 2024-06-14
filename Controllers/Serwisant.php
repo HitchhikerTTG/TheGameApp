@@ -574,9 +574,9 @@ protected $_key;
         $terminarzZapytanie=$terminarzModel->builder();
         $terminarzZapytanie->where("Date",$dzis);
         $terminarz=$terminarzZapytanie->get()->getResultArray();
-        //echo "<pre>";
-  //      print_r($terminarz);
-   //     echo "</pre>";
+        echo "<pre>";
+        print_r($terminarz);
+        echo "</pre>";
 
 
         if ($this->request->getMethod() === 'post' && $this->validate([
