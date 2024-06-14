@@ -74,7 +74,7 @@ public function setActiveTournamentFlagForUsers($userIds)
 
 
     // Funkcja, która zwraca listę email użytkowników, którzy nie podali typu na mecz o wskazanym ID
-    public function getUserWithoutTyp($matchID) {
+    public function getUsersWithoutTyp($matchID) {
         // Najpierw pobierzemy listę użytkowników, którzy grają w aktywnym turnieju
         $builder = $this->db->table($this->table);
         $builder->select('id, email');
