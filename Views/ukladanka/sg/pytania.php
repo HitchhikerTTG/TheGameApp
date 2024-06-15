@@ -59,7 +59,7 @@
                     </form>
                 </div>
                 <div class="card-footer text-muted">
-                    Ważne do: <?= esc($pytanie['wazneDo']) ?>
+                    Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
                 </div>
             </div>
         <?php endforeach; ?>
