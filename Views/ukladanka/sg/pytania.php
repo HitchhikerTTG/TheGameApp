@@ -45,7 +45,6 @@
                     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
-                        <div class="form-group">
                             <div class="form-group">
                             <label class="static-label">Twoja odpowiedź</label>
                             <div class="input-group d-flex align-items-center">
@@ -55,7 +54,6 @@
                                 </span>
                                 <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0"><?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?></button>
                             </div>
-                        </div>
                     </form>
                 </div>
                 <div class="card-footer text-muted">
