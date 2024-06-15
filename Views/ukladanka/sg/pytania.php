@@ -54,6 +54,7 @@
                     <span class="badge text-bg-secondary"><?= esc($pytanie['pkt']) ?> pkt</span>
                 </div>
                 <div class="card-body">
+                    <p><?=$wazneDoTimestamp?> | <?=$currentTimestamp?></p>
                     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
