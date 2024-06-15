@@ -51,7 +51,7 @@
                             <div class="input-group d-flex align-items-center">
                                 <span class="flex-grow-1 odpowiedz-container">
                                     <label class="odpowiedz-label form-control-plaintext"><?= !empty($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?></label>
-                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'display: none;' : 'display: block;' ?>" required>
+                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'display: none;' : 'display: inlin-block;' ?>" required>
                                 </span>
                                 <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0"><?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?></button>
                             </div>
