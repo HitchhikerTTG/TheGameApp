@@ -43,7 +43,7 @@
         <?php foreach ($pytania as $pytanie): ?>
             <?php
             // Konwersja daty na timestamp
-            $wazneDoTimestamp = strtotime($pytanie['wazneDoLocal']);
+            $wazneDoTimestamp = strtotime($pytanie['wazneDo']);
             $currentTimestamp = time();
             $isPast = $currentTimestamp > $wazneDoTimestamp;
             $hasAnswer = !empty($pytanie['dotychczasowa_odpowiedz']);
