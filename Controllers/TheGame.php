@@ -141,8 +141,22 @@ class TheGame extends BaseController
                                     ->first();
         if ($odpowiedz) {
             $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
+            }
+         // Konwersja 'wazneDo' na czas lokalny
+    if (isset($pytanie['wazneDo'])) {
+        $utcDateTime = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
+        $localTimezone = new DateTimeZone('Europe/Warsaw'); // Zastąp 'Europe/Warsaw' swoją strefą czasową
+        $utcDateTime->setTimezone($localTimezone);
+        $pytanie['wazneDoLocal'] = $utcDateTime->format('Y-m-d H:i:s');
         }
     }
+unset($pytanie); // Unset reference
+
+
+
+
+
+
 
     
 
