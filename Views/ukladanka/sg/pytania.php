@@ -46,6 +46,7 @@
             $wazneDoTimestamp = strtotime($pytanie['wazneDoLocal']);
             $currentTimestamp = time();
             $isPast = $currentTimestamp > $wazneDoTimestamp;
+            $hasAnswer = !empty($pytanie['dotychczasowa_odpowiedz']);
             ?>
             <div class="card mb-3">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -60,13 +61,13 @@
                             <label class="static-label">Twoja odpowiedź</label>
                             <div class="input-group d-flex align-items-center">
                                 <span class="flex-grow-1 odpowiedz-container">
-                                    <label class="odpowiedz-label form-control-plaintext" style="display: <?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'block' : 'none' ?>;">
-                                        <?= !empty($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
+                                    <label class="odpowiedz-label form-control-plaintext" style="display: <?= $hasAnswer ? 'block' : 'none' ?>;">
+                                        <?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
                                     </label>
-                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'display: none;' : 'display: inline-block;' ?>" required>
+                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= $hasAnswer ? 'display: none;' : 'display: inline-block;' ?>" required>
                                 </span>
                                 <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0 <?= $isPast ? 'disabled' : '' ?>" <?= $isPast ? 'disabled' : '' ?>>
-                                    <?= !empty($pytanie['dotychczasowa_odpowiedz']) ? 'Zmień' : 'Zapisz' ?>
+                                    <?= $hasAnswer ? 'Zmień' : 'Zapisz' ?>
                                 </button>
                             </div>
                         </div>
