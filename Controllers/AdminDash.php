@@ -566,6 +566,10 @@ public function loadClubs(){
 
     public function pokazMiAdresy($turniejID){
         $userModel = model(UserModel::class);
+        
+        $file = WRITEPATH . 'logs/test_log.log';
+        // Zapisujemy URL do pliku logów
+        file_put_contents($file, "wywołałem funkcję do pobrania pliku \n\n", FILE_APPEND);
 
         $lista = $userModel->getActiveUsersInTournament($turniejID);
         

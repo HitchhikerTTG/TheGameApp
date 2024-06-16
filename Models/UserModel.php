@@ -100,8 +100,14 @@ public function setActiveTournamentFlagForUsers($userIds)
     }
     
 
-    public function getActiveUsersInTournament($tournamentID)
+    public function getActiveUsersInTournament($tournamentID) 
     {
+        
+        $file = WRITEPATH . 'logs/test_log.log';
+
+        // Zapisujemy URL do pliku logów
+        file_put_contents($file, "wywołana metoda w modelu\n", FILE_APPEND);
+    
         return $this->select('uzytkownicy.id, uzytkownicy.nick, uzytkownicy.email')
                     ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
                     ->where('users.PlaysTheActiveTournament', 1)
