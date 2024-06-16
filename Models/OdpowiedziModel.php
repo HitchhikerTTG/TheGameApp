@@ -47,5 +47,11 @@ public function saveAnswer($data)
 
         return $this->save($data);
     }
+    
+    public function liczbaOdpowiedziNaPytanie($pytanieID) {
+    $builder = $this->builder();
+    $builder->where('idPyt', $pytanieID);
+    return $builder->countAllResults(); // Zwraca liczbę wyników pasujących do danego meczu
+}
 
 }

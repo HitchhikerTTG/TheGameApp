@@ -139,6 +139,9 @@ class TheGame extends BaseController
     $pytania = $pytaniaModel->getActiveQuestions($turniejID);
     
     foreach ($pytania as &$pytanie) {
+    
+        $pytanie['liczbaOdpowiedzi']=$odpowiedziModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+    
         $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
                                     ->where('uniidOdp', $loggedInUserId)
                                     ->first();

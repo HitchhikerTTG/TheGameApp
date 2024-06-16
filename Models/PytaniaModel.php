@@ -45,6 +45,10 @@ class PytaniaModel extends Model{
     {
         return $this->where(['TurniejID' => $turniejID, 'aktywne' => 1])->findAll();
     }
+    
+    
+    
+    
 }
 
 
