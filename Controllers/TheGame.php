@@ -533,6 +533,7 @@ unset($pytanie); // Unset reference
     $jsonString = file_get_contents($configPath);
     $config = json_decode($jsonString, true);
     $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+    $czasDoPorownania = date('Y-m-d H:i:s');
     
     if ($turniejID === null) {
         $turniejID = $config['activeTournamentId'];
@@ -557,7 +558,7 @@ unset($pytanie); // Unset reference
     ];
     $pytaniaModel= new PytaniaModel();
     $odpowiedzModel = new OdpowiedziModel();
-    $pytania = $pytaniaModel->getQuestionsArchive($turniejID, $currentDateTime);
+    $pytania = $pytaniaModel->getQuestionsArchive($turniejID, $czasDoPorownania);
 
     foreach ($pytania as &$pytanie) {
 
