@@ -100,20 +100,25 @@ public function setActiveTournamentFlagForUsers($userIds)
     }
     
 
-    public function getActiveUsersInTournament($tournamentID) 
-    {
-        
-        $file = WRITEPATH . 'logs/test_log.log';
+  public function getActiveUsersInTournament($tournamentID) 
+{
+    $file = WRITEPATH . 'logs/test_log.log';
 
-        // Zapisujemy URL do pliku logów
-        file_put_contents($file, "wywołana metoda w modelu\n", FILE_APPEND);
-    
-        return $this->select('uzytkownicy.id, uzytkownicy.nick, uzytkownicy.email')
-                    ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
-                    ->where('uzytkownicy.PlaysTheActiveTournament', 1)
-                    ->where('ktowcogra.turniejID', $tournamentID)
-                    ->findAll();
-    }
+    // Zapisujemy URL do pliku logów
+    file_put_contents($file, "wywołana metoda w modelu\n", FILE_APPEND);
+
+    $query = $this->select('uzytkownicy.id, uzytkownicy.nick, uzytkownicy.email')
+                  ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
+                  ->where('uzytkownicy.PlaysTheActiveTournament', 1)
+                  ->where('ktowcogra.turniejID', $tournamentID);
+
+    $result = $query->findAll();
+
+    // Zapisujemy liczbę zwróconych rekordów do pliku logów
+    file_put_contents($file, "Liczba zwróconych rekordów: " . count($result) . "\n", FILE_APPEND);
+
+    return $result;
+}
 
 }
 
