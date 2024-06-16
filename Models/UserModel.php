@@ -110,7 +110,7 @@ public function setActiveTournamentFlagForUsers($userIds)
     
         return $this->select('uzytkownicy.id, uzytkownicy.nick, uzytkownicy.email')
                     ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
-                    ->where('users.PlaysTheActiveTournament', 1)
+                    ->where('uzytkownicy.PlaysTheActiveTournament', 1)
                     ->where('ktowcogra.turniejID', $tournamentID)
                     ->findAll();
     }
