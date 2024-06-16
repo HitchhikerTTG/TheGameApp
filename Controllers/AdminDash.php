@@ -561,7 +561,7 @@ public function loadClubs(){
         print_r($niewytypowali);
         echo("</pre>");        
     }
-}
+
 
 
     public function pokazMiAdresy($turniejID){
@@ -579,7 +579,7 @@ public function loadClubs(){
         
         
     }
-
+}
    
 ?>
 
