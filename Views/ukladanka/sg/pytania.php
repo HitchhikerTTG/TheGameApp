@@ -73,9 +73,18 @@
                             </div>
                         </div>
                     </form>
+                    <?php if ($isPast): ?>
+                        <div class="row mt-3">
+                            <div class="col text-center">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#odpowiedziModal<?= $pytanie['id']; ?>">
+                                    Pokaż odpowiedzi użytkowników
+                                </button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="card-footer text-muted">
-                    <div class ="row">
+                    <div class="row">
                         <div class="col">
                             Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
                         </div>
@@ -83,9 +92,46 @@
                             Udzielonych odpowiedzi: <?= esc($pytanie['liczbaOdpowiedzi']) ?>
                         </div>
                     </div>
-                    
                 </div>
             </div>
+
+            <?php if ($isPast): ?>
+                <div class="modal fade" id="odpowiedziModal<?= $pytanie['id']; ?>" tabindex="-1" aria-labelledby="odpowiedziModalLabel<?= $pytanie['id']; ?>" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="odpowiedziModalLabel<?= $pytanie['id']; ?>">Odpowiedzi użytkowników na pytanie: <?= esc($pytanie['tresc']); ?></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <?php if (!empty($pytanie['odpowiedzi'])): ?>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Nick</th>
+                                                <th>Odpowiedź</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($pytanie['odpowiedzi'] as $odpowiedz): ?>
+                                                <tr>
+                                                    <td><?= esc($odpowiedz['nick']); ?></td>
+                                                    <td><?= esc($odpowiedz['odpowiedz']); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                <?php else: ?>
+                                    <p>Brak odpowiedzi.</p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         <?php endforeach; ?>
     </div>
 </div>
