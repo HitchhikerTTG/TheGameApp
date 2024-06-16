@@ -128,7 +128,7 @@ class TheGame extends BaseController
     $daneTurniejowe = [
         'tabelaDanych' => $tabelaDanych,
         'turniejID' => $turniejID,
-        'userID' => session()->get('loggedInUser')
+        'userID' => $daneUzytkownika['id'],
     ];
     
     $wstep = [

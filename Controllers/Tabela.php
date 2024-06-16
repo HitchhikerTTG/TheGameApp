@@ -48,7 +48,7 @@ class Tabela extends BaseController
         $uzytkownicyBuilder->where('activated',1);
         $aktywniUzytkownicy=$uzytkownicyBuilder->get()->getResultArray();
 
-        $userIdsInTournament = $ktoWCoGraModel->getUsersOfTournament($turniejID);
+        $userIdsInTournament = $ktoWCoGraModel->getUser sOfTournament($turniejID);
 
         // Teraz masz listę ID użytkowników uczestniczących w turnieju, możesz zrobić kolejne zapytanie
         // do modelu użytkowników (lub innego modelu), aby pobrać szczegółowe informacje o tych użytkownikach.
