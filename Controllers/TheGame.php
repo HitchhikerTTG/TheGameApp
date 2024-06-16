@@ -140,7 +140,7 @@ class TheGame extends BaseController
     
     foreach ($pytania as &$pytanie) {
     
-        $pytanie['liczbaOdpowiedzi']=$odpowiedziModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+        $pytanie['liczbaOdpowiedzi']=$odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
     
         $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
                                     ->where('uniidOdp', $loggedInUserId)
