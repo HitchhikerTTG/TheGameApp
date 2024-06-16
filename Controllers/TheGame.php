@@ -352,6 +352,7 @@ unset($pytanie); // Unset reference
 
         $userModel = model(UserModel::class);
         $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
         
 
