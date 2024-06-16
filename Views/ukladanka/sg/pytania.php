@@ -75,7 +75,15 @@
                     </form>
                 </div>
                 <div class="card-footer text-muted">
-                    Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
+                    <div class ="row">
+                        <div class="col">
+                            Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
+                        </div>
+                        <div class="col">
+                            Udzielonych odpowiedzi: <?= esc($pytanie['liczbaOdpowiedzi']) ?>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         <?php endforeach; ?>
