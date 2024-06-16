@@ -369,6 +369,15 @@ unset($pytanie); // Unset reference
         } else {
             $mecz['details'] = null;
         }
+        if($mecz['rozpoczety']){
+            $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
+            if (file_exists($jsonPath)) {
+                $mecz['typyGraczy'] = json_decode(file_get_contents($jsonPath), true);
+                }
+            else {
+                $mecz['typyGraczy'] = null;
+            }
+        }
     }
 
         return view('typowanie/header', $wstep)
