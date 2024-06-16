@@ -372,7 +372,7 @@ unset($pytanie); // Unset reference
 
         return view('typowanie/header', $wstep)
                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
-               .view('ukladanka/sg/zakonczoneMecze', ['mecze' => $meczeArchiwalne,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])
+               .view('ukladanka/sg/zakonczoneMecze', ['mecze' => $meczeArchiwalne,'turniejID'=>$turniejID,'userID'=>$loggedInUserId,               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']])
                //.view('ukladanka/sg/skryptArchiwum')
                .view('typowanie/footer');
 
