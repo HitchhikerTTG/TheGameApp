@@ -54,7 +54,6 @@
                     <span class="badge text-bg-secondary"><?= esc($pytanie['pkt']) ?> pkt</span>
                 </div>
                 <div class="card-body">
-                    <p><?=$wazneDoTimestamp?> | <?=$currentTimestamp?></p>
                     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
@@ -86,7 +85,7 @@
                 <div class="card-footer text-muted">
                     <div class="row">
                         <div class="col">
-                            Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
+                            Odpowiedz przed: <?= esc($pytanie['wazneDoLocal']) ?>
                         </div>
                         <div class="col">
                             Udzielonych odpowiedzi: <?= esc($pytanie['liczbaOdpowiedzi']) ?>

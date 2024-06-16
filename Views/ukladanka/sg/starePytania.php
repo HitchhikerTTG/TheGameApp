@@ -54,7 +54,6 @@
                     <span class="badge text-bg-secondary"><?= esc($pytanie['pkt']) ?> pkt</span>
                 </div>
                 <div class="card-body">
-                    <p><?=$wazneDoTimestamp?> | <?=$currentTimestamp?></p>
                     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
                         <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
                         <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
@@ -67,9 +66,7 @@
                                     </label>
                                     <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= $hasAnswer ? 'display: none;' : 'display: inline-block;' ?>" required>
                                 </span>
-                                <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0 <?= $isPast ? 'disabled' : '' ?>" <?= $isPast ? 'disabled' : '' ?>>
-                                    <?= $hasAnswer ? 'Zmień' : 'Zapisz' ?>
-                                </button>
+
                             </div>
                         </div>
                     </form>
@@ -83,15 +80,7 @@
                         </div>
                     <?php endif; ?>
                 </div>
-                <div class="card-footer text-muted">
-                    <div class="row">
-                        <div class="col">
-                            Ważne do: <?= esc($pytanie['wazneDoLocal']) ?>
-                        </div>
-                        <div class="col">
-                            Udzielonych odpowiedzi: <?= esc($pytanie['liczbaOdpowiedzi']) ?>
-                        </div>
-                    </div>
+                <div class="card-footer text-muted">    
                 </div>
             </div>
 
