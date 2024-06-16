@@ -150,8 +150,26 @@
                                                     <div class="odds">1: <?= $match['details']['odds']['1'] ?? 'N/A'; ?></div>
                                                     <div class="odds">X: <?= $match['details']['odds']['X'] ?? 'N/A'; ?></div>
                                                     <div class="odds">2: <?= $match['details']['odds']['2'] ?? 'N/A'; ?></div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div> <!-- Close the last date group -->
+</div>
+<div class="container mt-3 px-0 mx-0">
+<div class="row">
+    <div class="col">
+        <button type="button" class="btn btn-outline-secondary"><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></button>
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-outline-secondary"><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></button>
+    </div>
+</div>
+</div>
+</div>
