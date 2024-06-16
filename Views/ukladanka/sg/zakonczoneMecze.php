@@ -81,13 +81,7 @@
                                                 </div>
                                  </div>
 
-                                <div class="col">
-                                    
-                                    <div class="row">
-                                        <div class="col">                                            
-                                        </div>
-                                    </div>
-                                </div>
+                     
                             </div>
                         </div>
                     </div>
@@ -100,9 +94,6 @@
 <div class="row">
     <div class="col">
         <button type="button" class="btn btn-outline-secondary"><a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a></button>
-    </div>
-    <div class="col">
-        <button type="button" class="btn btn-outline-secondary"><a href="/archiwumturnieju">Wyniki rozegranych meczów &raquo;</a></button>
     </div>
 </div>
 </div>
