@@ -548,7 +548,6 @@ unset($pytanie); // Unset reference
     $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
 
     $daneTurniejowe = [
-        'tabelaDanych' => $tabelaDanych,
         'turniejID' => $turniejID,
         'userID' => $daneUzytkownika['id'],
     ];
