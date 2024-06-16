@@ -27,6 +27,60 @@
                     <div id="collapse<?= $match['ApiID']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $match['ApiID']; ?>">
                         <div class="accordion-body">
                             <div class="row match form-row text-center">
+                                 <div class="col">
+                                 <p>Twój typ: <?= $match['typy']['HomeTyp'] ?? '-'; ?> : <?= $match['typy']['AwayTyp'] ?? '-'; ?></p>
+                                 <?
+                                 if ($usedGoldenBall == 0) {
+                                                        $labelText = 'Nie chciałeś 2x więcej punktów za ten mecz';
+                                                    } elseif ($usedGoldenBall == $match['Id']) {
+                                                        $labelText = 'Za ten mecz chciałeś 2x wiecej punktów';
+                                                    } else {
+                                                        $labelText = 'Nie chciałeś 2x więcej punktów za ten mecz';
+                                                    } 
+                                 ?>
+                                 <p><?=$labelText?></p>
+                                 <p>Ten mecz wytypowało: <?= $match['liczbaTypow']; ?> osób </p>
+                                 
+                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#typy<?= $match['Id']; ?>">
+                                                    Jak typowali?
+                                                </button>
+                                                <div class="modal fade" id="typy<?= $match['Id']; ?>" tabindex="-1" aria-labelledby="typy<?= $match['Id']; ?>Label" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5" id="typy<?= $match['Id']; ?>Label">Nasze typy na ten mecz:</h1>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <?php if (isset($match['rozpoczety']) && $match['rozpoczety'] == 1): ?> 
+                                                                    <table class="table">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Nick</th>
+                                                                                <th>Typ</th>
+                                                                                <th>Złota piłka</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <?php if (isset($match['typyGraczy'])): 
+                                                                                foreach ($match['typyGraczy'] as $typ): ?>
+                                                                                    <tr>
+                                                                                        <td><?= htmlspecialchars($typ['username']); ?></td>
+                                                                                        <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
+                                                                                        <td><?= htmlspecialchars($typ['GoldenGame']); ?></td>
+                                                                                    </tr>
+                                                                                <?php endforeach; 
+                                                                            endif; ?>
+                                                                        </tbody>
+                                                                    </table>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <div class="modal-footer"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                 </div>
+
                                 <div class="col">
                                     <form action="/theGame/nowyZapisTypu" method="post" class="betting-form">
                                         <input type="hidden" name="userUID" value="<?= $userID; ?>">
