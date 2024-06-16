@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var userID = <?php echo json_encode($userID); ?>;
     var aktualnyFiltr = 'pelny';
     var widokSkrócony = true; // Domyślnie skrócony widok
+    
+    console.log('Uzytkownik', ${userID});
 
     function ustalPozycje(dane, filtr) {
         let aktualnaPozycja = 1;
