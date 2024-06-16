@@ -57,7 +57,7 @@ public function saveAnswer($data)
 	// Funkcja do pobierania odpowiedzi na pytanie
     public function pobierzOdpowiedziNaPytanie($pytanieID)
     {
-        return $this->where('pytanieID', $pytanieID)->findAll();
+        return $this->where('idPyt', $pytanieID)->findAll();
     }
 
 }
