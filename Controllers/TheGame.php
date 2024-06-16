@@ -360,6 +360,16 @@ unset($pytanie); // Unset reference
         $meczeArchiwalne = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju,"rozegrane");
 
 
+        // Fetch JSON data for each match
+        foreach ($meczeArchiwalne as &$mecz) {
+        $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
+        } else {
+            $mecz['details'] = null;
+        }
+    }
+
         return view('typowanie/header', $wstep)
                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
                .view('ukladanka/sg/zakonczoneMecze', ['mecze' => $meczeArchiwalne,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])
