@@ -116,7 +116,7 @@
                                             <?php foreach ($pytanie['odpowiedzi'] as $odpowiedz): ?>
                                                 <tr>
                                                     <td><?= esc($odpowiedz['nick']); ?></td>
-                                                    <td><?= esc($odpowiedz['odpowiedz']); ?></td>
+                                                    <td><?= esc($odpowiedz['odp']); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
