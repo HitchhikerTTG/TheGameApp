@@ -67,7 +67,13 @@
                                                                                     <tr>
                                                                                         <td><?= htmlspecialchars($typ['username']); ?></td>
                                                                                         <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
-                                                                                        <td><?= htmlspecialchars($typ['GoldenGame']); ?></td>
+                                                                                            <td>
+    <?php if ($typ['GoldenGame'] == 1): ?>
+        <svg width="75" height="75" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="50" stroke="black" stroke-width="3" fill="red" />
+        </svg>
+    <?php endif; ?>
+</td>
                                                                                     </tr>
                                                                                 <?php endforeach; 
                                                                             endif; ?>
