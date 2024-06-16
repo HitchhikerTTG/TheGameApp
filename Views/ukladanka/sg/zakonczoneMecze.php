@@ -21,7 +21,7 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading<?= $match['ApiID']; ?>">
                         <button class="accordion-button collapsed px-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
-                            <?= $naszCzas; ?> | <?= $match['details']['home_team']['name'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['name'] ?? 'Unknown'; ?>
+                           <?= $match['details']['home_team']['name'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['name'] ?? 'Unknown'; ?> <?= $match['details']['home_team']['score'] ?? 'Unknown'; ?> vs <?= $match['details']['away_team']['score'] ?? 'Unknown'; ?> | Twoje Pkt: <?=$match['typy']['pkt']?>
                         </button>
                     </h2>
                     <div id="collapse<?= $match['ApiID']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $match['ApiID']; ?>">
@@ -140,17 +140,6 @@
                                                     </div>
                                                 </div>
                                             <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col betting-hints">
-                                            <div class="col-12">
-                                                <div class="hints-title">Podpowiedź bookmacherów</div>
-                                                <div class="odds-container">
-                                                    <div class="odds">1: <?= $match['details']['odds']['1'] ?? 'N/A'; ?></div>
-                                                    <div class="odds">X: <?= $match['details']['odds']['X'] ?? 'N/A'; ?></div>
-                                                 <div class="odds">2: <?= $match['details']['odds']['2'] ?? 'N/A'; ?></div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
