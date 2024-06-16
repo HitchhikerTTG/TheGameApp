@@ -137,25 +137,44 @@ class TheGame extends BaseController
     $pytaniaModel= new PytaniaModel();
     $odpowiedzModel = new OdpowiedziModel();
     $pytania = $pytaniaModel->getActiveQuestions($turniejID);
+
+foreach ($pytania as &$pytanie) {
+
+    $pytanie['liczbaOdpowiedzi'] = $odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+
+    $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
+                                ->where('uniidOdp', $loggedInUserId)
+                                ->first();
+    if ($odpowiedz) {
+        $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
+    }
     
-    foreach ($pytania as &$pytanie) {
-    
-        $pytanie['liczbaOdpowiedzi']=$odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
-    
-        $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
-                                    ->where('uniidOdp', $loggedInUserId)
-                                    ->first();
-        if ($odpowiedz) {
-            $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
-            }
-         // Konwersja 'wazneDo' na czas lokalny
+    // Konwersja 'wazneDo' na czas lokalny
     if (isset($pytanie['wazneDo'])) {
         $utcDateTime = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
         $localTimezone = new DateTimeZone('Europe/Warsaw'); // Zastąp 'Europe/Warsaw' swoją strefą czasową
         $utcDateTime->setTimezone($localTimezone);
         $pytanie['wazneDoLocal'] = $utcDateTime->format('Y-m-d H:i:s');
+    }
+
+    // Sprawdzenie, czy czas wywołania funkcji jest po wartości 'wazneDo'
+    $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+    if ($currentDateTime > $utcDateTime) {
+        // Ścieżka do pliku JSON
+        $jsonFilePath = WRITEPATH . "odpowiedzi/{$pytanie['id']}.json";
+
+        if (file_exists($jsonFilePath)) {
+            // Pobierz dane z pliku JSON
+            $jsonData = file_get_contents($jsonFilePath);
+            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
+        } else {
+            // Wygeneruj dane i zapisz do pliku JSON
+            $this->wygenerujOdpowiedziNaPytanie($pytanie['id']);
+            $jsonData = file_get_contents($jsonFilePath);
+            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
         }
     }
+}
 unset($pytanie); // Unset reference
 
 
@@ -485,6 +504,30 @@ unset($pytanie); // Unset reference
         return $this->response->setJSON(['status' => 'error', 'message' => 'Wystąpił błąd podczas walidacji odpowiedzi.']);
     }
 }
+
+     public function wygenerujOdpowiedziNaPytanie($pytanieID)
+    {
+        // Inicjalizacja modelu
+        $odpowiedziModel = new OdpowiedziModel();
+        
+        // Pobierz odpowiedzi na pytanie
+        $odpowiedzi = $odpowiedziModel->pobierzOdpowiedziNaPytanie($pytanieID);
+
+        // Konwersja danych do formatu JSON
+        $jsonData = json_encode($odpowiedzi);
+
+        // Bazowy katalog dla plików JSON
+        $baseDir = WRITEPATH . "odpowiedzi";
+
+        // Sprawdź, czy katalog istnieje, a jeśli nie, to go stwórz
+        if (!is_dir($baseDir)) {
+            mkdir($baseDir, 0755, true);
+        }
+
+        // Zapisz dane JSON do pliku
+        file_put_contents("{$baseDir}/{$pytanieID}.json", $jsonData);
+    }
+    
 
 }
 ?>

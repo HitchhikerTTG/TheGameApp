@@ -54,4 +54,10 @@ public function saveAnswer($data)
     return $builder->countAllResults(); // Zwraca liczbę wyników pasujących do danego meczu
 }
 
+	// Funkcja do pobierania odpowiedzi na pytanie
+    public function pobierzOdpowiedziNaPytanie($pytanieID)
+    {
+        return $this->where('pytanieID', $pytanieID)->findAll();
+    }
+
 }
