@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var aktualnyFiltr = 'pelny';
     var widokSkrócony = true; // Domyślnie skrócony widok
     
-    console.log('Uzytkownik', ${userID});
+    console.log('Uzytkownik', userID);
 
     function ustalPozycje(dane, filtr) {
         let aktualnaPozycja = 1;
