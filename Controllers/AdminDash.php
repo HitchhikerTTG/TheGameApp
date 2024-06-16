@@ -564,7 +564,17 @@ public function loadClubs(){
 }
 
 
+    public function pokazMiAdresy($turniejID){
+        $userModel = model(UserModel::class);
 
+        $lista = $userModel->getActiveUsersInTournament($turniejID);
+        
+        echo('<pre>');
+        print_r($lista);
+        echo('</pre>');
+        
+        
+    }
 
    
 ?>
