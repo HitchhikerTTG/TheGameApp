@@ -528,6 +528,83 @@ unset($pytanie); // Unset reference
         file_put_contents("{$baseDir}/{$pytanieID}.json", $jsonData);
     }
     
+    public function archiwumPytan($turniejID = null) {
+    $configPath = WRITEPATH . 'ActiveTournament.json'; 
+    $jsonString = file_get_contents($configPath);
+    $config = json_decode($jsonString, true);
+    $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
+    
+    if ($turniejID === null) {
+        $turniejID = $config['activeTournamentId'];
+        $turniejName = $config['activeTournamentName'];
+        $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+    } else {
+        $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+    }
+
+    $loggedInUserId = session()->get('loggedInUser');
+
+    $userModel = model(UserModel::class);
+    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+
+    $daneTurniejowe = [
+        'tabelaDanych' => $tabelaDanych,
+        'turniejID' => $turniejID,
+        'userID' => $daneUzytkownika['id'],
+    ];
+    
+    $wstep = [
+        'title'=> $turniejName
+    ];
+    $pytaniaModel= new PytaniaModel();
+    $odpowiedzModel = new OdpowiedziModel();
+    $pytania = $pytaniaModel->getQuestionsArchive($turniejID, $currentDateTime);
+
+    foreach ($pytania as &$pytanie) {
+
+    $pytanie['liczbaOdpowiedzi'] = $odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+
+    $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
+                                ->where('uniidOdp', $loggedInUserId)
+                                ->first();
+    if ($odpowiedz) {
+        $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
+    }
+    
+    // Konwersja 'wazneDo' na czas lokalny
+    if (isset($pytanie['wazneDo'])) {
+        $utcDateTime = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
+        $localTimezone = new DateTimeZone('Europe/Warsaw'); // Zastąp 'Europe/Warsaw' swoją strefą czasową
+        $utcDateTime->setTimezone($localTimezone);
+        $pytanie['wazneDoLocal'] = $utcDateTime->format('Y-m-d H:i:s');
+    }
+
+    // Sprawdzenie, czy czas wywołania funkcji jest po wartości 'wazneDo'
+
+    if ($currentDateTime > $utcDateTime) {
+        // Ścieżka do pliku JSON
+        $jsonFilePath = WRITEPATH . "odpowiedzi/{$pytanie['id']}.json";
+
+        if (file_exists($jsonFilePath)) {
+            // Pobierz dane z pliku JSON
+            $jsonData = file_get_contents($jsonFilePath);
+            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
+        } else {
+            // Wygeneruj dane i zapisz do pliku JSON
+            $this->wygenerujOdpowiedziNaPytanie($pytanie['id']);
+            $jsonData = file_get_contents($jsonFilePath);
+            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
+        }
+    }
+}
+unset($pytanie); // Unset reference
+
+    return view('typowanie/header', $wstep)
+           .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
+           .view('ukladanka/sg/starePytania', ['pytania'=>$pytania])
+           .view('typowanie/footer');
+}
+
 
 }
 ?>

@@ -46,6 +46,11 @@ class PytaniaModel extends Model{
         return $this->where(['TurniejID' => $turniejID, 'aktywne' => 1])->findAll();
     }
     
+    public function getQuestionsArchive($turniejID, $date){
+        return $this->where('TurniejID', $turniejID)
+                    ->where('wazneDo <', $date)
+                    ->findAll();
+    }
     
     
     
