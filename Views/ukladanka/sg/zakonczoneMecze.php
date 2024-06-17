@@ -46,6 +46,11 @@
                                     ?>
                                     <p><?= $labelText ?></p>
                                     <p>Ten mecz wytypowało: <?= $match['liczbaTypow']; ?> osób </p>
+                                    <p>Zwycięstwo $homeTeamName wytypowało: <?= $match['podsumowanieTypow']['countWin1']; ?> osób </p>
+                                    <p>Zwycięstwo $awayTeamName: <?= $match['podsumowanieTypow']['countWin2']; ?> osób </p>
+                                    <p>Remis obstawiło: <?= $match['podsumowanieTypow']['countDraw']; ?> osób </p>
+                                    <p>Najpopularniejszy typ: <?= $match['podsumowanieTypow']['MostPopularType']; ?> osób </p>
+                                    <p>Złota piłka użyta: <?= $match['podsumowanieTypow']['GoldenBallCount']; ?> osób </p>
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#typy<?= $match['Id']; ?>">
                                         Jak typowali?
                                     </button>
