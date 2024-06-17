@@ -427,7 +427,7 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
 
 public function wygenerujTypyDlaMeczu($matchId) {
     $typyModel = new \App\Models\TypyModel();
-    $types = $typyModel->ktoTypujeTenMecz($matchId);
+    $types = $typyModel->ktoTypujeTenMeczLimited($matchId);
 
     // Inicjalizacja zmiennych do przechowywania statystyk
     $countWin1 = 0;
