@@ -460,10 +460,12 @@ public function wygenerujTypyDlaMeczu($matchId) {
 
     // Znajdowanie najpopularniejszego typu
     $mostPopularType = array_search(max($typeCounts), $typeCounts);
-
+    $mostPopularTypeCount = $typeCounts[$mostPopularType];
+    
     // Przygotowanie sekcji summary
     $summary = [
         'mostPopularType' => $mostPopularType,
+        'mostPopularTypeCount'=>$mostPopularTypeCount,
         'countWin1' => $countWin1,
         'countWin2' => $countWin2,
         'countDraw' => $countDraw,
