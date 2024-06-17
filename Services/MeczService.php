@@ -437,7 +437,7 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $typeCounts = [];
     $playersWithPoints = 0;
     $correctPredictions = 0;
-    $doublePointsPlayers = 0
+    $doublePointsPlayers = 0;
 
     // Przetwarzanie typów
     foreach ($types as $typ) {
