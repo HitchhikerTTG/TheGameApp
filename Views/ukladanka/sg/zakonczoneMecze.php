@@ -4,7 +4,7 @@
         <div id="matchesAccordion" class="accordion">
             <?php 
             $lastDate = null;
-            foreach ($mecze as $match): 
+            foreach ($mecze['types'] as $match): 
                 $matchDate = date('Y-m-d', strtotime($match['details']['date']));
                 $matchTime = date('H:i', strtotime($match['details']['time']));
                 $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
@@ -70,8 +70,8 @@
                                                                 <?php if (isset($match['typyGraczy'])): 
                                                                     foreach ($match['typyGraczy'] as $typ): ?>
                                                                         <tr>
-                                                                            <td><?= htmlspecialchars($typ['types']['username']); ?></td>
-                                                                            <td><?= htmlspecialchars($typ['types']['HomeTyp']); ?>:<?= htmlspecialchars($typ['types']['AwayTyp']); ?></td>
+                                                                            <td><?= htmlspecialchars($typ['username']); ?></td>
+                                                                            <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
                                                                             <td><?php if ($typ['GoldenGame'] == 1): ?>🙏<?php endif; ?></td>
                                                                         </tr>
                                                                     <?php endforeach; 
