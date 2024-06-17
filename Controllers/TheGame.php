@@ -272,7 +272,7 @@ foreach ($mecze4 as &$mecz) {
             
                 $data = json_decode(file_get_contents($jsonPath), true);
                 $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
-                $mecz['podsumowanieTypow'] = isset($data['types']) ? $data['types'] : [];
+                $mecz['podsumowanieTypow'] = isset($data['summary']) ? $data['summary'] : [];
                 }
             else {
                 $mecz['typyGraczy'] = null;
