@@ -405,10 +405,12 @@ foreach ($meczeArchiwalne as &$mecz) {
                 $data = json_decode(file_get_contents($jsonPath), true);
                 $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
                 $mecz['podsumowanieTypow'] = isset($data['summary']) ? $data['summary'] : [];
+                $mecz['naKoniec'] = isset($data['zakonczone']) ? $data['zakonczone'] : [];
                 }
             else {
                 $mecz['typyGraczy'] = null;
                 $mecz['podsumowanieTypow'] = null;
+                $mecz['naKoniec'] = null;
             }
         }
     }

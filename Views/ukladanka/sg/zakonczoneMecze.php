@@ -49,8 +49,16 @@
                                     <p>Zwycięstwo <?=$homeTeamName?> wytypowało: <?= $match['podsumowanieTypow']['countWin1']; ?> osób </p>
                                     <p>Zwycięstwo <?=$awayTeamName?> wytypowało: <?= $match['podsumowanieTypow']['countWin2']; ?> osób </p>
                                     <p>Remis obstawiło: <?= $match['podsumowanieTypow']['countDraw']; ?> osób </p>
-                                    <p>Najpopularniejszy typ: <?= $match['podsumowanieTypow']['mostPopularType']; ?>, wskazany <?=$match['podsumowanieTypow']['mostPopularTypeCount']?> razy(ów) </p>
+                                    <p>Najpopularniejszy typ: <?= $match['podsumowanieTypow']['mostPopularType']; ?>, wskazany <?=$match['podsumowanieTypow']['mostPopularTypeCount']?> razy </p>
                                     <p>Złota piłka użyta: <?= $match['podsumowanieTypow']['goldenBallCount']; ?> raz(y) </p>
+                                    
+                                    <?php if($match['details']['status']=="Zakonczony"){?>
+                                    	<p>Punkty zdobyło: <?= $match['naKoniec']['playersWithPoints']; ?> graczy </p>
+                                    	<p>Dokładnie mecz wytypowało: <?= $match['naKoniec']['correctPredictions']; ?> graczy </p>
+                                    	<p>A z użycia złotej piłki ucieszyło się: <?= $match['naKoniec']['doublePointsPlayers']; ?> gracz(y) </p>'' 
+	
+                                    <?php }?>
+                                    
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#typy<?= $match['Id']; ?>">
                                         Jak typowali?
                                     </button>

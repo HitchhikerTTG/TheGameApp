@@ -435,6 +435,9 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $countDraw = 0;
     $goldenBallCount = 0;
     $typeCounts = [];
+    $playersWithPoints = 0;
+    $correctPredictions = 0;
+    $doublePointsPlayers = 0
 
     // Przetwarzanie typów
     foreach ($types as $typ) {
@@ -456,6 +459,18 @@ public function wygenerujTypyDlaMeczu($matchId) {
         } else {
             $typeCounts[$typeKey] = 1;
         }
+        
+         // Sprawdzanie punktów graczy
+        $pkt = intval($typ['pkt']);
+        if ($pkt > 0) {
+            $playersWithPoints++;
+        }
+        if ($pkt == 3 || $pkt == 6) {
+            $correctPredictions++;
+        }
+        if ($pkt == 2 || $pkt == 6) {
+            $doublePointsPlayers++;
+        }
     }
 
     // Znajdowanie najpopularniejszego typu
@@ -471,11 +486,18 @@ public function wygenerujTypyDlaMeczu($matchId) {
         'countDraw' => $countDraw,
         'goldenBallCount' => $goldenBallCount
     ];
-
+    
+    $zakonczone = [
+        'playersWithPoints' => $playersWithPoints,
+        'correctPredictions' => $correctPredictions,
+        'doublePointsPlayers' => $doublePointsPlayer
+        ];
+        
     // Przygotowanie danych JSON do zapisu
     $data = [
         'types' => $types,
-        'summary' => $summary
+        'summary' => $summary,
+        'zakonczone' =>$zakonczone
     ];
 
     $jsonData = json_encode($data, JSON_PRETTY_PRINT);
