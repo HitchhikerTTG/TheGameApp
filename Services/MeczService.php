@@ -429,48 +429,54 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $typyModel = new \App\Models\TypyModel();
     $types = $typyModel->ktoTypujeTenMecz($matchId);
 
-    // Inicjalizacja zmiennych do przechowywania liczników
+    // Inicjalizacja zmiennych do przechowywania statystyk
     $countWin1 = 0;
     $countWin2 = 0;
     $countDraw = 0;
     $goldenBallCount = 0;
     $typeCounts = [];
 
-    // Iteracja po typach, aby zliczyć odpowiednie dane
-    foreach ($types as $type) {
-        if (isset($type['HomeTyp']) && isset($type['AwayTyp'])) {
-            if ($type['HomeTyp'] > $type['AwayTyp']) {
-                $countWin1++;
-            } elseif ($type['HomeTyp'] < $type['AwayTyp']) {
-                $countWin2++;
-            } else {
-                $countDraw++;
-            }
-
-            $typeKey = "{$type['HomeTyp']}:{$type['AwayTyp']}";
-            if (!isset($typeCounts[$typeKey])) {
-                $typeCounts[$typeKey] = 0;
-            }
-            $typeCounts[$typeKey]++;
+    // Przetwarzanie typów
+    foreach ($types as $typ) {
+        if ($typ['HomeTyp'] > $typ['AwayTyp']) {
+            $countWin1++;
+        } elseif ($typ['HomeTyp'] < $typ['AwayTyp']) {
+            $countWin2++;
+        } else {
+            $countDraw++;
         }
 
-        if (isset($type['GoldenGame']) && $type['GoldenGame'] == 1) {
+        if ($typ['GoldenGame'] == 1) {
             $goldenBallCount++;
+        }
+
+        $typeKey = $typ['HomeTyp'] . ':' . $typ['AwayTyp'];
+        if (isset($typeCounts[$typeKey])) {
+            $typeCounts[$typeKey]++;
+        } else {
+            $typeCounts[$typeKey] = 1;
         }
     }
 
-    // Znalezienie najpopularniejszego typu
-    $mostPopularType = array_keys($typeCounts, max($typeCounts))[0] ?? null;
+    // Znajdowanie najpopularniejszego typu
+    $mostPopularType = array_search(max($typeCounts), $typeCounts);
 
-    // Przygotowanie danych do zapisu w JSON
-    $jsonData = json_encode([
-        'types' => $types,
+    // Przygotowanie sekcji summary
+    $summary = [
         'mostPopularType' => $mostPopularType,
         'countWin1' => $countWin1,
         'countWin2' => $countWin2,
         'countDraw' => $countDraw,
         'goldenBallCount' => $goldenBallCount
-    ]);
+    ];
+
+    // Przygotowanie danych JSON do zapisu
+    $data = [
+        'types' => $types,
+        'summary' => $summary
+    ];
+
+    $jsonData = json_encode($data, JSON_PRETTY_PRINT);
 
     // Bazowy katalog dla plików JSON
     $baseDir = WRITEPATH . "typy"; 

@@ -268,31 +268,18 @@ foreach ($mecze4 as &$mecz) {
         if($mecz['rozpoczety']){
             $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
             if (file_exists($jsonPath)) {
-                $mecz['typyGraczy'] = json_decode(file_get_contents($jsonPath), true);
+            
+            
+                $data = json_decode(file_get_contents($jsonPath), true);
+                $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
+                $mecz['podsumowanieTypow'] = isset($data['types']) ? $data['types'] : [];
                 }
             else {
                 $mecz['typyGraczy'] = null;
+                $mecz['podsumowanieTypow'] = null;
             }
         }
     }
-
-//        $pytania = [];
-        /*
-        //Przekazanie danych do widoku?*/
-
-//        $daneTurniejowe = [
-//            'tabelaDanych' => $tabelaDanych,
-//            'turniejID' => $turniejID,
-//            'userID' => session()->get('loggedInUser')
-//            //'title' => 'Wit pastwi się nad tabelą'
-//            ];
-        
- //       $wstep = [
-  //          'title'=> $turniejName
-   //     ];
-
-     //   $userModel = model(UserModel::class);
-     //    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
         
         echo("<pre>");
         print_r($mecze4);
