@@ -214,7 +214,7 @@ unset($pytanie); // Unset reference
                 $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
             }
 
-        //$loggedInUserId = session()->get('loggedInUser');
+        $loggedInUserId = session()->get('loggedInUser');
 
 
 //        $model = model(TabelaModel::class);
