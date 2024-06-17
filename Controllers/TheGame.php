@@ -214,17 +214,17 @@ unset($pytanie); // Unset reference
                 $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
             }
 
-        $loggedInUserId = session()->get('loggedInUser');
+        //$loggedInUserId = session()->get('loggedInUser');
 
 
-        $model = model(TabelaModel::class);
-        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+//        $model = model(TabelaModel::class);
+//        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+//        $userModel = model(UserModel::class);
+//        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
         // Pobranie informacji o "GoldenBall" z sesji
 
-        $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+//        $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
 
 #        $mecze = $this->meczService->getMeczeDnia($turniejID);
@@ -264,19 +264,19 @@ unset($pytanie); // Unset reference
         /*
         //Przekazanie danych do widoku?*/
 
-        $daneTurniejowe = [
-            'tabelaDanych' => $tabelaDanych,
-            'turniejID' => $turniejID,
-            'userID' => session()->get('loggedInUser')
-            //'title' => 'Wit pastwi się nad tabelą'
-            ];
+//        $daneTurniejowe = [
+//            'tabelaDanych' => $tabelaDanych,
+//            'turniejID' => $turniejID,
+//            'userID' => session()->get('loggedInUser')
+//            //'title' => 'Wit pastwi się nad tabelą'
+//            ];
         
-        $wstep = [
-            'title'=> $turniejName
-        ];
+ //       $wstep = [
+  //          'title'=> $turniejName
+   //     ];
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+     //   $userModel = model(UserModel::class);
+     //    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
         
         echo("<pre>");
         print_r($mecze4);
