@@ -429,7 +429,48 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $typyModel = new \App\Models\TypyModel();
     $types = $typyModel->ktoTypujeTenMecz($matchId);
 
-    $jsonData = json_encode($types);
+    // Inicjalizacja zmiennych do przechowywania liczników
+    $countWin1 = 0;
+    $countWin2 = 0;
+    $countDraw = 0;
+    $goldenBallCount = 0;
+    $typeCounts = [];
+
+    // Iteracja po typach, aby zliczyć odpowiednie dane
+    foreach ($types as $type) {
+        if (isset($type['HomeTyp']) && isset($type['AwayTyp'])) {
+            if ($type['HomeTyp'] > $type['AwayTyp']) {
+                $countWin1++;
+            } elseif ($type['HomeTyp'] < $type['AwayTyp']) {
+                $countWin2++;
+            } else {
+                $countDraw++;
+            }
+
+            $typeKey = "{$type['HomeTyp']}:{$type['AwayTyp']}";
+            if (!isset($typeCounts[$typeKey])) {
+                $typeCounts[$typeKey] = 0;
+            }
+            $typeCounts[$typeKey]++;
+        }
+
+        if (isset($type['GoldenGame']) && $type['GoldenGame'] == 1) {
+            $goldenBallCount++;
+        }
+    }
+
+    // Znalezienie najpopularniejszego typu
+    $mostPopularType = array_keys($typeCounts, max($typeCounts))[0] ?? null;
+
+    // Przygotowanie danych do zapisu w JSON
+    $jsonData = json_encode([
+        'types' => $types,
+        'mostPopularType' => $mostPopularType,
+        'countWin1' => $countWin1,
+        'countWin2' => $countWin2,
+        'countDraw' => $countDraw,
+        'goldenBallCount' => $goldenBallCount
+    ]);
 
     // Bazowy katalog dla plików JSON
     $baseDir = WRITEPATH . "typy"; 
@@ -441,7 +482,6 @@ public function wygenerujTypyDlaMeczu($matchId) {
 
     // Zapisz dane JSON do pliku
     file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
-}
 }
 
 ?>
