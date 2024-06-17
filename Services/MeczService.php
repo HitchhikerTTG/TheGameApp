@@ -483,6 +483,6 @@ public function wygenerujTypyDlaMeczu($matchId) {
     // Zapisz dane JSON do pliku
     file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
 }
-}
+}   
 
 ?>

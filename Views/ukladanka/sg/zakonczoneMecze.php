@@ -70,8 +70,8 @@
                                                                 <?php if (isset($match['typyGraczy'])): 
                                                                     foreach ($match['typyGraczy'] as $typ): ?>
                                                                         <tr>
-                                                                            <td><?= htmlspecialchars($typ['username']); ?></td>
-                                                                            <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
+                                                                            <td><?= htmlspecialchars($typ['types']['username']); ?></td>
+                                                                            <td><?= htmlspecialchars($typ['types']['HomeTyp']); ?>:<?= htmlspecialchars($typ['types']['AwayTyp']); ?></td>
                                                                             <td><?php if ($typ['GoldenGame'] == 1): ?>🙏<?php endif; ?></td>
                                                                         </tr>
                                                                     <?php endforeach; 
