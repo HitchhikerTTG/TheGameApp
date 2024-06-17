@@ -1,3 +1,20 @@
+<style>
+.bg-platyna {
+    background-color: #e5e4e2;
+}
+
+.bg-zloto {
+    background-color: #ffd700;
+}
+
+.bg-srebro {
+    background-color: #c0c0c0;
+}
+
+.bg-braz {
+    background-color: #cd7f32;
+}
+</style>
 <div class="section my-3 pt-3">
     <h4>Archiwum meczów</h4>
     <div class="container mt-3 px-0 mx-0">
@@ -80,15 +97,34 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <?php if (isset($match['typyGraczy'])): 
-                                                                    foreach ($match['typyGraczy'] as $typ): ?>
-                                                                        <tr>
-                                                                            <td><?= htmlspecialchars($typ['username']); ?></td>
-                                                                            <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
-                                                                            <td><?php if ($typ['GoldenGame'] == 1): ?>🙏<?php endif; ?></td>
-                                                                        </tr>
-                                                                    <?php endforeach; 
-                                                                endif; ?>
+                                                               <?php if (isset($match['typyGraczy'])): 
+    foreach ($match['typyGraczy'] as $typ): 
+        // Określenie klasy CSS na podstawie punktów
+        $class = '';
+        switch (intval($typ['pkt'])) {
+            case 6:
+                $class = 'bg-platyna';
+                break;
+            case 3:
+                $class = 'bg-zloto';
+                break;
+            case 2:
+                $class = 'bg-srebro';
+                break;
+            case 1:
+                $class = 'bg-braz';
+                break;
+            default:
+                $class = '';
+        }
+        ?>
+        <tr class="<?= $class; ?>">
+            <td><?= htmlspecialchars($typ['username']); ?></td>
+            <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
+            <td><?php if ($typ['GoldenGame'] == 1): ?>🙏<?php endif; ?></td>
+        </tr>
+    <?php endforeach; 
+endif; ?>
                                                             </tbody>
                                                         </table>
                                                     <?php endif; ?>
