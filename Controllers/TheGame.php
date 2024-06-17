@@ -246,7 +246,7 @@ unset($pytanie); // Unset reference
         print_r($mecze3);
         echo "</pre>";
 */
-        $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju,"do_rozegrania");
+        $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju,"rozegrane");
 
 /*      echo "<p>jeszcze sie okaże, że będę śpiewał hallelujah:</p><pre>";
         print_r($mecze4);
@@ -277,13 +277,16 @@ unset($pytanie); // Unset reference
 
         $userModel = model(UserModel::class);
         $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
-
-        return view('typowanie/header', $wstep)
+        
+        echo("<pre>");
+        print_r($mecze4);
+        echo("</pre>");
+/*        return view('typowanie/header', $wstep)
                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
                .view('ukladanka/sg/znowumecze',['mecze' => $mecze4,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])               .view('ukladanka/sg/meczenanowo',['mecze' => $mecze4,'turniejID'=>$turniejID,'userID'=>$loggedInUserId])
                .view('ukladanka/sg/jeszczejedenskrypt')
                .view('typowanie/footer');
-
+*/
         
 
     }
