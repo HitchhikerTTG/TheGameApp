@@ -258,9 +258,25 @@ unset($pytanie); // Unset reference
         echo "</pre><p>że pojawiły sie nowe katalogi z odpowiednimi danymi... sprawdź i trzymaj kciuki, a w razie czego chwal pana i wołaj Alleluja</p>";
 */
     
+foreach ($mecze4 as &$mecz) {
+        $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
+        } else {
+            $mecz['details'] = null;
+        }
+        if($mecz['rozpoczety']){
+            $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
+            if (file_exists($jsonPath)) {
+                $mecz['typyGraczy'] = json_decode(file_get_contents($jsonPath), true);
+                }
+            else {
+                $mecz['typyGraczy'] = null;
+            }
+        }
+    }
 
-
-        $pytania = [];
+//        $pytania = [];
         /*
         //Przekazanie danych do widoku?*/
 
