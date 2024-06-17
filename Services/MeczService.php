@@ -490,7 +490,7 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $zakonczone = [
         'playersWithPoints' => $playersWithPoints,
         'correctPredictions' => $correctPredictions,
-        'doublePointsPlayers' => $doublePointsPlayer
+        'doublePointsPlayers' => $doublePointsPlayers
         ];
         
     // Przygotowanie danych JSON do zapisu
