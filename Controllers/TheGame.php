@@ -390,7 +390,7 @@ foreach ($mecze4 as &$mecz) {
 
 
         // Fetch JSON data for each match
-        foreach ($meczeArchiwalne as &$mecz) {
+foreach ($meczeArchiwalne as &$mecz) {
         $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
         if (file_exists($jsonPath)) {
             $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
@@ -400,10 +400,15 @@ foreach ($mecze4 as &$mecz) {
         if($mecz['rozpoczety']){
             $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
             if (file_exists($jsonPath)) {
-                $mecz['typyGraczy'] = json_decode(file_get_contents($jsonPath), true);
+            
+            
+                $data = json_decode(file_get_contents($jsonPath), true);
+                $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
+                $mecz['podsumowanieTypow'] = isset($data['summary']) ? $data['summary'] : [];
                 }
             else {
                 $mecz['typyGraczy'] = null;
+                $mecz['podsumowanieTypow'] = null;
             }
         }
     }

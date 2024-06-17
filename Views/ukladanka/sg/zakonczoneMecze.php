@@ -4,7 +4,7 @@
         <div id="matchesAccordion" class="accordion">
             <?php 
             $lastDate = null;
-            foreach ($mecze['types'] as $match): 
+            foreach ($mecze as $match): 
                 $matchDate = date('Y-m-d', strtotime($match['details']['date']));
                 $matchTime = date('H:i', strtotime($match['details']['time']));
                 $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
