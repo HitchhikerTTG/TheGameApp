@@ -385,12 +385,12 @@ function processMatchesData($matchesData) {
             'home_team' => [
                 'id' => $match['home_id'],
                 'name' => $match['home_name'],
-                'plName'=> $match['home_translations']['pl']
+                'plName' => isset($match['home_translations']['pl']) ? $match['home_translations']['pl'] : $match['home_name'] // Użycie tłumaczenia lub domyślnej nazwy
             ],
             'away_team' => [
                 'id' => $match['away_id'],
                 'name' => $match['away_name'],
-                 'plName'=> $match['away_translations']['pl']
+                'plName' => isset($match['away_translations']['pl']) ? $match['away_translations']['pl'] : $match['away_name'] // Użycie tłumaczenia lub domyślnej nazwy
             ],
             'competition' => $match['competition']['name'],
             'date' => $match['date'],
