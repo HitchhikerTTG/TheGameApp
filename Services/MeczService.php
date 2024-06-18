@@ -385,12 +385,12 @@ function processMatchesData($matchesData) {
             'home_team' => [
                 'id' => $match['home_id'],
                 'name' => $match['home_name'],
-                'plName'=> $match['home_translations']['pl']
+                'plName'=> $match['home_translations']
             ],
             'away_team' => [
                 'id' => $match['away_id'],
                 'name' => $match['away_name'],
-                 'plName'=> $match['away_translations']['pl']
+                 'plName'=> $match['away_translations']
             ],
             'competition' => $match['competition']['name'],
             'date' => $match['date'],
