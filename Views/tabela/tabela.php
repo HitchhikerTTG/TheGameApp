@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 kluczSortowania = 'punkty';
         }
 
-        dane.sort((a, b) => b[kluczSortowania] - a[kluczSortowania]);
+        dane.sort((a, b) => parseInt(b[kluczSortowania]) - parseInt(a[kluczSortowania]));
 
         let pozycje = [];
         let aktualnaPozycja = 1;
@@ -146,4 +146,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>  
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
