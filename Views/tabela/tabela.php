@@ -6,28 +6,33 @@ document.addEventListener('DOMContentLoaded', function() {
     var widokSkrócony = true; // Domyślnie skrócony widok
 
     function ustalPozycje(dane, filtr) {
-        if (filtr === 'punktyZaMecze') {
-            dane.sort((a, b) => b.punktyZaMecze - a.punktyZaMecze);
-        } else if (filtr === 'punktyZaPytania') {
-            dane.sort((a, b) => b.punktyZaPytania - a.punktyZaPytania);
-        } else {
-            filtr = 'punkty'; // Default case for 'pelny' filter
-            dane.sort((a, b) => b.punkty - a.punkty);
+        let kluczSortowania;
+        switch(filtr) {
+            case 'punktyZaMecze':
+                kluczSortowania = 'punktyZaMecze';
+                break;
+            case 'punktyZaPytania':
+                kluczSortowania = 'punktyZaPytania';
+                break;
+            default:
+                kluczSortowania = 'punkty';
         }
+
+        dane.sort((a, b) => b[kluczSortowania] - a[kluczSortowania]);
 
         let pozycje = [];
         let aktualnaPozycja = 1;
 
         for (let i = 0; i < dane.length; i++) {
-            if (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) {
+            if (i === 0 || dane[i][kluczSortowania] !== dane[i - 1][kluczSortowania]) {
                 aktualnaPozycja = i + 1;
             }
             pozycje.push({
                 uid: dane[i].uid,
                 nick: dane[i].nick,
-                punkty: dane[i][filtr],
+                punkty: dane[i][kluczSortowania],
                 dokladneTrafienia: dane[i].dokladneTrafienia,
-                pozycja: (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) ? aktualnaPozycja : '-'
+                pozycja: (i === 0 || dane[i][kluczSortowania] !== dane[i - 1][kluczSortowania]) ? aktualnaPozycja : '-'
             });
         }
 
@@ -151,4 +156,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>  
