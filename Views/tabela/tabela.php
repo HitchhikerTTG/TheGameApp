@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 pozycja: (i === 0 || dane[i][kluczSortowania] !== dane[i - 1][kluczSortowania]) ? aktualnaPozycja : '-'
             });
         }
-
+        console.log(pozycje);
         return pozycje;
     }
 
