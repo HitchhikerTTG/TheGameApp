@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 uid: dane[i].uid,
                 nick: dane[i].nick,
                 punkty: dane[i].punkty,
-                pozycja: (i === 0 || dane[i].punkty !== dane[i - 1].punkty) ? aktualnaPozycja : '-'
+                pozycja: aktualnaPozycja,
+                wyswietlanaPozycja: (i === 0 || dane[i].punkty !== dane[i - 1].punkty) ? aktualnaPozycja : '-'
             });
         }
 
@@ -38,16 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = '';
             if (gracz.uid == userID) {
-                klasaStylu = 'class="table-light"';
+                klasaStylu = 'table-light';
             } else if (gracz.pozycja == 1) {
-                klasaStylu = 'class="bg-warning"';
+                klasaStylu = 'table-warning';
             } else if (gracz.pozycja == 2) {
-                klasaStylu = 'class="bg-secondary"';
+                klasaStylu = 'table-secondary';
             } else if (gracz.pozycja == 3) {
-                klasaStylu = 'class="bg-danger"';
+                klasaStylu = 'table-danger';
             }
-            let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
-            html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
+            let wyswietlanaPozycja = gracz.wyswietlanaPozycja;
+            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
         });
 
         if (widokSkrócony && pozycjaUzytkownika > 10) {
@@ -73,41 +74,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('przelacznikWidoku').addEventListener('click', function() {
         widokSkrócony = !widokSkrócony;
-        this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabelę";
-        let pozycje = ustalPozycje(tabelaDanych);
-        generujTabele(pozycje);
-    });
-
-    let pozycje = ustalPozycje(tabelaDanych);
-    generujTabele(pozycje);
-});
-</script>
-
-<style>
-.user-row { background-color: #d3d3d3; }
-</style>
-
-<div class="row">
-  <div class="col mt-3 mb-3">
-    <p>A teraz to, po co wszyscy tu przychodzimy, czyli...</p>
-    <h3>Aktualna tabela Typera Mistrzostw</h3>
-  </div>
-</div>
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active filtr" data-filtr="pelny" href="#">Ogółem</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link filtr" data-filtr="punktyZaMecze" href="#">Mecze</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link filtr" data-filtr="punktyZaPytania" href="#">Pytania</a>
-  </li>
-</ul>
-<div class="row">
-  <div class="col">
-    <div id="tabelaGraczyContainer" class="table-responsive"></div>
-  </div>
-</div>
-
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
+        this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabel
