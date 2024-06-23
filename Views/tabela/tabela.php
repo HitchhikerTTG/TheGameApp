@@ -40,26 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getKolor(liczbaGraczyZWiekszaLiczbaPunktow, uid) {
-        if (uid === userID) {
-            if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
-                return 'bg-warning'; // gold
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
-                return 'bg-secondary'; // silver
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
-                return 'bg-danger'; // bronze
-            } else {
-                return 'bg-light'; // szary
-            }
+        if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
+            return 'bg-warning'; // gold
+        } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
+            return 'bg-secondary'; // silver
+        } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
+            return 'bg-danger'; // bronze
+        } else if (uid === userID) {
+            return 'bg-light'; // szary
         } else {
-            if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
-                return 'bg-warning'; // gold
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
-                return 'bg-secondary'; // silver
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
-                return 'bg-danger'; // bronze
-            } else {
-                return '';
-            }
+            return '';
         }
     }
 
@@ -156,4 +146,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>  
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
