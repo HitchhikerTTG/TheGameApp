@@ -30,18 +30,20 @@ document.addEventListener('DOMContentLoaded', function() {
         var html = '<table class="table">';
         html += '<tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr>';
 
-        let pozycjaUzytkownika = pozycje.find(p => p.uid == userID).pozycja;
+        let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
+        let liczbaGraczyZWiekszaLiczbaPunktow = pozycje.filter(p => p.punkty > pozycje.find(p => p.uid == userID).punkty).length;
         let limit = widokSkrócony ? 10 : pozycje.length;
 
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = gracz.uid == userID ? 'class="user-row"' : '';
-            html += `<tr ${klasaStylu}><td>${gracz.pozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
+            let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
+            html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
         });
 
         if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row"><td>${daneUzytkownika.pozycja}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="user-row"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
         }
 
         html += '</table>';
