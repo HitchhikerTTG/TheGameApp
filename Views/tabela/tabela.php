@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 nick: dane[i].nick,
                 punkty: dane[i][kluczSortowania],
                 dokladneTrafienia: dane[i].dokladneTrafienia,
-                pozycja: (i === 0 || dane[i][kluczSortowania] !== dane[i - 1][kluczSortowania]) ? aktualnaPozycja : '-'
+                pozycja: (i === 0 || dane[i][kluczSortowania] !== dane[i - 1][kluczSortowania]) ? aktualnaPozycja : '-',
+                rzeczywistaPozycja: i + 1
             });
         }
 
@@ -62,15 +63,19 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</tr></thead>';
         html += '<tbody>';
 
-        let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID);
-        let liczbaGraczyZWiekszaLiczbaPunktow = pozycje.filter(p => p.punkty > pozycje[pozycjaUzytkownika].punkty).length;
+        let pozycjaUzytkownika = pozycje.find(p => p.uid == userID).rzeczywistaPozycja;
+        let liczbaGraczyZWiekszaLiczbaPunktow = pozycje.filter(p => p.punkty > pozycje.find(p => p.uid == userID).punkty).length;
         let limit = widokSkrócony ? 10 : pozycje.length;
 
         pozycje.slice(0, limit).forEach(gracz => {
             let liczbaGraczyZWiekszaLiczbaPunktowGracz = pozycje.filter(p => p.punkty > gracz.punkty).length;
             let klasaStylu = getKolor(liczbaGraczyZWiekszaLiczbaPunktowGracz, gracz.uid);
 
-            let wyswietlanaPozycja = (gracz.uid == userID) ? (pozycjaUzytkownika + 1) : gracz.pozycja;
+            let wyswietlanaPozycja = gracz.pozycja;
+            if (gracz.uid == userID) {
+                wyswietlanaPozycja = liczbaGraczyZWiekszaLiczbaPunktow + 1;
+            }
+
             html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td>`;
             if (filtr === 'punktyZaMecze') {
                 html += `<td class="text-center">${gracz.dokladneTrafienia}</td>`;
@@ -78,10 +83,10 @@ document.addEventListener('DOMContentLoaded', function() {
             html += '</tr>';
         });
 
-        if (widokSkrócony && pozycjaUzytkownika + 1 > 10) {
+        if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="4">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow, userID)}"><td>${pozycjaUzytkownika + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td>`;
+            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow, userID)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td>`;
             if (filtr === 'punktyZaMecze') {
                 html += `<td class="text-center">${daneUzytkownika.dokladneTrafienia}</td>`;
             }
