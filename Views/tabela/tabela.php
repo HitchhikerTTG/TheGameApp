@@ -5,21 +5,27 @@ document.addEventListener('DOMContentLoaded', function() {
     var aktualnyFiltr = 'pelny';
     var widokSkrócony = true; // Domyślnie skrócony widok
 
-    function ustalPozycje(dane) {
-        dane.sort((a, b) => b.punkty - a.punkty);
+    function ustalPozycje(dane, filtr) {
+        if (filtr === 'punktyZaMecze') {
+            dane.sort((a, b) => b.punktyZaMecze - a.punktyZaMecze);
+        } else if (filtr === 'punktyZaPytania') {
+            dane.sort((a, b) => b.punktyZaPytania - a.punktyZaPytania);
+        } else {
+            dane.sort((a, b) => b.punkty - a.punkty);
+        }
 
         let pozycje = [];
         let aktualnaPozycja = 1;
 
         for (let i = 0; i < dane.length; i++) {
-            if (i === 0 || dane[i].punkty !== dane[i - 1].punkty) {
+            if (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) {
                 aktualnaPozycja = i + 1;
             }
             pozycje.push({
                 uid: dane[i].uid,
                 nick: dane[i].nick,
-                punkty: dane[i].punkty,
-                pozycja: (i === 0 || dane[i].punkty !== dane[i - 1].punkty) ? aktualnaPozycja : '-'
+                punkty: dane[i][filtr],
+                pozycja: (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) ? aktualnaPozycja : '-'
             });
         }
 
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.filtr').forEach(lnk => lnk.classList.remove('active'));
             this.classList.add('active');
             aktualnyFiltr = this.dataset.filtr;
-            let pozycje = ustalPozycje(tabelaDanych);
+            let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
             generujTabele(pozycje);
         });
     });
@@ -91,11 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('przelacznikWidoku').addEventListener('click', function() {
         widokSkrócony = !widokSkrócony;
         this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabelę";
-        let pozycje = ustalPozycje(tabelaDanych);
+        let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
         generujTabele(pozycje);
     });
 
-    let pozycje = ustalPozycje(tabelaDanych);
+    let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
     generujTabele(pozycje);
 });
 </script>
