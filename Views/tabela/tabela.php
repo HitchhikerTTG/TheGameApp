@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generujTabele(pozycje) {
         var html = '<table class="table">';
-        html += '<tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr>';
+        html += '<thead class="table-dark"><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
+        html += '<tbody>';
 
         let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
         let liczbaGraczyZWiekszaLiczbaPunktow = pozycje.filter(p => p.punkty > pozycje.find(p => p.uid == userID).punkty).length;
@@ -37,13 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = '';
             if (gracz.uid == userID) {
-                klasaStylu = 'class="user-row"';
+                klasaStylu = 'class="table-light"';
             } else if (gracz.pozycja == 1) {
-                klasaStylu = 'class="gold-row"';
+                klasaStylu = 'class="bg-warning"';
             } else if (gracz.pozycja == 2) {
-                klasaStylu = 'class="silver-row"';
+                klasaStylu = 'class="bg-secondary"';
             } else if (gracz.pozycja == 3) {
-                klasaStylu = 'class="bronze-row"';
+                klasaStylu = 'class="bg-danger"';
             }
             let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
             html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
@@ -52,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="table-light"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
         }
 
-        html += '</table>';
+        html += '</tbody></table>';
         document.getElementById('tabelaGraczyContainer').innerHTML = html;
     }
 
@@ -83,19 +84,13 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.miejsce-1 { font-weight: bold; }
-.miejsce-2 { font-style: italic; }
-.miejsce-3 { text-decoration: underline; }
-.gold-row { background-color: #ffd700; } /* Złote tło */
-.silver-row { background-color: #c0c0c0; } /* Srebrne tło */
-.bronze-row { background-color: #cd7f32; } /* Brązowe tło */
-.user-row { background-color: #d3d3d3; } /* Szare tło dla zalogowanego użytkownika */
+.user-row { background-color: #d3d3d3; }
 </style>
 
 <div class="row">
   <div class="col mt-3 mb-3">
-  <p>A teraz to, po co wszyscy tu przychodzimy, czyli...</p>
-  <h3>Aktualna tabela Typera Mistrzostw</h3>
+    <p>A teraz to, po co wszyscy tu przychodzimy, czyli...</p>
+    <h3>Aktualna tabela Typera Mistrzostw</h3>
   </div>
 </div>
 <ul class="nav nav-tabs">
@@ -110,9 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
   </li>
 </ul>
 <div class="row">
-<div class="col">
-<div id="tabelaGraczyContainer" class="table"></div>
-</div>
+  <div class="col">
+    <div id="tabelaGraczyContainer" class="table-responsive"></div>
+  </div>
 </div>
 
-<button id="przelacznikWidoku">Rozwiń tabelę</button>
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
