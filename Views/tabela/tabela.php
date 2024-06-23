@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 uid: dane[i].uid,
                 nick: dane[i].nick,
                 punkty: dane[i][filtr],
+                dokladneTrafienia: dane[i].dokladneTrafienia,
                 pozycja: (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) ? aktualnaPozycja : '-'
             });
         }
@@ -57,9 +58,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function generujTabele(pozycje) {
+    function generujTabele(pozycje, filtr) {
         var html = '<table class="table">';
-        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
+        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th>';
+        if (filtr === 'punktyZaMecze') {
+            html += '<th class="text-center">Dokładne trafienia</th>';
+        }
+        html += '</tr></thead>';
         html += '<tbody>';
 
         let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
@@ -71,13 +76,21 @@ document.addEventListener('DOMContentLoaded', function() {
             let klasaStylu = getKolor(liczbaGraczyZWiekszaLiczbaPunktowGracz, gracz.uid);
 
             let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
-            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
+            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td>`;
+            if (filtr === 'punktyZaMecze') {
+                html += `<td class="text-center">${gracz.dokladneTrafienia}</td>`;
+            }
+            html += '</tr>';
         });
 
         if (widokSkrócony && pozycjaUzytkownika > 10) {
-            html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
+            html += '<tr><td colspan="4">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow, userID)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow, userID)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td>`;
+            if (filtr === 'punktyZaMecze') {
+                html += `<td class="text-center">${daneUzytkownika.dokladneTrafienia}</td>`;
+            }
+            html += '</tr>';
         }
 
         html += '</tbody></table>';
@@ -91,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             aktualnyFiltr = this.dataset.filtr;
             let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-            generujTabele(pozycje);
+            generujTabele(pozycje, aktualnyFiltr);
         });
     });
 
@@ -99,14 +112,13 @@ document.addEventListener('DOMContentLoaded', function() {
         widokSkrócony = !widokSkrócony;
         this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabelę";
         let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-        generujTabele(pozycje);
+        generujTabele(pozycje, aktualnyFiltr);
     });
 
     let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-    generujTabele(pozycje);
+    generujTabele(pozycje, aktualnyFiltr);
 });
 </script>
-
 
 <style>
 .bg-warning { background-color: #ffd700 !important; } /* Złote tło */
