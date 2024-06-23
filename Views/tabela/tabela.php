@@ -26,9 +26,21 @@ document.addEventListener('DOMContentLoaded', function() {
         return pozycje;
     }
 
+    function getKolor(liczbaGraczyZWiekszaLiczbaPunktow) {
+        if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
+            return 'bg-warning'; // gold
+        } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
+            return 'bg-secondary'; // silver
+        } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
+            return 'bg-danger'; // bronze
+        } else {
+            return 'bg-light'; // szary
+        }
+    }
+
     function generujTabele(pozycje) {
         var html = '<table class="table">';
-        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
+        html += '<thead class="table-dark"><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
         html += '<tbody>';
 
         let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
@@ -38,13 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = '';
             if (gracz.uid == userID) {
-                klasaStylu = 'class="user-row table-light"';
+                klasaStylu = `class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}"`;
             } else if (gracz.pozycja == 1) {
-                klasaStylu = 'class="table-warning"';
+                klasaStylu = 'class="gold-row bg-warning"';
             } else if (gracz.pozycja == 2) {
-                klasaStylu = 'class="table-secondary"';
+                klasaStylu = 'class="silver-row bg-secondary"';
             } else if (gracz.pozycja == 3) {
-                klasaStylu = 'class="table-danger"';
+                klasaStylu = 'class="bronze-row bg-danger"';
             }
             let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
             html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
@@ -53,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row table-light"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
         }
 
         html += '</tbody></table>';
