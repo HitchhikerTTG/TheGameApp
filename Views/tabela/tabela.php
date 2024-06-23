@@ -52,7 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
             let liczbaGraczyZWiekszaLiczbaPunktowGracz = pozycje.filter(p => p.punkty > gracz.punkty).length;
 
             if (gracz.uid == userID) {
-                klasaStylu = `class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}"`;
+                if (liczbaGraczyZWiekszaLiczbaPunktow > 2) {
+                    klasaStylu = 'user-row bg-light';
+                } else {
+                    klasaStylu = `user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}`;
+                }
             } else {
                 klasaStylu = getKolor(liczbaGraczyZWiekszaLiczbaPunktowGracz);
             }
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="user-row bg-light"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
         }
 
         html += '</tbody></table>';
