@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generujTabele(pozycje) {
         var html = '<table class="table">';
-        html += '<thead class="table-dark"><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
+        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
         html += '<tbody>';
 
         let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
@@ -49,17 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = '';
+            let liczbaGraczyZWiekszaLiczbaPunktowGracz = pozycje.filter(p => p.punkty > gracz.punkty).length;
+
             if (gracz.uid == userID) {
                 klasaStylu = `class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow)}"`;
-            } else if (gracz.pozycja == 1) {
-                klasaStylu = 'class="gold-row bg-warning"';
-            } else if (gracz.pozycja == 2) {
-                klasaStylu = 'class="silver-row bg-secondary"';
-            } else if (gracz.pozycja == 3) {
-                klasaStylu = 'class="bronze-row bg-danger"';
+            } else {
+                klasaStylu = getKolor(liczbaGraczyZWiekszaLiczbaPunktowGracz);
             }
+
             let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
-            html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
+            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
         });
 
         if (widokSkrócony && pozycjaUzytkownika > 10) {
@@ -96,10 +95,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.gold-row { background-color: #ffd700 !important; } /* Złote tło */
-.silver-row { background-color: #c0c0c0 !important; } /* Srebrne tło */
-.bronze-row { background-color: #cd7f32 !important; } /* Brązowe tło */
-.user-row { background-color: #d3d3d3 !important; } /* Szare tło dla zalogowanego użytkownika */
+.bg-warning { background-color: #ffd700 !important; } /* Złote tło */
+.bg-secondary { background-color: #c0c0c0 !important; } /* Srebrne tło */
+.bg-danger { background-color: #cd7f32 !important; } /* Brązowe tło */
+.bg-light { background-color: #d3d3d3 !important; } /* Szare tło */
+.user-row { font-weight: bold; }
 </style>
 
 <div class="row">
