@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (filtr === 'punktyZaPytania') {
             dane.sort((a, b) => b.punktyZaPytania - a.punktyZaPytania);
         } else {
+            filtr = 'punkty'; // Default case for 'pelny' filter
             dane.sort((a, b) => b.punkty - a.punkty);
         }
 
@@ -105,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generujTabele(pozycje);
 });
 </script>
+
 
 <style>
 .bg-warning { background-color: #ffd700 !important; } /* Złote tło */
