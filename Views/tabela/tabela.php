@@ -40,14 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getKolor(liczbaGraczyZWiekszaLiczbaPunktow, uid) {
-        if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
+        if (uid === userID && liczbaGraczyZWiekszaLiczbaPunktow > 2) {
+            return 'bg-light'; // szary dla zalogowanego użytkownika, jeśli ma więcej niż 2 graczy z większą liczbą punktów
+        } else if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
             return 'bg-warning'; // gold
         } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
             return 'bg-secondary'; // silver
         } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
             return 'bg-danger'; // bronze
-        } else if (uid === userID) {
-            return 'bg-light'; // szary
         } else {
             return '';
         }
@@ -146,4 +146,4 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>  
