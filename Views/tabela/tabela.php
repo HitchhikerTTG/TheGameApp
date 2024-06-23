@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (gracz.uid == userID) {
                 klasaStylu = 'class="user-row table-light"';
             } else if (gracz.pozycja == 1) {
-                klasaStylu = 'class="tabele-warning"';
+                klasaStylu = 'class="table-warning"';
             } else if (gracz.pozycja == 2) {
-                klasaStylu = 'class="tabele-secondary"';
+                klasaStylu = 'class="table-secondary"';
             } else if (gracz.pozycja == 3) {
                 klasaStylu = 'class="table-danger"';
             }
