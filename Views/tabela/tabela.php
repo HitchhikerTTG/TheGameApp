@@ -19,8 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 uid: dane[i].uid,
                 nick: dane[i].nick,
                 punkty: dane[i].punkty,
-                pozycja: aktualnaPozycja,
-                wyswietlanaPozycja: (i === 0 || dane[i].punkty !== dane[i - 1].punkty) ? aktualnaPozycja : '-'
+                pozycja: (i === 0 || dane[i].punkty !== dane[i - 1].punkty) ? aktualnaPozycja : '-'
             });
         }
 
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function generujTabele(pozycje) {
         var html = '<table class="table">';
-        html += '<thead class="table-dark"><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
+        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
         html += '<tbody>';
 
         let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
@@ -39,22 +38,22 @@ document.addEventListener('DOMContentLoaded', function() {
         pozycje.slice(0, limit).forEach(gracz => {
             let klasaStylu = '';
             if (gracz.uid == userID) {
-                klasaStylu = 'table-light';
+                klasaStylu = 'class="user-row table-light"';
             } else if (gracz.pozycja == 1) {
-                klasaStylu = 'table-warning';
+                klasaStylu = 'class="tabele-warning"';
             } else if (gracz.pozycja == 2) {
-                klasaStylu = 'table-secondary';
+                klasaStylu = 'class="tabele-secondary"';
             } else if (gracz.pozycja == 3) {
-                klasaStylu = 'table-danger';
+                klasaStylu = 'class="table-danger"';
             }
-            let wyswietlanaPozycja = gracz.wyswietlanaPozycja;
-            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
+            let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
+            html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
         });
 
         if (widokSkrócony && pozycjaUzytkownika > 10) {
             html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
             let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="table-light"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
+            html += `<tr class="user-row table-light"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
         }
 
         html += '</tbody></table>';
@@ -74,4 +73,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('przelacznikWidoku').addEventListener('click', function() {
         widokSkrócony = !widokSkrócony;
-        this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabel
+        this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabelę";
+        let pozycje = ustalPozycje(tabelaDanych);
+        generujTabele(pozycje);
+    });
+
+    let pozycje = ustalPozycje(tabelaDanych);
+    generujTabele(pozycje);
+});
+</script>
+
+<style>
+.gold-row { background-color: #ffd700 !important; } /* Złote tło */
+.silver-row { background-color: #c0c0c0 !important; } /* Srebrne tło */
+.bronze-row { background-color: #cd7f32 !important; } /* Brązowe tło */
+.user-row { background-color: #d3d3d3 !important; } /* Szare tło dla zalogowanego użytkownika */
+</style>
+
+<div class="row">
+  <div class="col mt-3 mb-3">
+    <p>A teraz to, po co wszyscy tu przychodzimy, czyli...</p>
+    <h3>Aktualna tabela Typera Mistrzostw</h3>
+  </div>
+</div>
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active filtr" data-filtr="pelny" href="#">Ogółem</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link filtr" data-filtr="punktyZaMecze" href="#">Mecze</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link filtr" data-filtr="punktyZaPytania" href="#">Pytania</a>
+  </li>
+</ul>
+<div class="row">
+  <div class="col">
+    <div id="tabelaGraczyContainer" class="table-responsive"></div>
+  </div>
+</div>
+
+<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>
