@@ -35,7 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
         let limit = widokSkrócony ? 10 : pozycje.length;
 
         pozycje.slice(0, limit).forEach(gracz => {
-            let klasaStylu = gracz.uid == userID ? 'class="user-row"' : '';
+            let klasaStylu = '';
+            if (gracz.uid == userID) {
+                klasaStylu = 'class="user-row"';
+            } else if (gracz.pozycja == 1) {
+                klasaStylu = 'class="gold-row"';
+            } else if (gracz.pozycja == 2) {
+                klasaStylu = 'class="silver-row"';
+            } else if (gracz.pozycja == 3) {
+                klasaStylu = 'class="bronze-row"';
+            }
             let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
             html += `<tr ${klasaStylu}><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
         });
@@ -77,7 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
 .miejsce-1 { font-weight: bold; }
 .miejsce-2 { font-style: italic; }
 .miejsce-3 { text-decoration: underline; }
-.user-row { background-color: #ffff99; }
+.gold-row { background-color: #ffd700; } /* Złote tło */
+.silver-row { background-color: #c0c0c0; } /* Srebrne tło */
+.bronze-row { background-color: #cd7f32; } /* Brązowe tło */
+.user-row { background-color: #d3d3d3; } /* Szare tło dla zalogowanego użytkownika */
 </style>
 
 <div class="row">
