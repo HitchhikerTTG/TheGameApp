@@ -136,16 +136,37 @@ class LiveScore extends BaseController
 
 
     public function naZywo(){
+        $start_time = microtime(true);
+        
         $cache_key = "live_scores_data";
         $cache_duration = 60; // 1 minute cache
 
+        $cache_start = microtime(true);
         if (!$data = cache($cache_key)) {
+            $cache_check_time = microtime(true) - $cache_start;
+            log_message('info', 'Cache check took: ' . $cache_check_time . ' seconds');
+            
+            $api_start = microtime(true);
             $parametry_live['competition_id'] = "362,363,387,274,271,227,244,245,1,2,3,4,60,209,349,350,446,149,150,151,152,153,167,169,179,178,333,334,111,205";
             $data['live'] = $this->getLivescores($parametry_live);
+            $api_time = microtime(true) - $api_start;
+            log_message('info', 'API call took: ' . $api_time . ' seconds');
+            
+            $cache_save_start = microtime(true);
             cache()->save($cache_key, $data, $cache_duration);
+            $cache_save_time = microtime(true) - $cache_save_start;
+            log_message('info', 'Cache save took: ' . $cache_save_time . ' seconds');
         }
 
-        return view('live/naZywo', $data);
+        $view_start = microtime(true);
+        $view = view('live/naZywo', $data);
+        $view_time = microtime(true) - $view_start;
+        log_message('info', 'View generation took: ' . $view_time . ' seconds');
+
+        $total_time = microtime(true) - $start_time;
+        log_message('info', 'Total execution took: ' . $total_time . ' seconds');
+
+        return $view;
     }
 
     public function zaplanowaneNaDzis()
