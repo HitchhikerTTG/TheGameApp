@@ -56,6 +56,8 @@ if ($tabelaWydarzen['event']){
       <button class="notyetcollapsible rozgrywki_<?=$_score['competition_id']?>"><?=$_score['home_name']?> <?=$_score['score']?> <?=$_score['away_name']?> | <?=$_score['time']?>'
       </button>  
       <? }}?>
+</div>
+<h3 style="margin-top:15px; margin-bottom: 15px">Na żywo: <small style="color: #666;">(<?= $data_source ?>)</small></h3>
 <div>
 <p align="right" style="font-size:11px; padding-right: 10px">Wyniki są aktualizowane raz na minutę. Ostatnia aktualizacja <?php echo date("H:i")?></p></div>
 </div>

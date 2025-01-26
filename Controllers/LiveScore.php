@@ -143,13 +143,15 @@ class LiveScore extends BaseController
 
         $cache_key = "live_scores_data";
         $cache_duration = 60; // 1 minute cache
-
+        
         $cache_start = microtime(true);
+        $data['data_source'] = 'Cache';
         if (!$data = cache($cache_key)) {
             // Enable response compression
             if (extension_loaded('zlib')) {
                 ini_set('zlib.output_compression', 'On');
             }
+            $data['data_source'] = 'API Fetch';
             $cache_check_time = microtime(true) - $cache_start;
             log_message('info', 'Cache check took: ' . $cache_check_time . ' seconds');
 
