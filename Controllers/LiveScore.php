@@ -51,11 +51,14 @@ class LiveScore extends BaseController
         }    
 
     protected function _makeRequest($url) {
-         $arrContextOptions=array( //this is the workaround i've found. Not sure the smartest way to play, but lets try.
+         $arrContextOptions=array(
                 "ssl"=>array(
                 "verify_peer"=>false,
                 "verify_peer_name"=>false,
                 ),
+                "http"=>array(
+                    "header"=>"Accept-Encoding: gzip, deflate"
+                )
                 );      
         //file_get_contents("https://domain.tld/path/script.php", false, stream_context_create($arrContextOptions));
 
@@ -137,7 +140,7 @@ class LiveScore extends BaseController
 
     public function naZywo(){
         $start_time = microtime(true);
-        
+
         $cache_key = "live_scores_data";
         $cache_duration = 60; // 1 minute cache
 
@@ -149,13 +152,13 @@ class LiveScore extends BaseController
             }
             $cache_check_time = microtime(true) - $cache_start;
             log_message('info', 'Cache check took: ' . $cache_check_time . ' seconds');
-            
+
             $api_start = microtime(true);
             $parametry_live['competition_id'] = "362,363,387,274,271,227,244,245,1,2,3,4,60,209,349,350,446,149,150,151,152,153,167,169,179,178,333,334,111,205";
             $data['live'] = $this->getLivescores($parametry_live);
             $api_time = microtime(true) - $api_start;
             log_message('info', 'API call took: ' . $api_time . ' seconds');
-            
+
             $cache_save_start = microtime(true);
             // Cache for 60 seconds to maintain live updates
             cache()->save($cache_key, $data, 60);
