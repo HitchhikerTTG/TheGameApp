@@ -3,9 +3,9 @@
 <?php if (isset($live) && is_array($live)) { ?>
 <div id="TrwajaceMecze">
 <?php foreach ($live as $_score) { ?>
-      <button style="width:100%; margin-bottom: 5px;" id="mecz_<?=$_score['id']?>" class="collapsible">      
-        <p class="h"><?=$_score['competition']['name']?></p>
-        <p class="a"><?=$_score['home_name']?> <?=$_score['score']?> <?=$_score['away_name']?></p>
+      <button style="width:100%; margin-bottom: 5px;" id="mecz_<?=$_score['id'] ?? ''?>" class="collapsible">      
+        <p class="h"><?=isset($_score['competition']['name']) ? $_score['competition']['name'] : 'Unknown Competition'?></p>
+        <p class="a"><?=$_score['home_name'] ?? ''?> <?=$_score['score'] ?? ''?> <?=$_score['away_name'] ?? ''?></p>
       </button>  
       <? }}?>
 </div>
