@@ -143,6 +143,10 @@ class LiveScore extends BaseController
 
         $cache_start = microtime(true);
         if (!$data = cache($cache_key)) {
+            // Enable response compression
+            if (extension_loaded('zlib')) {
+                ini_set('zlib.output_compression', 'On');
+            }
             $cache_check_time = microtime(true) - $cache_start;
             log_message('info', 'Cache check took: ' . $cache_check_time . ' seconds');
             
@@ -153,7 +157,8 @@ class LiveScore extends BaseController
             log_message('info', 'API call took: ' . $api_time . ' seconds');
             
             $cache_save_start = microtime(true);
-            cache()->save($cache_key, $data, $cache_duration);
+            // Cache for 5 minutes since live score updates aren't that frequent
+            cache()->save($cache_key, $data, 300);
             $cache_save_time = microtime(true) - $cache_save_start;
             log_message('info', 'Cache save took: ' . $cache_save_time . ' seconds');
         }
