@@ -84,7 +84,7 @@ class LiveScore extends BaseController
                .view('live/test',$data)
                .view('live/footer',$data);
 //      echo view('live/skrypty', $data);
-	 
+
 	}
 
 
@@ -95,19 +95,19 @@ class LiveScore extends BaseController
             'team1_id'=>$druzyna1,
             'team2_id'=>$druzyna2,
         ];
-    
+
     if (!$preMecz = cache($cashedPreMecz)){
         $data['h2h'] = $this->getHTH($parametry);
 
-    
-    
+
+
         $preMecz = view('live/eksperyment',$data,['cache'=>60,'cache_name'=>$cashedPreMecz]);
         }
 
         return $preMecz;
 
     }
-    
+
 
     public function index()
     {
@@ -129,25 +129,23 @@ class LiveScore extends BaseController
 
         echo $this->naZywo();
         echo $this->zaplanowaneNaDzis();
-        
+
         echo view('live/footer',$data);
         echo view('live/skrypty', $data);
     }
 
 
     public function naZywo(){
-        $ms_parametry_live['competition_id']="362";
-        $parametry_live['competition_id']="362,363,387,274,271,227,244,245,1,2,3,4,60,209,349,350,446,149,150,151,152,153,167,169,179,178,333,334,111,205";
-//Pamiętaj, że jesli bedziesz chcial robic mistrzostwa, to musisz ponownie wprowadzić kategorie 362
-//wyłączam towarzyskie 371 i 372
-        $cachedLive = "live_general";
-        if (! $live = cache($cachedLive)){
-        $data['live']=$this->getLivescores($parametry_live);
-        //$data['live']=$this->getLivescores();
-                $live =view('live/naZywo', $data, ['cache'=>60, 'cache_name'=>$cachedLive]);
-            }   
+        $cache_key = "live_scores_data";
+        $cache_duration = 60; // 1 minute cache
 
-        return $live;
+        if (!$data = cache($cache_key)) {
+            $parametry_live['competition_id'] = "362,363,387,274,271,227,244,245,1,2,3,4,60,209,349,350,446,149,150,151,152,153,167,169,179,178,333,334,111,205";
+            $data['live'] = $this->getLivescores($parametry_live);
+            cache()->save($cache_key, $data, $cache_duration);
+        }
+
+        return view('live/naZywo', $data);
     }
 
     public function zaplanowaneNaDzis()
@@ -178,11 +176,11 @@ class LiveScore extends BaseController
 	$cashedEvents="wydarzenia_meczu_";
 	$cashedEvents.=$numerekMeczu;
 	$parametr['id']=$numerekMeczu;
-	
+
 	if (!$wydarzenia = cache($cashedEvents)){
 		$data['event']=$this->getEvents($parametr);
-	
-	
+
+
 		$wydarzenia = view('live/gameEvents',$data,['cache'=>60,'cache_name'=>$cashedEvents]);
 		}
 	}

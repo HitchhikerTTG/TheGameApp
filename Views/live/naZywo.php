@@ -1,4 +1,3 @@
-
 <div id="TrwajaceMecze">
 
 <?php 
@@ -8,7 +7,7 @@ $tabelaWydarzen=$_score['wydarzenia'];
 if ($tabelaWydarzen['event']){
 
  ?>
-<button class="collapsible rozgrywki_<?=$_score['competition_id']?>" id="m_<?=$_score['id']?>>"><?=$_score['home_name']?> <?=$_score['score']?> <?=$_score['away_name']?> | <?=$_score['time']?>'
+<button class="collapsible rozgrywki_<?=$_score['competition_id']?>" id="m_<?=$_score['id']?>"><?=$_score['home_name']?> <?=$_score['score']?> <?=$_score['away_name']?> | <?=$_score['time']?>'
       </button>
       <div class="content" id="<?=$_score['id']?>">
 <p align="left" style="font-size:11px; padding-left: 10px; margin:5px">Rozgrywki: <?=$_score['competition_name']?> (<?=$_score['competition_id']?> )</p>
@@ -65,36 +64,28 @@ if ($tabelaWydarzen['event']){
 </div>
 
 <script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
-//console.log(coll);
+document.addEventListener('DOMContentLoaded', function() {
+    const collapsibles = document.getElementsByClassName("collapsible");
 
-$('.collapsible').each(function(){
-        //jeśli dobrze rozumiem, to oznacza, że dla każdego elementu który ma atrybut collapsible, mogę coś zrobić. To co chcę zrobić, to - jeśli mam dla Twojego id zapisane active - masz być active. Domyślnie 0 inactive
-        if (sessionStorage.getItem(this.id)=="active"){
-        this.nextElementSibling.style.maxHeight = this.nextElementSibling.scrollHeight + "px";
-        this.classList.toggle("active");
-        this.nextElementSibling.style.transitionDuration ="0s";
-    }
+    // Restore states from session storage
+    Array.from(collapsibles).forEach(element => {
+        if(sessionStorage.getItem(element.id) === "active") {
+            element.classList.add("active");
+            const content = element.nextElementSibling;
+            content.style.maxHeight = content.scrollHeight + "px";
+            content.style.transitionDuration = "0s";
+        }
 
+        // Add click listeners
+        element.addEventListener("click", function() {
+            this.classList.toggle("active");
+            const content = this.nextElementSibling;
+            const isActive = this.classList.contains("active");
+
+            content.style.maxHeight = isActive ? content.scrollHeight + "px" : null;
+            content.style.transitionDuration = "0.2s";
+            sessionStorage.setItem(this.id, isActive ? "active" : "inactive");
+        });
+    });
 });
-
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-     localStorage.setItem(this['id'],'active');
-    var content = this.nextElementSibling;
-    if (content.style.maxHeight){
-      content.style.maxHeight = null;
-        sessionStorage.setItem(this.id,"inactive");
-        content.style.transitionDuration ="0.2s";
-    } else {
-      content.style.maxHeight = content.scrollHeight + "px";
-        sessionStorage.setItem(this.id,"active");
-        content.style.transitionDuration ="0.2s";
-    } 
-  });
-}
-
-
 </script>
