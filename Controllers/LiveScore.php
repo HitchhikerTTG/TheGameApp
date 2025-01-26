@@ -142,10 +142,16 @@ class LiveScore extends BaseController
         $start_time = microtime(true);
 
         $cache_key = "live_scores_data";
+        $views_key = "live_scores_views";
         $cache_duration = 60; // 1 minute cache
         
         $cache_start = microtime(true);
         $data['data_source'] = 'Cache';
+        
+        // Increment view counter
+        $views = cache($views_key) ?: 0;
+        $data['views'] = ++$views;
+        cache()->save($views_key, $views, $cache_duration);
         if (!$data = cache($cache_key)) {
             // Enable response compression
             if (extension_loaded('zlib')) {
@@ -158,6 +164,9 @@ class LiveScore extends BaseController
             $api_start = microtime(true);
             $parametry_live['competition_id'] = "362,363,387,274,271,227,244,245,1,2,3,4,60,209,349,350,446,149,150,151,152,153,167,169,179,178,333,334,111,205";
             $data['live'] = $this->getLivescores($parametry_live);
+            // Reset view counter on new API fetch
+            cache()->save($views_key, 1, $cache_duration);
+            $data['views'] = 1;
             $api_time = microtime(true) - $api_start;
             log_message('info', 'API call took: ' . $api_time . ' seconds');
 
