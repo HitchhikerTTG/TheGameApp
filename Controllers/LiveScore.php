@@ -157,8 +157,8 @@ class LiveScore extends BaseController
             log_message('info', 'API call took: ' . $api_time . ' seconds');
             
             $cache_save_start = microtime(true);
-            // Cache for 5 minutes since live score updates aren't that frequent
-            cache()->save($cache_key, $data, 300);
+            // Cache for 60 seconds to maintain live updates
+            cache()->save($cache_key, $data, 60);
             $cache_save_time = microtime(true) - $cache_save_start;
             log_message('info', 'Cache save took: ' . $cache_save_time . ' seconds');
         }
