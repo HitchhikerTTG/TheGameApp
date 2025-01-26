@@ -133,7 +133,11 @@ class LiveScore extends BaseController
         echo $this->naZywo();
         echo $this->zaplanowaneNaDzis();
 
-        echo view('live/footer',$data);
+        $footer_data = [
+            'data_source' => $data['data_source'] ?? 'Cache',
+            'views' => $data['views'] ?? 0
+        ];
+        echo view('live/footer', $footer_data);
         echo view('live/skrypty', $data);
     }
 

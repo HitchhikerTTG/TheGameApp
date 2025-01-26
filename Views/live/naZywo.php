@@ -57,7 +57,7 @@ if ($tabelaWydarzen['event']){
       </button>  
       <? }}?>
 </div>
-<h3 style="margin-top:15px; margin-bottom: 15px">Na żywo: <small style="color: #666;">(<?= $data_source ?>) | Views: <?= $views ?></small></h3>
+<h3 style="margin-top:15px; margin-bottom: 15px">Na żywo:</h3>
 <div>
 <p align="right" style="font-size:11px; padding-right: 10px">Wyniki są aktualizowane raz na minutę. Ostatnia aktualizacja <?php echo date("H:i")?></p></div>
 </div>
