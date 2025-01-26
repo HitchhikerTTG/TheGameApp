@@ -1,0 +1,8 @@
+modules = ["php-8.2", "web"]
+run = "echo \"No run command needed\""
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "echo \"No run command needed\""]
