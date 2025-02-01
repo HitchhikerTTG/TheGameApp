@@ -152,6 +152,7 @@ class LiveScore extends BaseController
         $cache_start = microtime(true);
         $cached_data = cache($cache_key);
         $data['data_source'] = 'Cache';
+        $data['live'] = []; // Initialize with empty array as fallback
         
         // Increment view counter
         $views = cache($views_key) ?: 0;
