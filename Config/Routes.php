@@ -44,7 +44,7 @@ $routes->get('wydarzenia/(:num)','LiveScore::wydarzeniaMeczu/$1');
 $routes->get('/komentarz', 'LiveScore::komentarz');
 $routes->get('/komentarzDoTypera', 'Typer::komentarz');
 $routes->get('/nowykomentarz', 'Komentarz::post');
-$routes->get('/', 'LiveScore::index');
+//$routes->get('/', 'LiveScore::index');
 //$routes->get('archiwum', 'theGame::archiwum');
 $routes->get('eksperyment', 'LiveScore::eksperyment');
 $routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
