@@ -407,7 +407,7 @@ protected $_key;
     {
         $pytanie = model(PytaniaModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'tresc' => 'required|min_length[3]|max_length[255]',
         ])) {
             $pytanie->save([
@@ -611,7 +611,7 @@ protected $_key;
         ]
     ];
 
-if ($this->request->getMethod() === 'post') {
+if ($this->request->getMethod() === 'POST') {
         if (!$this->validate($validationRules)) {
             session()->setFlashdata('error', $validation->listErrors());
             return redirect()->back()->withInput();

@@ -84,7 +84,7 @@ protected $_key;
     {
         $turniej = model(TurniejeModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'nazwa' => 'required|min_length[3]|max_length[255]',
         ])) {
             $turniej->save([
@@ -524,7 +524,7 @@ public function loadClubs(){
     {
         $clubMembersModel = model(ClubMembersModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'userID' => 'required|is_natural',
             'clubID' => 'required|is_natural',
         ])) {

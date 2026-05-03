@@ -633,7 +633,7 @@ public function getLivescores($params = []) {
             $teraz=date("Y-m-d H:i:s");
         //    echo "Do przerobienia jest ".$gameCount." gier";
 
-            if ($this->request->getMethod() === 'post') {
+            if ($this->request->getMethod() === 'POST') {
                $mecze = $this->request->getPost('mecze'); // Pobranie tablicy meczy
                 foreach ($mecze as $idMeczu => $wyniki) {
                     $typH = $wyniki['H']; // Wynik gospodarzy
@@ -935,7 +935,7 @@ public function getLivescores($params = []) {
         //echo "Na razie tylko tak sobie zartuję";
         $odpowiedz = model(OdpowiedziModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'odpowiedz' => 'required|max_length[255]',
         ])) {
 
