@@ -7,9 +7,11 @@ class TabelaModel extends Model
 
     public function przeliczTabeleGraczy($turniejID=null){
 
-        $configPath = WRITEPATH . 'ActiveTournament.json';
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+        //$configPath = WRITEPATH . 'ActiveTournament.json';
+        //$jsonString = file_get_contents($configPath);
+        //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+
+        $config = get_active_tournament_config();
 
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
@@ -82,9 +84,11 @@ class TabelaModel extends Model
     }
  
     public function gimmeTabelaGraczy($turniejID){
-            $configPath = WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-            $jsonString = file_get_contents($configPath);
-            $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            //$configPath = WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
+            //$jsonString = file_get_contents($configPath);
+            //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            
+            $config = get_active_tournament_config();
             
             if ($turniejID === null) {
                 // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
