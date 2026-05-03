@@ -24,9 +24,10 @@ class Typer extends BaseController
     public function __construct()
     {
         helper(['url', 'form']);
-        $configPath = WRITEPATH . 'ActiveTournament.json';
-        $jsonString = file_get_contents($configPath);
-        $this->config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+        //$configPath = WRITEPATH . 'ActiveTournament.json';
+        //$jsonString = file_get_contents($configPath);
+        //$this->config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+        $this->config = get_active_tournament_config();
     }
 
     protected function _buildUrl($endpoint, $params) {
