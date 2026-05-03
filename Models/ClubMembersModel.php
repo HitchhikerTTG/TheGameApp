@@ -8,7 +8,7 @@ class ClubMembersModel extends Model{
     
     protected $allowedFields = [				
 			'id',
-			'ClubID',
+			'klubID',
 			'uniID',
 			'memberSince'
     ];
@@ -52,6 +52,17 @@ class ClubMembersModel extends Model{
     return !is_null($record);
 }
 
+
+    public function getAllClubMembers() {
+    return $this->select('uzytkownicy.nick, kluby.Nazwa as clubName')
+                ->join('uzytkownicy', 'uzytkownicy.uniID = clubMembers.uniID')
+                ->join('kluby', 'kluby.id = clubMembers.klubID')
+                ->findAll();
+}
+
+    public function getUsersInAnyClub() {
+    return $this->select('uniID')->findAll();
+}
 
 }
 ?>

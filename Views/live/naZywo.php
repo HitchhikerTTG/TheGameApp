@@ -45,6 +45,8 @@ if ($tabelaWydarzen['event']){
                   
 
         }
+
+       // echo "<p>".$wydarzenie['time']."' : ".$wydarzenie['event']." - ".$wydarzenie['player']."</p>";
       }
 			?>
 
@@ -65,8 +67,10 @@ if ($tabelaWydarzen['event']){
 <script>
 var coll = document.getElementsByClassName("collapsible");
 var i;
+//console.log(coll);
 
 $('.collapsible').each(function(){
+		//jeśli dobrze rozumiem, to oznacza, że dla każdego elementu który ma atrybut collapsible, mogę coś zrobić. To co chcę zrobić, to - jeśli mam dla Twojego id zapisane active - masz być active. Domyślnie 0 inactive
 		if (sessionStorage.getItem(this.id)=="active"){
 		this.nextElementSibling.style.maxHeight = this.nextElementSibling.scrollHeight + "px";
 		this.classList.toggle("active");
@@ -91,4 +95,6 @@ for (i = 0; i < coll.length; i++) {
     } 
   });
 }
+
+
 </script>

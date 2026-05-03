@@ -6,6 +6,7 @@ class UserModel extends Model{
     protected $table = 'uzytkownicy';
     
     protected $allowedFields = [
+        'id',
         'nick',
         'email',
         'passhash',
@@ -71,6 +72,50 @@ public function setActiveTournamentFlagForUsers($userIds)
     public function getUserByNick($nick) {
         return $this->where('nick', $nick)->first();
     }
+
+
+    public function doKogoSlemy()
+    {
+        return $this->select('email')->findAll();
+    }
+
+    public function getActiveUsersInTournament($tournamentID) {
+    $file = WRITEPATH . 'logs/test_log.log';
+
+    // Zapisujemy URL do pliku logów
+    file_put_contents($file, "wywołana metoda w modelu\n", FILE_APPEND);
+
+    $query = $this->select('uzytkownicy.email')
+                  ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
+                  ->where('uzytkownicy.PlaysTheActiveTournament', 1)
+                  ->where('ktowcogra.turniejID', $tournamentID);
+
+    $result = $query->findAll();
+
+    // Zapisujemy liczbę zwróconych rekordów do pliku logów
+    file_put_contents($file, "Liczba zwróconych rekordów: " . count($result) . "\n", FILE_APPEND);
+
+    return $result;
+}
+
+    public function prepActiveUsersInTournament($tournamentID) {
+    //$file = WRITEPATH . 'logs/test_log.log';
+
+    // Zapisujemy URL do pliku logów
+    //file_put_contents($file, "wywołana metoda w modelu\n", FILE_APPEND);
+
+$query = $this->select('uzytkownicy.email, uzytkownicy.nick, uzytkownicy.id, uzytkownicy.uniID')
+              ->join('ktowcogra', 'uzytkownicy.id = ktowcogra.userID')
+              ->where('uzytkownicy.PlaysTheActiveTournament', 1)
+              ->where('ktowcogra.turniejID', $tournamentID);
+
+    $result = $query->findAll();
+
+    // Zapisujemy liczbę zwróconych rekordów do pliku logów
+    //file_put_contents($file, "Liczba zwróconych rekordów: " . count($result) . "\n", FILE_APPEND);
+
+    return $result;
+}
 
 }
 

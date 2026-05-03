@@ -27,13 +27,13 @@ echo "</pre>";
 <div class="row">
     <div class="col">
     <?php if ($gdzieGram['active']): ?>
-        <div class="card w-50">
+        <div class="card w-90 mb-4">
             <div class="card-header">Aktywny turniej:</div>
             <div class="card-body">
                 <h5 class="card-title"><?= $gdzieGram['active']['CompetitionName']; ?></h5>
                 <p class="card-text">I tu by było fajnie ogarnąć jakąś logikę</p>
                 <?php if ($gdzieGram['isActiveParticipant']): ?>
-                <a href="/nowytest" class="btn btn-primary">Ić typować &raquo;</a> <?php else: ?> <a href="/Profil/dodajMnieDoTurnieju/<?= esc($userInfo['id']) ?>/<?= esc($gdzieGram['active']['ID'])?>" class="btn btn-primary">Chcę dołączyć</a> <?php  endif; ?> 
+                <a href="/typowanie" class="btn btn-primary">Typuj mecze turnieju &raquo;</a> <?php else: ?> <a href="/Profil/dodajMnieDoTurnieju/<?= esc($userInfo['id']) ?>/<?= esc($gdzieGram['active']['ID'])?>" class="btn btn-primary">Chcę dołączyć</a> <?php  endif; ?> 
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@ echo "</pre>";
 </div>
 <div class="row">
 <div class="col">
-<div class="card w-50">
+<div class="card w-90">
   <div class="card-header">Wcześniejsze turnieje:</div>
 <div class="card-body">
 

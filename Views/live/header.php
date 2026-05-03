@@ -139,49 +139,49 @@ content:"🤝 | ";
 }
 
 .rozgrywki_362:before{
-    content:"🏆🌏 | ";
+	content:"🏆🌏 | ";
 }
 
 .rozgrywki_244:before{
-    content:"🏆🇪🇺 LM | ";
-    }
+	content:"🏆🇪🇺 LM | ";
+	}
 
 .rozgrywki_1:before{
-    content:"🇩🇪 | ";
+	content:"🇩🇪 | ";
 }
 
 .rozgrywki_167:before{
-    content:"🏆🇩🇪 | ";
+	content:"🏆🇩🇪 | ";
 }
 
 .rozgrywki_2:before{
-    content:"🏴󠁧󠁢󠁥󠁮󠁧󠁿 | ";
+	content:"🏴󠁧󠁢󠁥󠁮󠁧󠁿 | ";
 }
 
 .rozgrywki_3:before{
-    content:"🇪🇸 | ";
+	content:"🇪🇸 | ";
 }
 
 .rozgrywki_334:before{
-    content:"🏆🇪🇸 | ";
+	content:"🏆🇪🇸 | ";
 }
 
 
 .rozgrywki_4:before{
-    content:"🇮🇹 | ";
+	content:"🇮🇹 | ";
 }
 
 .rozgrywki_60:before{
-    content:"🇵🇱ᴱ | ";
+	content:"🇵🇱ᴱ | ";
 }
 .rozgrywki_209:before{
-    content:"🇵🇱\00b9ᴸ | ";
+	content:"🇵🇱\00b9ᴸ | ";
 }
 .rozgrywki_245:before{
-    content:"🇪🇺 LE | ";
+	content:"🇪🇺 LE | ";
 }
 .rozgrywki_446:before{
-    content:"🇪🇺 LK | ";
+	content:"🇪🇺 LK | ";
 }
 
 .content {
@@ -205,8 +205,8 @@ background:#111;
 padding-top:25px;
 color:#fff;
 
-    }
-
+	}
+	
 .footer-content{
 display: flex;
 align-items: center;

@@ -5,10 +5,10 @@
     <base href="<?= base_url(); ?>">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Typer Mistrzostw Świata w Katarze</title>
+    <title>Typer na Euro 2024</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" type="text/css" href="/public/nowystyl_alpha_013.css">
+    <link rel="stylesheet" type="text/css" href="/public/nowystyl_alpha_017.css">
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -386,23 +386,23 @@ font-weight:300;
 <div class="topnav">
   <a href="/typowanie"><?=$title?> </a>
   <!-- Navigation links (hidden by default) -->
-  <div id="myLinks">
-    <a class="nav-link" href="/typowanie" id="Mecze live">Pierwszy sposób typowania</a>
-    <a class="nav-link" href="/wszystkieMecze" id="Ekstraklasa">Drugi sposob typowania (PL)</a>
-    <a class="nav-link" href="/tabelaMecze" id="Ekstraklasa">Ranking (same mecze)</a>
-    <a class="nav-link" href="/ileDokladnychTypow">Tabela tylko dokładnych typów</a>
-    <a class="nav-link" href="/tabelaPytania" id="Ekstraklasa">Ranking (same pytania)</a>
-    <a class="nav-link" href="/strzelcy" id="Strzelcy" >Najlepsi strzelcy turnieju</a>
-    <a class="nav-link" href="/fazaGrupowa" id="Faza Grupowa" >Mecze fazy grupowej</a>
+   <div id="myLinks">
+    <!-- <a class="nav-link" href="/typowanie" id="Mecze live">Pierwszy sposób typowania</a>-->
+    <!-- <a class="nav-link" href="/wszystkieMecze" id="Ekstraklasa">Drugi sposob typowania (PL)</a>-->
+    <!-- <a class="nav-link" href="/tabelaMecze" id="Ekstraklasa">Ranking (same mecze)</a>-->
+    <!-- <a class="nav-link" href="/ileDokladnychTypow">Tabela tylko dokładnych typów</a>-->
+    <!-- <a class="nav-link" href="/tabelaPytania" id="Ekstraklasa">Ranking (same pytania)</a>-->
+    <!-- <a class="nav-link" href="/strzelcy" id="Strzelcy" >Najlepsi strzelcy turnieju</a>-->
+    <!-- <a class="nav-link" href="/fazaGrupowa" id="Faza Grupowa" >Mecze fazy grupowej</a>-->
     <a class="nav-link" href="/zasady" id="1st_Liga" >Zasady typera</a>
-    <a class="nav-link" href="/komentarzDoTypera" id="1st_Liga" >Komentarz odautorski</a>
+    <!-- <a class="nav-link" href="/komentarzDoTypera" id="1st_Liga" >Komentarz odautorski</a>-->
     <a class="nav-link" href="/auth/logout" id="1_Bundesliga">Wyloguj Się</a>
-  <!--  <a class="nav-link" href="/rozgrywki/93/27" id="2_Bundesliga">2. Bundesliga</a>
+    <!-- <a class="nav-link" href="/rozgrywki/93/27" id="2_Bundesliga">2. Bundesliga</a>
     <a class="nav-link" href="/rozgrywki/2/20" id="Bundesliga">Premiership</a>
-    <a class="nav-link" href="/rozgrywki/3/29" id="Bundesliga">La Liga</a> -->
-  </div>
+    <a class="nav-link" href="/rozgrywki/3/29" id="Bundesliga">La Liga</a>--> 
+  </div> 
   <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
-  <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+   <a href="javascript:void(0);" class="icon" onclick="myFunction()">
   <h3><i class="bi bi-list"></i></h3>
   </a>
 </div>

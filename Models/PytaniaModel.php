@@ -12,7 +12,8 @@ class PytaniaModel extends Model{
         'wazneDo',
         'odpowiedz',
         'zamkniete',
-        'TurniejID'
+        'TurniejID',
+        'aktywne'
     ];
 
     public function getPytanieById(int $id)
@@ -27,10 +28,28 @@ class PytaniaModel extends Model{
 
     public function addQuestion($data)
     {
-        $this->insert($data);
-        $db = \Config\Database::connect();
-        $lastQuery = $db->getLastQuery();
-        log_message('debug', 'Last Query: ' . $lastQuery);
-        return $this->insertID();
+        return $this->insert($data);
+    }
+    
+    public function updateQuestionStatus($id, $status)
+    {
+        return $this->where('id', $id)->set(['aktywne' => $status])->update();
+    }
+
+    public function resetAllQuestionStatuses()
+    {
+        return $this->where('id !=', 0)->set(['aktywne' => 0])->update();
+    }
+    
+    public function getActiveQuestions($turniejID)
+    {
+        return $this->where(['TurniejID' => $turniejID, 'aktywne' => 1])->findAll();
+    }
+        public function getQuestionsArchive($turniejID, $date){
+        return $this->where('TurniejID', $turniejID)
+                    ->where('wazneDo <', $date)
+                    ->findAll();
     }
 }
+
+

@@ -8,7 +8,7 @@ $KiedyGraja = strtotime($ZassanaData.'UTC');?>
 <td style="padding-right: 12px;" class="rozgrywki_<?=$_score['competition']['id']?>" title="<?=$_score['competition']['name']?>"></td><td><?=date("H:i", $KiedyGraja)?></td><Td style="padding-right: 12px;"><?=$_score['home_name']?> - <?=$_score['away_name']?></td></tr>
 <tr><td>&nbsp;</td></tr>
 
-      <?	} ?> 
+  	  <?	} ?> 
 </table>
 
 <!--<p>Taaaak, tu będą wrzucane mecze turnieju w Katarze... ale jeśli szukasz typera, to znajdziesz go na <a href="https://jakiwynik.com/typowanie">https://jakiwynik.com/typowanie</a></p> -->

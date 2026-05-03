@@ -7,10 +7,13 @@ class TabelaModel extends Model
 
     public function przeliczTabeleGraczy($turniejID=null){
 
-        $config = get_active_tournament_config();
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $jsonString = file_get_contents($configPath);
+        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
 
         if ($turniejID === null) {
-            $turniejID = $config['activeTournamentId'];
+            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
+            $turniejID = $this->config['activeTournamentId'];
             }
 
 
@@ -79,17 +82,20 @@ class TabelaModel extends Model
     }
  
     public function gimmeTabelaGraczy($turniejID){
-            $config = get_active_tournament_config();
-
+            $configPath = WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
+            $jsonString = file_get_contents($configPath);
+            $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            
             if ($turniejID === null) {
-                $turniejID = $config['activeTournamentId'];
+                // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
+                $turniejID = $this->config['activeTournamentId'];
                 }
 
             // Wczytanie danych TURNIEJU  z pliku JSON
             
 
             if ($turniejID !== null) {
-                $turniejPath = WRITEPATH . "tabelaGraczy_${turniejID}.json"; // Ścieżka do pliku JSON konkretnego turnieju
+                $turniejPath = WRITEPATH . "tabelaGraczy_{$turniejID}.json"; // Ścieżka do pliku JSON konkretnego turnieju
                 }
 
             if (file_exists($turniejPath)) {

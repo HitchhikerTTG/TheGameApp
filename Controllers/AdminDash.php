@@ -84,7 +84,7 @@ protected $_key;
     {
         $turniej = model(TurniejeModel::class);
 
-        if ($this->request->getMethod() === 'POST' && $this->validate([
+        if ($this->request->getMethod() === 'post' && $this->validate([
             'nazwa' => 'required|min_length[3]|max_length[255]',
         ])) {
             $turniej->save([
@@ -227,10 +227,37 @@ protected $_key;
 */
 // NOWY POMYSŁ NA ZARZADZANIE ZAPISU TERMINARZA 
 
+function custom_log($message) {
+    $file = WRITEPATH . 'logs/custom_log.log';
+    
+    // Sprawdź, czy katalog istnieje, jeśli nie, utwórz go
+    if (!is_dir(dirname($file))) {
+        mkdir(dirname($file), 0755, true);
+    }
+    
+    // Sprawdź, czy plik istnieje, jeśli nie, utwórz go
+    if (!file_exists($file)) {
+        file_put_contents($file, ''); // Utwórz pusty plik
+    }
+    
+    // Odczytaj zawartość pliku
+    $current = file_get_contents($file);
+    
+    // Dodaj nową wiadomość do logu
+    $current .= "[" . date('Y-m-d H:i:s') . "] " . $message . "\n";
+    
+    // Zapisz zaktualizowaną zawartość do pliku
+    file_put_contents($file, $current);
+}
+
+
     public function zapiszMeczeTurnieju($iDTurnieju, $page=1) {
         $turniejeModel = model(TurniejeModel::class);
         $terminarzModel = model(TerminarzModel::class);
         $localIdTurnieju = $turniejeModel->znajdzLokalnyIdTurnieju($iDTurnieju);
+
+        $this->custom_log("Rozpoczęto ZapiszMeczeTurnieju");
+
 
         if (!$localIdTurnieju) {
             echo "Nie znaleziono lokalnego ID dla turnieju o zewnętrznym ID: $iDTurnieju";
@@ -241,12 +268,16 @@ protected $_key;
         'competition_id' => $iDTurnieju,
         'page' => $page
         ];
-    
+
+        //$this->custom_log("Parametry: " . print_r($parametry_turniejowe, true));
+        
         $common = new \App\Libraries\Common();
-        $data['turniejowe'] = $common->getFixtures($parametry_turniejowe);   
-        $terminarzModel->zapiszLubAktualizujMecze($data['turniejowe']['fixtures'], $localIdTurnieju);
+        $data['turniejowe'] = $common->getFixtures($parametry_turniejowe);
+        //$this->custom_log("Parametry: " . print_r($data['turniejowe'], true));
+        $terminarzModel->zapiszLubAktualizujMecze($data['turniejowe']['data']['fixtures'], $localIdTurnieju);
 
         if ($data['turniejowe']['next_page']) {
+            
             $this->zapiszMeczeTurnieju($iDTurnieju, $page + 1);
         } else {
             echo "<p>Zakończyłem prace ręczne </p>";
@@ -289,10 +320,20 @@ public function loadClubs(){
     public function dodajKlub()
     {
     $klubModel = model(KlubyModel::class);
-
-        if ($this->request->getMethod() === 'POST' && $this->validate([
-            'nazwa' => 'required|min_length[3]|max_length[255]',
-        ])) {
+    
+        $validated = $this->validate([
+            'nazwa' => [
+                'rules'=>'required|min_length[3]|max_length[255]',
+            'errors' =>[
+                'required' =>'Musisz podać nazwę klubu',
+                'min_length' => 'Nazwa klubu mieć co najmniej 3 znaki',
+                'max_length' => 'nazwa klubu nie może przekraczać 255 znaków',
+                ]
+                ],
+                ]);
+        if (!$validated) {
+            return view('administracja/dodajKlub', ['validation' => $this->validator]);
+        } else {
             $daneDoZapisu=[
                 'Nazwa' => $this->request->getPost('nazwa'),
                 'Opis'  => $this->request->getPost('opis'),
@@ -302,87 +343,268 @@ public function loadClubs(){
             return redirect()->to('hell');
         }
 
+    }
+
+            public function dodajPytanie()
+    {
+        $pytanieModel = new PytaniaModel();
+
+        $validated = $this->validate([
+            'tresc' => [
+                'rules' => 'required|min_length[3]|max_length[255]',
+                'errors' => [
+                    'required' => 'Treść pytania jest wymagana',
+                    'min_length' => 'Treść pytania musi mieć co najmniej 3 znaki',
+                    'max_length' => 'Treść pytania nie może przekraczać 255 znaków',
+                ]
+            ],
+            'pkt' => [
+                'rules' => 'required|is_natural',
+                'errors' => [
+                    'required' => 'Liczba punktów jest wymagana',
+                    'is_natural' => 'Liczba punktów musi być liczbą naturalną',
+                ]
+            ],
+            'wazneDo' => [
+                'rules' => 'required|valid_date[Y-m-d H:i:s]',
+                'errors' => [
+                    'required' => 'Data ważności jest wymagana',
+                    'valid_date' => 'Data ważności musi mieć format YYYY-MM-DD HH:MM:SS',
+                ]
+            ],
+            'TurniejID' => [
+                'rules' => 'required|is_natural',
+                'errors' => [
+                    'required' => 'ID turnieju jest wymagane',
+                    'is_natural' => 'ID turnieju musi być liczbą naturalną',
+                ]
+            ],
+        ]);
+
+        if (!$validated) {
+            return view('administracja/dodajPytanie', ['validation' => $this->validator]);
+        } else {
+            $data = [
+                'tresc' => $this->request->getPost('tresc'),
+                'pkt' => $this->request->getPost('pkt'),
+                'wazneDo' => $this->request->getPost('wazneDo'),
+                'utworzone' => date('Y-m-d H:i:s'),
+                'zamkniete' => 0,
+                'TurniejID' => $this->request->getPost('TurniejID'),
+            ];
+
+            log_message('debug', 'Data to be inserted: ' . json_encode($data));
+
+            if ($pytanieModel->addQuestion($data)) {
+                session()->setFlashdata('success', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
+                return redirect()->to('/hell');
+            } else {
+                session()->setFlashdata('error', 'Wystąpił błąd podczas dodawania pytania.');
+            }
+        }
+
         return redirect()->to('/hell');
     }
 
-    public function dodajPytanie()
-{
-    $pytanieModel = new PytaniaModel();
+        public function getTourmanentQuestions($turniejID){
+        $pytaniaModel = new PytaniaModel();
+        return $pytaniaModel->getPytanieByTurniejID($turniejID);
+    }
 
-    if ($this->request->getMethod() === 'POST' && $this->validate([
-        'tresc' => 'required|min_length[3]|max_length[255]',
-        'pkt' => 'required|is_natural',
-        'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',
-        'TurniejID' => 'required|is_natural',
-    ])) {
-        $data = [
-            'tresc' => $this->request->getPost('tresc'),
-            'pkt' => $this->request->getPost('pkt'),
-            'wazneDo' => $this->request->getPost('wazneDo'),
-            'utworzone' => date('Y-m-d H:i:s'),
-            'zamkniete' => 0, // Domyślnie pytanie jest otwarte
-            'TurniejID' => $this->request->getPost('TurniejID'), // Dodajemy TurniejID, jeśli jest wymagane
+        public function updateQuestionStatus()
+    {
+        $pytaniaModel = new PytaniaModel();
+        $activeQuestions = $this->request->getPost('aktywne');
+
+        // Reset all questions to inactive
+        $pytaniaModel->resetAllQuestionStatuses();
+
+        // Update selected questions to active
+        if (!empty($activeQuestions)) {
+            foreach ($activeQuestions as $id) {
+                $pytaniaModel->updateQuestionStatus($id, 1);
+            }
+        }
+
+        session()->setFlashdata('success', 'Statusy pytań zostały zaktualizowane.');
+        return redirect()->to('/hell');
+    }
+
+    /* TU ZARZĄDZAMY KLUBAMI I UŻYTKOWNIKAMI */
+    
+    /*public function listClubMembers()
+    {
+        $clubMembersModel = new ClubMembersModel();
+        $clubMembers = $clubMembersModel->getAllClubMembers();
+        
+        return view('administracja/assignUserToClub', ['clubMembers' => $clubMembers]);
+    }*/
+
+
+    public function assignUserToClub()
+    {
+        $clubMembersModel = model(ClubMembersModel::class);
+
+        // Walidacja danych
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'userID' => 'required|alpha_numeric|is_not_unique[uzytkownicy.uniID]',
+            'clubID' => 'required|integer|is_not_unique[kluby.id]'
+        ], [
+            'userID' => [
+                'required' => 'Użytkownik jest wymagany.',
+                'alpha_numeric' => 'ID użytkownika musi być ciągiem alfanumerycznym.',
+                'is_not_unique' => 'Wybrany użytkownik nie istnieje.'
+            ],
+            'clubID' => [
+                'required' => 'Klub jest wymagany.',
+                'integer' => 'ID klubu musi być liczbą całkowitą.',
+                'is_not_unique' => 'Wybrany klub nie istnieje.'
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            session()->setFlashdata('error', $validation->listErrors());
+            return redirect()->back()->withInput();
+        }
+
+        $userID = $this->request->getPost('userID');
+        $clubID = $this->request->getPost('clubID');
+
+        // Sprawdzenie, czy uniID istnieje w tabeli uzytkownicy
+        $userModel = model(UserModel::class);
+        $user = $userModel->where('uniID', $userID)->first();
+
+        if (!$user) {
+            session()->setFlashdata('error', 'Wybrany użytkownik nie istnieje.');
+            return redirect()->back()->withInput();
+        }
+
+        if ($clubMembersModel->addUserToClub($userID, $clubID)) {
+            session()->setFlashdata('success', 'Użytkownik został przypisany do klubu.');
+        } else {
+            session()->setFlashdata('error', 'Nie udało się przypisać użytkownika do klubu.');
+        }
+
+        return redirect()->to('/AdminDash/assignUserToClubView');
+    }
+
+    public function assignUserToClubView() {
+    $userModel = model(UserModel::class);
+    $clubMembersModel = model(ClubMembersModel::class);
+    $klubyModel = model(KlubyModel::class);
+
+    $users = $userModel->findAll();
+    $clubs = $klubyModel->findAll();
+    $clubMembers = $clubMembersModel->getAllClubMembers();
+    $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
+
+    // Filtracja użytkowników, którzy są już w klubach
+    $users = array_filter($users, function($user) use ($usersInAnyClub) {
+        foreach ($usersInAnyClub as $userInClub) {
+            if ($user['uniID'] == $userInClub['uniID']) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    return view('administracja/assignUserToClub', [
+        'users' => $users,
+        'clubs' => $clubs,
+        'clubMembers' => $clubMembers,
+        'validation' => \Config\Services::validation()
+    ]);
+}
+
+
+
+
+    public function removeUserFromClub()
+    {
+        $clubMembersModel = model(ClubMembersModel::class);
+
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'userID' => 'required|is_natural',
+            'clubID' => 'required|is_natural',
+        ])) {
+            $userID = $this->request->getPost('userID');
+            $clubID = $this->request->getPost('clubID');
+
+            if ($clubMembersModel->removeUserFromClub($userID, $clubID)) {
+                session()->setFlashData('success', 'Użytkownik został usunięty z klubu.');
+            } else {
+                session()->setFlashData('fail', 'Nie znaleziono użytkownika w tym klubie.');
+            }
+            return redirect()->to('/AdminDash/removeUserFromClub');
+        }
+
+        return view('administracja/removeUserFromClub', [
+            'validation' => $this->validator
+        ]);
+    }
+
+    public function index() {
+        // Wczytanie z pliku konfiguracyjnego json:
+        $common = new Common();
+        $tournaments = $common->loadTournaments();
+        $kluby = $this->loadClubs();
+
+        $meczService = new MeczService;
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
+            'activeTournamentId' => 'Brak danych',
+            'activeCompetitionId' => 'Brak danych',
+            'activeTournamentName' => 'Brak danych'
         ];
 
-        if ($pytanieModel->addQuestion($data)) {
-            session()->setFlashData('sukces', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-            return redirect()->to('hell');
-        } else {
-            session()->setFlashData('error', 'Wystąpił błąd podczas dodawania pytania.');
-        }
+        $data = [
+            'pageTitle' => 'Twoje własne osobiste piekielko',
+            'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
+            'turnieje' => $tournaments,
+            'kluby' => $kluby,
+            'config' => $config,
+            'pytania' => $this->getTourmanentQuestions($config['activeTournamentId']),
+        ];
+
+        $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
+                 ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
+                 : [];
+
+               
+
+        return view('administracja/index', $data)
+               .view('administracja/listaTurniejow', $data)
+               .view('administracja/dodajTurniej', $data)
+               .view('administracja/dodajKlub', $data)
+               .view('administracja/listaKlubow', $data)
+               .view('administracja/listaMeczow', ['mecze' => $mecze])
+               .view('administracja/zarzadzajPytaniami', $data)
+               .view('administracja/dodajPytanie');
+               
     }
 
-    return redirect()->to('/hell');
-}
+    public function pokazMiAdresy($turniejID){
+        $userModel = model(UserModel::class);
+        
+        $file = WRITEPATH . 'logs/test_log.log';
+        // Zapisujemy URL do pliku logów
+        file_put_contents($file, "wywołałem funkcję do pobrania pliku \n\n", FILE_APPEND);
 
-
-
-
-public function index() {
-    // Wczytanie z pliku konfiguracyjnego json:
-    $common = new Common();
-    $tournaments = $common->loadTournaments();
-    $kluby = $this->loadClubs();
-
-    $meczService = new MeczService;
-
-    $configPath = WRITEPATH . 'ActiveTournament.json';
-
-    $config = [];
-    if (file_exists($configPath)) {
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-    } else {
-        // Ustawianie domyślnych wartości jeśli plik nie istnieje
-        $config['activeTournamentId'] = 'Brak danych';
-        $config['activeCompetitionId'] = 'Brak danych';
-        $config['activeTournamentName'] = 'Brak danych';
+        $lista = $userModel->getActiveUsersInTournament($turniejID);
+        
+        echo('<pre>');
+        print_r($lista);
+        echo('</pre>');
+        
+        
     }
 
-    $data = [
-        'pageTitle' => 'Twoje własne osobiste piekielko',
-        'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
-        'turnieje' => $tournaments,
-        'kluby' => $kluby,
-        'config' => $config
-    ];
-
-    $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
-             ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
-             : [];
-
-    return view('administracja/index', $data)
-           .view('administracja/listaTurniejow', $data)
-           .view('administracja/dodajTurniej', $data)
-           .view('administracja/dodajKlub', $data)
-           .view('administracja/listaKlubow', $data)
-           .view('administracja/listaMeczow', ['mecze' => $mecze])
-           .view('administracja/dodajPytanie');
-}
-
-
-
 
 }
 
+
+
+
+   
 ?>

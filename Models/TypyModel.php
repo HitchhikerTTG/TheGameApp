@@ -21,21 +21,21 @@ class TypyModel extends Model{
 
     public function punktyZaMecze($userId, $turniejId) {
         $builder = $this->builder();
-        $builder->where('UserId', $userId);
+        $builder->where('uniID', $userId);
         $builder->where('TurniejID', $turniejId);
         $builder->selectSum('pkt');
         $result = $builder->get()->getRow();
         return $result->pkt ?? 0; // Zwraca 0 jeśli nie ma wyników
     }
 
-    public function dokladneTrafienia($userId, $turniejId,$exactScorePoints = 3) {
-        $builder = $this->builder();
-        $builder->where('UserId', $userId);
-        $builder->where('TurniejID', $turniejId);
-        $builder->where('pkt', $exactScorePoints);
-        
-        return $builder->countAllResults();
-    }
+    public function dokladneTrafienia($userId, $turniejId, $exactScorePoints = [3, 6]) {
+    $builder = $this->builder();
+    $builder->where('uniID', $userId);
+    $builder->where('TurniejID', $turniejId);
+    $builder->whereIn('pkt', $exactScorePoints); // Zmiana where na whereIn
+    
+    return $builder->countAllResults();
+}
 
     public function getTypyByMeczId($meczId) {
        return $this->where('GameID', $meczId)->findAll();
@@ -65,7 +65,23 @@ class TypyModel extends Model{
 
 public function usedGoldenBall($userUniId, $turniejId = null) {
 
-    $config = get_active_tournament_config();
+    // Ścieżka do pliku konfiguracyjnego
+    $configPath = WRITEPATH . 'ActiveTournament.json'; 
+    $jsonString = file_get_contents($configPath);
+
+    if ($jsonString === false) {
+        // Obsługa błędu, jeśli nie udało się otworzyć pliku
+        log_message('error', 'Nie udało się otworzyć pliku ActiveTournament.json');
+        return 0; // Wartość domyślna
+    }
+
+    $config = json_decode($jsonString, true); 
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        // Obsługa błędu, jeśli nie udało się zdekodować JSON-a
+        log_message('error', 'Błąd dekodowania JSON: ' . json_last_error_msg());
+        return 0; // Wartość domyślna
+    }
 
     // Sprawdzenie, czy turniejId jest podany, jeśli nie, użycie ID aktywnego turnieju
     if ($turniejId === null) {
@@ -88,6 +104,9 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
     return $result ? $result['GameID'] : 0; // Zwraca numer meczu, jeśli użytkownik wykorzystał "GoldenBall", w przeciwnym razie 0
 }
 
+    
+
+
     public function liczbaTypowDlaMeczu($meczID) {
     $builder = $this->builder();
     $builder->where('GameID', $meczID);
@@ -97,12 +116,41 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
     public function ktoTypujeTenMecz($meczId) {
         $builder = $this->db->table($this->table);
         $builder->select('typy.*, uzytkownicy.nick AS username');
-        $builder->join('uzytkownicy', 'typy.UserID = uzytkownicy.id');
+        $builder->join('uzytkownicy', 'typy.uniID = uzytkownicy.uniID');
         $builder->where('typy.GameID', $meczId);
         return $builder->get()->getResultArray();
     }
 
+    public function ktoTypujeTenMeczLimited($meczId) {
+        $builder = $this->db->table($this->table);
+        $builder->select('typy.GameID, typy.HomeTyp, typy.AwayTyp, typy.GoldenGame, typy.pkt, uzytkownicy.nick AS username');
+        $builder->join('uzytkownicy', 'typy.uniID = uzytkownicy.uniID');
+        $builder->where('typy.GameID', $meczId);
+        return $builder->get()->getResultArray();
+    }
+
+public function canSaveTyp($gameID) {
+    $terminarzModel = model(TerminarzModel::class);
+    $match = $terminarzModel->getMatchDateTime($gameID);
+    $matchTime = strtotime($match['Date'] . ' ' . $match['Time']);
+    $currentTime = time();
+
+    // Alternatively, you can use error_log() to log to the server error log
+     error_log('Match time: ' . $matchTime);
+     error_log('Current time: ' . $currentTime);
+
+    return $currentTime <= $matchTime;
+}
+
     public function zapiszTyp($data) {
+    
+    $terminarzModel = model(TerminarzModel::class);
+    
+    
+     if ($terminarzModel->czyRozpoczety($data['GameID'])) {
+            return false; // or handle as per your need
+        }
+             
         $warunki = $this->builder();
         $warunki->where('uniID', $data['uniID']);
         $warunki->where('GameID', $data['GameID']);
@@ -115,5 +163,40 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
             return $this->insert($data);
         }
     }
+
+
+
+    public function removeGoldenGame($userUniId, $gameID, $turniejID)
+    {
+        return $this->where([
+            'uniID' => $userUniId,
+            'GameID' => $gameID,
+            'TurniejID' => $turniejID
+        ])->set(['GoldenGame' => 0])->update();
+        
+        
+    }
+
+    public function liczbaTypow($userUniID, $turniejID) {
+    return $this->where('uniID', $userUniID)
+                ->where('TurniejID', $turniejID)
+                ->countAllResults();
+    }
+
+    public function liczbaDokladnychTypow($userUniID, $turniejID) {
+    return $this->where('uniID', $userUniID)
+                ->where('TurniejID', $turniejID)
+                ->whereIn('pkt', [3, 6])
+                ->countAllResults();
+    }
+
+    public function liczbaTotolotkowychTypow($userUniID, $turniejID) {
+    return $this->where('uniID', $userUniID)
+                ->where('TurniejID', $turniejID)
+                ->whereIn('pkt', [1, 2])
+                ->countAllResults();
+    }
+
+
 
 }

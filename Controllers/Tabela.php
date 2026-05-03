@@ -3,6 +3,11 @@
 namespace App\Controllers;
 $session = \Config\Services::session();
 use App\Models\TabelaModel;
+use App\Models\UserModel;
+use App\Models\TypyModel;
+use App\Models\OdpowiedziModel;
+use App\Models\KtoWCoGraModel;
+use App\Models\PomocnicaPiPModel;
 
 class Tabela extends BaseController
 {
@@ -16,10 +21,13 @@ class Tabela extends BaseController
     
     public function tabelaGraczy($turniejID=null){
 
-        $config = get_active_tournament_config();
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $jsonString = file_get_contents($configPath);
+        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
 
         if ($turniejID === null) {
-            $turniejID = $config['activeTournamentId'];
+            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
+            $turniejID = $this->config['activeTournamentId'];
             }
 
 
@@ -63,9 +71,9 @@ class Tabela extends BaseController
             //na razie na sucho, czyli wypiszemy same proste rzeczy :)
             // potrzebujemy wiedzieć, ile punktów ma dany użytkownik, czyli stworzymy sobie tabele, w której bedzie:
             // nick=>punkty
-            $liczbaPktZaTypy = $typy->punktyZaMecze($uzytkownik['id'], $turniejID);
+            $liczbaPktZaTypy = $typy->punktyZaMecze($uzytkownik['uniID'], $turniejID);
             $liczbaPktZaPytania = $odpowiedz->PunktyZaPytania($uzytkownik['uniID'], $turniejID);
-            $dokladneTrafienia = $typy->dokladneTrafienia($uzytkownik['id'], $turniejID);
+            $dokladneTrafienia = $typy->dokladneTrafienia($uzytkownik['uniID'], $turniejID);
 
             $liczbapkt = $liczbaPktZaTypy + $liczbaPktZaPytania;
 

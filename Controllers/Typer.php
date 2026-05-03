@@ -9,16 +9,12 @@ use App\Models\UserModel;
 use App\Models\TerminarzModel;
 use App\Models\TypyModel;
 use App\Models\TabelaModel;
-use App\Models\KtoWCoGraModel;
-use App\Models\PomocnicaPiPModel;
-
-//Mała zmiana, bo mnie wkurzył nie widząc tego, czego ja chcę. 
-
+use App\Midels\KtoWCoGraModel;
 $session = \Config\Services::session();
 
 class Typer extends BaseController
 {
-    protected array $config = [];
+
     protected $_key;
     protected $_secret;
 
@@ -28,7 +24,9 @@ class Typer extends BaseController
     public function __construct()
     {
         helper(['url', 'form']);
-        $this->config = get_active_tournament_config();
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $jsonString = file_get_contents($configPath);
+        $this->config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
     }
 
     protected function _buildUrl($endpoint, $params) {
@@ -198,6 +196,10 @@ public function getLivescores($params = []) {
 
         // TUTAJ TESTOWO PRZYGOTOWUJĘ SOBIE COŚ :) CZYLI NOWY SPOSÓB PREZENTOWANIA TABELI 
 
+            $configPath = WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
+            $jsonString = file_get_contents($configPath);
+            $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
+            
             if ($turniejID === null) {
                 // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
                 $turniejID = $this->config['activeTournamentId'];
@@ -631,7 +633,7 @@ public function getLivescores($params = []) {
             $teraz=date("Y-m-d H:i:s");
         //    echo "Do przerobienia jest ".$gameCount." gier";
 
-            if ($this->request->getMethod() === 'POST') {
+            if ($this->request->getMethod() === 'post') {
                $mecze = $this->request->getPost('mecze'); // Pobranie tablicy meczy
                 foreach ($mecze as $idMeczu => $wyniki) {
                     $typH = $wyniki['H']; // Wynik gospodarzy
@@ -792,7 +794,7 @@ public function getLivescores($params = []) {
 
     }
 
-        public function wyswietlMeczExpanded($przekazanymecz=1, $przekazanyuser){
+        public function wyswietlMeczExpanded($przekazanyuser, $przekazanymecz=1, ){
 
         //$userModel = new UserModel();
         $terminarzModel = new TerminarzModel();
@@ -933,7 +935,7 @@ public function getLivescores($params = []) {
         //echo "Na razie tylko tak sobie zartuję";
         $odpowiedz = model(OdpowiedziModel::class);
 
-        if ($this->request->getMethod() === 'POST' && $this->validate([
+        if ($this->request->getMethod() === 'post' && $this->validate([
             'odpowiedz' => 'required|max_length[255]',
         ])) {
 

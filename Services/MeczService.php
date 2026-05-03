@@ -54,10 +54,11 @@ class MeczService {
     {
         $this->terminarzModel = new TerminarzModel();
         $this->typyModel = new TypyModel();
-         $this->common = new Common();
+        $this->common = new Common();
     }
 
     public function meczeUzytkownikaWTurnieju($userUniID, $turniejID, $zewnetrznyTurniejID, $filtr){
+        $this->common->custom_log("Uruchomiliśmy mecz service: ");
 
         $lista_meczow=[];
         // Po pierwsze, określmy które mecze nas interesują na podstawie filtra
@@ -81,6 +82,8 @@ class MeczService {
 //        echo "</pre>";
         // kiedy mamy listę tych meczów powinniśmy sprawdzić pliki JSON dla tych meczów
         $JSONySprawdzone = $this->manageJsonFiles($lista_meczow, $turniejID, $zewnetrznyTurniejID);
+        //log_message('debug', 'JSONySprawdzone: ' . $JSONySprawdzone);
+
         // jeśli $jsonySprawdzone są true wtedy idziemy dalej, jeśli 0, wtedy przykro i trzeba sprawdzic // wypluć bład.
 
 #        $wypelniona_lista=$lista_meczow;         
@@ -90,7 +93,26 @@ class MeczService {
            // Dodanie liczby typów dla każdego meczu
     foreach ($wypelniona_lista as &$mecz) {
         $mecz['liczbaTypow'] = $this->typyModel->liczbaTypowDlaMeczu($mecz['Id']);
-    }
+        $mecz['rozpoczety']= $this->terminarzModel->czyRozpoczety($mecz['Id']);
+        // jeśli mecz jest rozpoczęty i nie ma jeszcze pliku JSON dla tego pliku z typami, wygeneruj pliki z typami.. jeśli rozpoczęty i są typy dla tego meczu, 
+        
+        if ($mecz['rozpoczety']){
+            
+            $baseDir = WRITEPATH . "typy"; // Bazowy katalog dla plików JSON    
+            $pathTypy = "{$baseDir}/{$mecz['Id']}.json";
+
+            // Sprawdź, czy plik istnieje
+            if (!file_exists($pathTypy)) {
+                // Jeśli plik nie istnieje, utwórz go
+                $this->common->custom_log("Wiemy, ze to potrzeba sprawdzić?");
+                $this->wygenerujTypyDlaMeczu($mecz['Id']);
+                } 
+    
+            }
+        
+        
+        
+        }
 
         return $wypelniona_lista;
     
@@ -250,6 +272,9 @@ private function manageJsonFiles($mecze, $turniejID, $zewnetrznyTurniejID) {
         // Używamy ApiID do generowania nazwy pliku JSON
         $filePath = $this->getJsonFilePath($turniejID, $mecz['ApiID']);
         if ($this->needsUpdate($filePath)) {
+            $file = WRITEPATH . 'logs/test_log.log';
+            file_put_contents($file, 'Mecz wymaga aktualizacji', FILE_APPEND);
+
             // Pobieramy dane z zewnętrznego API używając ApiID
             //$updatedData[$mecz['ApiID']] = $this->fetchDataFromExternalApi($mecz['ApiID']);
             // Zapisujemy zaktualizowane dane do pliku JSON
@@ -264,6 +289,9 @@ private function manageJsonFiles($mecze, $turniejID, $zewnetrznyTurniejID) {
             $mesydz = "Pliki meczów tego turnieju są aktualne - happy hippo";
         }
     }
+
+
+
     return $mesydz;
 }
 
@@ -296,7 +324,14 @@ public function fetchFixtures($turniejId, $page = 1) {
             'page' => $page
         ];
 
-        return $this->common->getFixtures($params);
+        $wynik = $this->common->getFixtures($params);
+        
+        //Logowanie danych zwróconych przez _makeRequest
+        //$file = WRITEPATH . 'logs/test_log.log';
+        //file_put_contents($file, "Zwrócone dane: " . print_r($wynik['data'], true) . "\n", FILE_APPEND);
+
+
+        return $wynik['data'];
     }
 
 /*public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID){
@@ -311,15 +346,29 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
     $allFixtures = [];
     $page = 1;
     $hasNextPage = true;
+    
+
 
     while ($hasNextPage) {
         // Pobierz dane z API dla bieżącej strony
         $response = $this->fetchFixtures($zewnetrznyTurniejID, $page);
 
+        // Logowanie danych zwróconych przez _makeRequest
+//        $file = WRITEPATH . 'logs/test_log.log';
+//        file_put_contents($file, "Repsponse: " . print_r($response, true) . "\n", FILE_APPEND);
+
         if (isset($response['fixtures'])) {
             $fixtures = $response['fixtures'];
             $allFixtures = array_merge($allFixtures, $fixtures);
+            $file = WRITEPATH . 'logs/test_log.log';
+            file_put_contents($file, 'Teraz juz mamy odpowiedz', FILE_APPEND);
+//          file_put_contents($file, $allFixtures, FILE_APPEND);
+
+        } else {
+            $file = WRITEPATH . 'logs/test_log.log';
+            file_put_contents($file, "\n Chciałbyś Wit, no ale nie.", FILE_APPEND);
         }
+
 
         // Sprawdź, czy jest następna strona
         $hasNextPage = isset($response['next_page']) && !empty($response['next_page']);
@@ -335,8 +384,16 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
 
 
 
-
 // Aby sparsować ten JSON i przetworzyć dane w taki sposób, aby zawierały tylko wybrane pola oraz dodatkowe informacje, a następnie zapisać je do odrębnych plików JSON dla każdego meczu, możesz użyć poniższego podejścia w PHP. Przygotowałem przykład, jak to zrobić krok po kroku:
+
+### Krok 0: Przygotowanie funkcji do aktualizacji czasu / przepisanie go na localTime;
+
+function convertToTimezone($dateTime, $timezone) {
+    $date = new \DateTime($dateTime, new \DateTimeZone('UTC'));
+    $date->setTimezone(new \DateTimeZone($timezone));
+    return $date->format('H:i:s');
+}
+
 
 ### Krok 1: Parsowanie i filtracja danych
 
@@ -345,24 +402,31 @@ public function zapiszDaneDoJson($turniejID, $zewnetrznyTurniejID) {
 
 function processMatchesData($matchesData) {
     $processedMatches = [];
+    $userTimezone = 'Europe/Warsaw'; // Zmienna przechowująca strefę czasową użytkownika. Możesz ją dynamicznie ustawić.
 
     foreach ($matchesData as $match) {
+        // Konwersja czasu meczu z UTC na lokalny czas
+        $localTime = $this->convertToTimezone($match['date'] . ' ' . $match['time'], $userTimezone);
+
         // Wybieranie tylko niezbędnych pól
         $processedMatch = [
             'match_id' => $match['id'],
-            'status'=>'PreMecz',
-            'OstatniaAktualizacja'=>date('Y-m-d H:i:s'), // Dodanie daty i czasu ostatniej aktualizacji
+            'status' => 'PreMecz',
+            'OstatniaAktualizacja' => date('Y-m-d H:i:s'), // Dodanie daty i czasu ostatniej aktualizacji
             'home_team' => [
                 'id' => $match['home_id'],
-                'name' => $match['home_name']
+                'name' => $match['home_name'],
+                'plName' => isset($match['home_translations']['pl']) ? $match['home_translations']['pl'] : $match['home_name'] // Użycie tłumaczenia lub domyślnej nazwy
             ],
             'away_team' => [
                 'id' => $match['away_id'],
-                'name' => $match['away_name']
+                'name' => $match['away_name'],
+                'plName' => isset($match['away_translations']['pl']) ? $match['away_translations']['pl'] : $match['away_name'] // Użycie tłumaczenia lub domyślnej nazwy
             ],
             'competition' => $match['competition']['name'],
             'date' => $match['date'],
             'time' => $match['time'],
+            'naszCzas' => $localTime, // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
             'additional_info' => 'Any additional info here' // Przykład dodawania nowych pól
@@ -392,5 +456,98 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
     }
 }
 
+
+
+public function wygenerujTypyDlaMeczu($matchId) {
+    $typyModel = new \App\Models\TypyModel();
+    $types = $typyModel->ktoTypujeTenMeczLimited($matchId);
+
+    $this->common->custom_log("Tak, próbuję wygenerować te typy: ");
+
+    // Inicjalizacja zmiennych do przechowywania statystyk
+    $countWin1 = 0;
+    $countWin2 = 0;
+    $countDraw = 0;
+    $goldenBallCount = 0;
+    $typeCounts = [];
+    $playersWithPoints = 0;
+    $correctPredictions = 0;
+    $doublePointsPlayers = 0;
+
+    // Przetwarzanie typów
+    foreach ($types as $typ) {
+        if ($typ['HomeTyp'] > $typ['AwayTyp']) {
+            $countWin1++;
+        } elseif ($typ['HomeTyp'] < $typ['AwayTyp']) {
+            $countWin2++;
+        } else {
+            $countDraw++;
+        }
+
+        if ($typ['GoldenGame'] == 1) {
+            $goldenBallCount++;
+        }
+
+        $typeKey = $typ['HomeTyp'] . ':' . $typ['AwayTyp'];
+        if (isset($typeCounts[$typeKey])) {
+            $typeCounts[$typeKey]++;
+        } else {
+            $typeCounts[$typeKey] = 1;
+        }
+        
+         // Sprawdzanie punktów graczy
+        $pkt = intval($typ['pkt']);
+        if ($pkt > 0) {
+            $playersWithPoints++;
+        }
+        if ($pkt == 3 || $pkt == 6) {
+            $correctPredictions++;
+        }
+        if ($pkt == 2 || $pkt == 6) {
+            $doublePointsPlayers++;
+        }
+    }
+
+    // Znajdowanie najpopularniejszego typu
+    $mostPopularType = array_search(max($typeCounts), $typeCounts);
+    $mostPopularTypeCount = $typeCounts[$mostPopularType];
+    
+    // Przygotowanie sekcji summary
+    $summary = [
+        'mostPopularType' => $mostPopularType,
+        'mostPopularTypeCount'=>$mostPopularTypeCount,
+        'countWin1' => $countWin1,
+        'countWin2' => $countWin2,
+        'countDraw' => $countDraw,
+        'goldenBallCount' => $goldenBallCount
+    ];
+    
+    $zakonczone = [
+        'playersWithPoints' => $playersWithPoints,
+        'correctPredictions' => $correctPredictions,
+        'doublePointsPlayers' => $doublePointsPlayers
+        ];
+        
+    // Przygotowanie danych JSON do zapisu
+    $data = [
+        'types' => $types,
+        'summary' => $summary,
+        'zakonczone' =>$zakonczone
+    ];
+
+    $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+    // Bazowy katalog dla plików JSON
+    $baseDir = WRITEPATH . "typy"; 
+
+    // Sprawdź, czy katalog istnieje, a jeśli nie, to go stwórz
+    if (!is_dir($baseDir)) {
+        mkdir($baseDir, 0755, true);
+    }
+
+    // Zapisz dane JSON do pliku
+    file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
 }
+}
+
 ?>
