@@ -28,17 +28,14 @@ class TheGame extends BaseController
 
     public function index($turniejID = null){
 
-        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-            
+        $config = get_active_tournament_config();
+
         if ($turniejID === null) {
-            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
             $turniejID = $config['activeTournamentId'];
             $turniejName = $config['activeTournamentName'];
-            } else {
-                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
-            }
+        } else {
+            $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+        }
 
         $loggedInUserId = session()->get('loggedInUser');
 
@@ -78,9 +75,7 @@ class TheGame extends BaseController
     }
 
     public function testIndex($turniejID = null) {
-    $configPath = WRITEPATH . 'ActiveTournament.json'; 
-    $jsonString = file_get_contents($configPath);
-    $config = json_decode($jsonString, true);
+    $config = get_active_tournament_config();
 
     if ($turniejID === null) {
         $turniejID = $config['activeTournamentId'];
@@ -139,18 +134,15 @@ class TheGame extends BaseController
 }
 
         public function akordeon($turniejID = null){
-        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-            
+        $config = get_active_tournament_config();
+
         if ($turniejID === null) {
-            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
             $turniejID = $config['activeTournamentId'];
             $turniejName = $config['activeTournamentName'];
             $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
-            } else {
-                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
-            }
+        } else {
+            $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+        }
 
         $loggedInUserId = session()->get('loggedInUser');
 
@@ -229,18 +221,15 @@ class TheGame extends BaseController
 
     public function archiwum($turniejID=null){
 
-        $configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        $jsonString = file_get_contents($configPath);
-        $config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-            
+        $config = get_active_tournament_config();
+
         if ($turniejID === null) {
-            // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
             $turniejID = $config['activeTournamentId'];
             $turniejName = $config['activeTournamentName'];
             $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
-            } else {
-                $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
-            }
+        } else {
+            $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
+        }
 
         $loggedInUserId = session()->get('loggedInUser');
 
