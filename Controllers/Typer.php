@@ -11,6 +11,9 @@ use App\Models\TypyModel;
 use App\Models\TabelaModel;
 use App\Models\KtoWCoGraModel;
 use App\Models\PomocnicaPiPModel;
+
+//Mała zmiana, bo mnie wkurzył nie widząc tego, czego ja chcę. 
+
 $session = \Config\Services::session();
 
 class Typer extends BaseController
