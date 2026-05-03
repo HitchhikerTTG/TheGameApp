@@ -35,60 +35,62 @@ $routes->setAutoRoute(true);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->GET('zegarek', 'LiveScore::zegarek');
-$routes->GET('live/(:num)', 'LiveScore::naZywo/$1');
-$routes->GET('aktywuj/(:any)', 'Auth::confirm/$1');
-$routes->get('dejnowehaslo/(:any)','Auth::newPassStart/$1');
-$routes->GET('live', 'LiveScore::naZywo');
-$routes->GET('test', 'LiveScore::test');
-$routes->GET('wydarzenia','LiveScore::wydarzeniaMeczu');
-$routes->GET('wydarzenia/(:num)','LiveScore::wydarzeniaMeczu/$1');
-$routes->GET('/komentarz', 'LiveScore::komentarz');
+/*$routes->get('zegarek', 'LiveScore::zegarek');
+$routes->get('live/(:num)', 'LiveScore::naZywo/$1');
+$routes->get('live', 'LiveScore::naZywo');
+$routes->get('test', 'LiveScore::test');*/
+$routes->get('wydarzenia','LiveScore::wydarzeniaMeczu');
+$routes->get('wydarzenia/(:num)','LiveScore::wydarzeniaMeczu/$1');
+$routes->get('/komentarz', 'LiveScore::komentarz');
 $routes->get('/komentarzDoTypera', 'Typer::komentarz');
 $routes->get('/nowykomentarz', 'Komentarz::post');
-$routes->get('/zasady', 'Typer::pokazZasady');
-//$routes->GET('/', 'LiveScore::index');
-$routes->get('archiwum', 'Archiwum::index');
-$routes->GET('eksperyment', 'LiveScore::eksperyment');
+$routes->get('/', 'LiveScore::index');
+//$routes->get('archiwum', 'theGame::archiwum');
+$routes->get('eksperyment', 'LiveScore::eksperyment');
 $routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
+$routes->get('/cookie', 'Kalkulator::dejCookie');
+$routes->get('aktywuj/(:any)', 'Auth::confirm/$1');
+$routes->get('dejnowehaslo/(:any)','Auth::newPassStart/$1');
+
 $routes->get('przeliczMecz/(:num)','Serwisant::policzPunktyDlaMeczu/$1');
 $routes->get('/mecze/(:num)/(:num)', 'JsonFileController::serveJson/$1/$2');
 $routes->get('/typy/(:num)', 'JsonFileController::serveTypy/$1');
-$routes->get('/cookie', 'Kalkulator::dejCookie');
-
-
-
+$routes->get('/zasady', 'Typer::pokazZasady');
+//$routes->get('/', 'TheGame::testIndex');
 
 /*
 * Routing związany z byciem zalogowanym użytkownikiem
 */
-
+    
 $routes->group('', ['filter'=>'authcheck'],function($routes){
-    $routes->get('/','Typer::theGame');
-    $routes->get('typowanie', 'Typer::theGame');
-    $routes->get('wszystkieMecze', 'Typer::wszystkieMecze');
-    $routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');
-    $routes->get('theGame', 'Typer::theGame');
+    //$routes->get('typowanie', 'Typer::theGame');
+    $routes->get('wszystkieMecze', 'TheGame::wszystkieMecze');
+    //$routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');
+    //$routes->get('theGame', 'Typer::theGame');
     $routes->get('mojepunkty','ExperimentalTyper::mojePunkty');
-    $routes->get('fazaGrupowa','Typer::fazaGrupowa');
-    $routes->get('strzelcy','ExperimentalTyper::pokazStrzelcow');
-    $routes->get('tabelaMecze','ExperimentalTyper::tabelaTylkoMecze');
-    $routes->get('tabelaPytania','ExperimentalTyper::tabelaTylkoPytania');
-    $routes->get('ileDokladnychTypow','ExperimentalTyper::ileDokladnychWynikow');
+    //$routes->get('fazaGrupowa','Typer::fazaGrupowa');
+    //$routes->get('strzelcy','ExperimentalTyper::pokazStrzelcow');
+    //$routes->get('tabelaMecze','ExperimentalTyper::tabelaTylkoMecze');
+    //$routes->get('tabelaPytania','ExperimentalTyper::tabelaTylkoPytania');
+    //$routes->get('ileDokladnychTypow','ExperimentalTyper::ileDokladnychWynikow');
     $routes->get('hell','AdminDash::index');
     $routes->get('profil','Profil::index');
     $routes->get('profil/dolaczDoTurnieju/(:num)/(:num)', 'Profil::dolaczDoTurnieju/$1/$2');
     $routes->get('/przeliczTabele/(:num)','Tabela::tabelaGraczy/$1');
     $routes->get('/tabela', 'Tabela::index');
     $routes->get('/tabela/(:num)', 'Tabela::index/$1');
-    $routes->get('testujemy', 'TheGame::index');
-    $routes->get('nowytest', 'TheGame::testIndex');
-    $routes->get('akordeon', 'TheGame::akordeon');
+    //$routes->get('testujemy', 'TheGame::index');
+    $routes->get('typowanie', 'TheGame::testIndex');
+    //$routes->get('akordeon', 'TheGame::akordeon');
     $routes->get('archiwumturnieju', 'TheGame::archiwum');
+    $routes->get('archiwalnePytania', 'TheGame::archiwumPytan');
+    
     $routes->post('/jaktypowali/(:num)', 'TheGame::wygenerujTypyDlaMeczu/$1');
     $routes->get('shoutbox', 'ShoutboxController::index');
     $routes->get('shoutbox/getMessages', 'ShoutboxController::getMessages');
-    $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');   
+    $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');  
+    $routes->match(['get', 'post'], 'hell/przypiszUdoK', 'AdminDash::assignUserToClub');
+    $routes->match(['get', 'post'], 'hell/usunUzK', 'AdminDash::removeUserFromClub'); 
 });
 
 
