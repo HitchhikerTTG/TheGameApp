@@ -551,12 +551,14 @@ public function loadClubs(){
         $kluby = $this->loadClubs();
 
         $meczService = new MeczService;
-        $configPath = WRITEPATH . 'ActiveTournament.json';
-        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
-            'activeTournamentId' => 'Brak danych',
-            'activeCompetitionId' => 'Brak danych',
-            'activeTournamentName' => 'Brak danych'
-        ];
+//        $configPath = WRITEPATH . 'ActiveTournament.json';
+//        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
+//            'activeTournamentId' => 'Brak danych',
+//            'activeCompetitionId' => 'Brak danych',
+//            'activeTournamentName' => 'Brak danych'
+//        ];
+        $config = get_active_tournament_config();
+
 
         $data = [
             'pageTitle' => 'Twoje własne osobiste piekielko',
