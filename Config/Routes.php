@@ -7,21 +7,25 @@ $routes = Services::routes();
 
 // Load the system's routing file first, so that the app and ENVIRONMENT
 // can override as needed.
+/* rzekomo, te linie też juz są gdzie indziej
 if (file_exists(SYSTEMPATH . 'Config/Routes.php')) {
     require SYSTEMPATH . 'Config/Routes.php';
 }
+*/
 
 /*
  * --------------------------------------------------------------------
  * Router Setup
  * --------------------------------------------------------------------
  */
+/* Te linie już są rzekomo gdzieś indziej
 $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
 $routes->setAutoRoute(true);
+*/
 
 /*
  * --------------------------------------------------------------------
@@ -43,7 +47,7 @@ $routes->GET('/komentarz', 'LiveScore::komentarz');
 $routes->get('/komentarzDoTypera', 'Typer::komentarz');
 $routes->get('/nowykomentarz', 'Komentarz::post');
 $routes->get('/zasady', 'Typer::pokazZasady');
-$routes->GET('/', 'LiveScore::index');
+//$routes->GET('/', 'LiveScore::index');
 $routes->get('archiwum', 'Archiwum::index');
 $routes->GET('eksperyment', 'LiveScore::eksperyment');
 $routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
@@ -60,6 +64,7 @@ $routes->get('/cookie', 'Kalkulator::dejCookie');
 */
 
 $routes->group('', ['filter'=>'authcheck'],function($routes){
+    $routes->get('/','Typer::theGame');
     $routes->get('typowanie', 'Typer::theGame');
     $routes->get('wszystkieMecze', 'Typer::wszystkieMecze');
     $routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');

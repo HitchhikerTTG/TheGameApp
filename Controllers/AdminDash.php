@@ -84,7 +84,7 @@ protected $_key;
     {
         $turniej = model(TurniejeModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'nazwa' => 'required|min_length[3]|max_length[255]',
         ])) {
             $turniej->save([
@@ -290,7 +290,7 @@ public function loadClubs(){
     {
     $klubModel = model(KlubyModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'nazwa' => 'required|min_length[3]|max_length[255]',
         ])) {
             $daneDoZapisu=[
@@ -309,7 +309,7 @@ public function loadClubs(){
 {
     $pytanieModel = new PytaniaModel();
 
-    if ($this->request->getMethod() === 'post' && $this->validate([
+    if ($this->request->getMethod() === 'POST' && $this->validate([
         'tresc' => 'required|min_length[3]|max_length[255]',
         'pkt' => 'required|is_natural',
         'wazneDo' => 'required|valid_date[Y-m-d H:i:s]',

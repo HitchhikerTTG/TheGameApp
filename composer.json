@@ -1,0 +1,10 @@
+{
+    "name": "hitchhikerttg/thegameapp",
+    "description": "Typer piłkarski -- TheGameApp",
+    "require": {
+        "php": "^8.1",
+        "codeigniter4/framework": "^4.7.2"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

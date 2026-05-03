@@ -406,7 +406,7 @@ protected $_key;
     {
         $pytanie = model(PytaniaModel::class);
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'tresc' => 'required|min_length[3]|max_length[255]',
         ])) {
             $pytanie->save([
@@ -579,7 +579,7 @@ protected $_key;
    //     echo "</pre>";
 
 
-        if ($this->request->getMethod() === 'post' && $this->validate([
+        if ($this->request->getMethod() === 'POST' && $this->validate([
             'H' => 'is_natural',
             'A'=>'is_natural',
 
