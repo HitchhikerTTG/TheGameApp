@@ -9,12 +9,16 @@ use App\Models\UserModel;
 use App\Models\TerminarzModel;
 use App\Models\TypyModel;
 use App\Models\TabelaModel;
-use App\Midels\KtoWCoGraModel;
+use App\Models\KtoWCoGraModel;
+use App\Models\PomocnicaPiPModel;
+use App\Models\PytaniaModel;
+use App\Models\OdpowiedziModel;
+
 $session = \Config\Services::session();
 
 class Typer extends BaseController
 {
-
+    protected array $config = [];
     protected $_key;
     protected $_secret;
 
