@@ -63,6 +63,8 @@ $routes->get('/zasady', 'Typer::pokazZasady');
 */
     
 $routes->group('', ['filter'=>'authcheck'],function($routes){
+    
+    $routes->get('/', 'TheGame::testIndex');
     //$routes->get('typowanie', 'Typer::theGame');
     $routes->get('wszystkieMecze', 'TheGame::wszystkieMecze');
     //$routes->get('pytanie/(:num)', 'Typer::wyswietlPytanie/$1');
@@ -81,6 +83,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('/tabela/(:num)', 'Tabela::index/$1');
     //$routes->get('testujemy', 'TheGame::index');
     $routes->get('typowanie', 'TheGame::testIndex');
+    
     //$routes->get('akordeon', 'TheGame::akordeon');
     $routes->get('archiwumturnieju', 'TheGame::archiwum');
     $routes->get('archiwalnePytania', 'TheGame::archiwumPytan');
