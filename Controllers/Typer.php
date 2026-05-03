@@ -801,8 +801,8 @@ public function getLivescores($params = []) {
 
     }
 
-        public function wyswietlMeczExpanded($przekazanyuser, $przekazanymecz=1, ){
-
+//        public function wyswietlMeczExpanded($przekazanyuser, $przekazanymecz=1, ){ tu robię podmiankę. 
+        public function wyswietlMeczExpanded($przekazanymecz, $przekazanyuser){
         //$userModel = new UserModel();
         $terminarzModel = new TerminarzModel();
         $typyModel = new TypyModel();
