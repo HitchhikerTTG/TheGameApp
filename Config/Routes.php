@@ -92,8 +92,8 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('shoutbox', 'ShoutboxController::index');
     $routes->get('shoutbox/getMessages', 'ShoutboxController::getMessages');
     $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');  
-    $routes->match(['get', 'post'], 'hell/przypiszUdoK', 'AdminDash::assignUserToClub');
-    $routes->match(['get', 'post'], 'hell/usunUzK', 'AdminDash::removeUserFromClub'); 
+    $routes->match(['GET', 'POST'], 'hell/przypiszUdoK', 'AdminDash::assignUserToClub');
+    $routes->match(['GET', 'POST'], 'hell/usunUzK', 'AdminDash::removeUserFromClub'); 
 });
 
 
