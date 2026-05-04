@@ -39,23 +39,25 @@ $routes->setAutoRoute(true);
 $routes->get('live/(:num)', 'LiveScore::naZywo/$1');
 $routes->get('live', 'LiveScore::naZywo');
 $routes->get('test', 'LiveScore::test');*/
-$routes->get('wydarzenia','LiveScore::wydarzeniaMeczu');
-$routes->get('wydarzenia/(:num)','LiveScore::wydarzeniaMeczu/$1');
-$routes->get('/komentarz', 'LiveScore::komentarz');
+//$routes->get('wydarzenia','LiveScore::wydarzeniaMeczu');
+//$routes->get('wydarzenia/(:num)','LiveScore::wydarzeniaMeczu/$1');
+//$routes->get('/komentarz', 'LiveScore::komentarz');
 $routes->get('/komentarzDoTypera', 'Typer::komentarz');
 $routes->get('/nowykomentarz', 'Komentarz::post');
 //$routes->get('/', 'LiveScore::index');
 //$routes->get('archiwum', 'theGame::archiwum');
-$routes->get('eksperyment', 'LiveScore::eksperyment');
-$routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
+//$routes->get('eksperyment', 'LiveScore::eksperyment');
+//$routes->get('premecz/(:num)/(:num)/(:num)','LiveScore::preMecz/$1/$2/$3');
 $routes->get('/cookie', 'Kalkulator::dejCookie');
 $routes->get('aktywuj/(:any)', 'Auth::confirm/$1');
 $routes->get('dejnowehaslo/(:any)','Auth::newPassStart/$1');
-
 $routes->get('przeliczMecz/(:num)','Serwisant::policzPunktyDlaMeczu/$1');
 $routes->get('/mecze/(:num)/(:num)', 'JsonFileController::serveJson/$1/$2');
 $routes->get('/typy/(:num)', 'JsonFileController::serveTypy/$1');
 $routes->get('/zasady', 'Typer::pokazZasady');
+$routes->get('auth', 'Auth::index');
+$routes->post('auth', 'Auth::loginUser');
+
 //$routes->get('/', 'TheGame::testIndex');
 
 /*
