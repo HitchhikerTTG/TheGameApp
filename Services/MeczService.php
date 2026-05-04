@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 namespace App\Services;
 
@@ -49,6 +49,7 @@ use App\Libraries\Common;
 class MeczService {
     protected $terminarzModel;
     protected $typyModel;
+    protected $common;
 
     public function __construct()
     {
