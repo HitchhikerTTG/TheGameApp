@@ -66,16 +66,18 @@ class TypyModel extends Model{
 public function usedGoldenBall($userUniId, $turniejId = null) {
 
     // Ścieżka do pliku konfiguracyjnego
-    $configPath = WRITEPATH . 'ActiveTournament.json'; 
-    $jsonString = file_get_contents($configPath);
+    // $configPath = WRITEPATH . 'ActiveTournament.json'; 
+    //$jsonString = file_get_contents($configPath);
 
-    if ($jsonString === false) {
+    //if ($jsonString === false) {
         // Obsługa błędu, jeśli nie udało się otworzyć pliku
-        log_message('error', 'Nie udało się otworzyć pliku ActiveTournament.json');
-        return 0; // Wartość domyślna
-    }
+    //    log_message('error', 'Nie udało się otworzyć pliku ActiveTournament.json');
+    //    return 0; // Wartość domyślna
+    //}
 
-    $config = json_decode($jsonString, true); 
+    //$config = json_decode($jsonString, true); 
+    
+    $config = get_active_tournament_config();
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         // Obsługa błędu, jeśli nie udało się zdekodować JSON-a
