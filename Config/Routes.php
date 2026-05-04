@@ -56,7 +56,7 @@ $routes->get('/mecze/(:num)/(:num)', 'JsonFileController::serveJson/$1/$2');
 $routes->get('/typy/(:num)', 'JsonFileController::serveTypy/$1');
 $routes->get('/zasady', 'Typer::pokazZasady');
 $routes->get('auth', 'Auth::index');
-$routes->post('auth', 'Auth::loginUser');
+$routes->post('auth/loginUser', 'Auth::loginUser'); 
 
 //$routes->get('/', 'TheGame::testIndex');
 
