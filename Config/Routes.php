@@ -58,6 +58,15 @@ $routes->get('/zasady', 'Typer::pokazZasady');
 $routes->get('auth', 'Auth::index');
 $routes->post('auth/loginUser', 'Auth::loginUser'); 
 
+// routing bardzo explicite (związane z formularzami)
+
+$routes->get('auth/register', 'Auth::register');
+$routes->post('auth/registerUser', 'Auth::registerUser');
+$routes->get('auth/reset', 'Auth::reset');
+$routes->post('auth/resetPassword', 'Auth::resetPassword');
+$routes->post('auth/newPass', 'Auth::newPass');
+$routes->post('auth/newPassSave', 'Auth::newPassSave');
+
 //$routes->get('/', 'TheGame::testIndex');
 
 /*
@@ -96,6 +105,27 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('shoutbox/postMessage', 'ShoutboxController::postMessage');  
     $routes->match(['GET', 'POST'], 'hell/przypiszUdoK', 'AdminDash::assignUserToClub');
     $routes->match(['GET', 'POST'], 'hell/usunUzK', 'AdminDash::removeUserFromClub'); 
+    
+    // Bo wszystko musi być jawne
+    $routes->post('AdminDash/zmienAktywnyTurniej', 'AdminDash::zmienAktywnyTurniej');
+
+    $routes->post('AdminDash/updateQuestionStatus', 'AdminDash::updateQuestionStatus');
+    $routes->get('AdminDash/zapiszMeczeTurnieju/(:num)', 'AdminDash::zapiszMeczeTurnieju/$1');
+    $routes->post('AdminDash/dodajTurniej', 'AdminDash::dodajTurniej');
+    $routes->post('AdminDash/dodajKlub', 'AdminDash::dodajKlub');
+    $routes->post('AdminDash/dodajPytanie', 'AdminDash::dodajPytanie');
+    $routes->post('AdminDash/assignUserToClub', 'AdminDash::assignUserToClub');
+    $routes->get('AdminDash/assignUserToClubView', 'AdminDash::assignUserToClubView');
+    $routes->post('AdminDash/removeUserFromClub', 'AdminDash::removeUserFromClub');
+    $routes->get('AdminDash/removeUserFromClub', 'AdminDash::removeUserFromClub');
+
+    $routes->post('TheGame/zapiszOdpowiedzNaPytanie', 'TheGame::zapiszOdpowiedzNaPytanie');
+    $routes->post('theGame/nowyZapisTypu', 'TheGame::nowyZapisTypu');
+
+    $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dolaczDoTurnieju/$1/$2');
+    $routes->post('serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+
+
 });
 
 
