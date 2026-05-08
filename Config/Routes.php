@@ -110,7 +110,8 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('AdminDash/zmienAktywnyTurniej', 'AdminDash::zmienAktywnyTurniej');
 
     $routes->post('AdminDash/updateQuestionStatus', 'AdminDash::updateQuestionStatus');
-    $routes->get('AdminDash/zapiszMeczeTurnieju/(:num)', 'AdminDash::zapiszMeczeTurnieju/$1');
+    //$routes->get('AdminDash/zapiszMeczeTurnieju/(:num)', 'AdminDash::zapiszMeczeTurnieju/$1');
+    $routes->get('AdminDash/zapiszMeczeTurnieju/(:num)/(:num)', 'AdminDash::zapiszMeczeTurnieju/$1/$2');
     $routes->post('AdminDash/dodajTurniej', 'AdminDash::dodajTurniej');
     $routes->post('AdminDash/dodajKlub', 'AdminDash::dodajKlub');
     $routes->post('AdminDash/dodajPytanie', 'AdminDash::dodajPytanie');

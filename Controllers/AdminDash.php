@@ -251,18 +251,22 @@ function custom_log($message) {
 }
 
 
-    public function zapiszMeczeTurnieju($iDTurnieju, $page=1) {
-        $turniejeModel = model(TurniejeModel::class);
+//    public function zapiszMeczeTurnieju($iDTurnieju, $page=1) {
+//        $turniejeModel = model(TurniejeModel::class);
+//        $terminarzModel = model(TerminarzModel::class);
+//        $localIdTurnieju = $turniejeModel->znajdzLokalnyIdTurnieju($iDTurnieju);
+ 
+    public function zapiszMeczeTurnieju($iDTurnieju, $localIdTurnieju, $page=1) {
         $terminarzModel = model(TerminarzModel::class);
-        $localIdTurnieju = $turniejeModel->znajdzLokalnyIdTurnieju($iDTurnieju);
+
 
         $this->custom_log("Rozpoczęto ZapiszMeczeTurnieju");
 
 
-        if (!$localIdTurnieju) {
-            echo "Nie znaleziono lokalnego ID dla turnieju o zewnętrznym ID: $iDTurnieju";
-            return;
-        }
+//        if (!$localIdTurnieju) {
+//            echo "Nie znaleziono lokalnego ID dla turnieju o zewnętrznym ID: $iDTurnieju";
+//            return;
+//        }
     
         $parametry_turniejowe = [
         'competition_id' => $iDTurnieju,
@@ -278,7 +282,7 @@ function custom_log($message) {
 
         if ($data['turniejowe']['data']['next_page']) {
     
-            $this->zapiszMeczeTurnieju($iDTurnieju, $page + 1);
+            $this->zapiszMeczeTurnieju($iDTurnieju, $localIdTurnieju, $page + 1);
         } else {
             echo "<p>Zakończyłem prace ręczne </p>";
         }

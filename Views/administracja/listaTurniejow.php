@@ -8,7 +8,7 @@
         <?php foreach ($turnieje as $turniej): ?>
     <div class="turniej">
         <label for="<?=esc($turniej['ID'])?>" style="<?= $turniej['Active'] ? 'background-color: lime;' : '' ?>"><?= esc($turniej['CompetitionName']) ?> <span class="details">[Api ID:<?=esc($turniej['CompetitionID'])?>] </span></label>
-        <input type="radio" id="<?= esc($turniej['ID']) ?>" name="aktywnyTurniej" value="<?= esc($turniej['ID']) ?>" <?= $turniej['Active'] ? 'checked' : '' ?>> <a href="<?= site_url('/AdminDash/zapiszMeczeTurnieju/' . $turniej['CompetitionID']) ?>">wczytaj mecze do bazy&raquo;</a>
+        <input type="radio" id="<?= esc($turniej['ID']) ?>" name="aktywnyTurniej" value="<?= esc($turniej['ID']) ?>" <?= $turniej['Active'] ? 'checked' : '' ?>> <a href="<?= site_url('/AdminDash/zapiszMeczeTurnieju/' . $turniej['CompetitionID'] . '/' . $turniej['ID']) ?>">wczytaj mecze do bazy&raquo;</a>
     </div>
     <?php endforeach; ?>
 
@@ -25,3 +25,5 @@
 
 <?
 ?>
+
+
