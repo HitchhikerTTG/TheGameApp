@@ -276,8 +276,8 @@ function custom_log($message) {
         //$this->custom_log("Parametry: " . print_r($data['turniejowe'], true));
         $terminarzModel->zapiszLubAktualizujMecze($data['turniejowe']['data']['fixtures'], $localIdTurnieju);
 
-        if ($data['turniejowe']['next_page']) {
-            
+        if ($data['turniejowe']['data']['next_page']) {
+    
             $this->zapiszMeczeTurnieju($iDTurnieju, $page + 1);
         } else {
             echo "<p>Zakończyłem prace ręczne </p>";
