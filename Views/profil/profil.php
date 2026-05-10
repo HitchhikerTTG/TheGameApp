@@ -39,6 +39,37 @@ echo "</pre>";
     </div>
 <?php endif; ?>
 </div>
+
+<div class="row mt-4">
+  <div class="col">
+    <div class="card w-90">
+      <div class="card-header">Powiadomienia email</div>
+      <div class="card-body">
+        <?php if ($sukces): ?><div class="alert alert-success"><?= $sukces ?></div><?php endif; ?>
+        <form method="post" action="/profil/zapiszPreferencje">
+          <?= csrf_field() ?>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="notify_bet_saved" id="notify_bet_saved"
+              <?= $userInfo['notify_bet_saved'] ? 'checked' : '' ?>>
+            <label class="form-check-label" for="notify_bet_saved">
+              Powiadom mnie gdy mój typ zostanie zapisany
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="notify_reminder" id="notify_reminder"
+              <?= $userInfo['notify_reminder'] ? 'checked' : '' ?>>
+            <label class="form-check-label" for="notify_reminder">
+              Przypomnij mi przed meczami gdy nie obstawiłem
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Zapisz</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="row">
 <div class="col">
 <div class="card w-90">

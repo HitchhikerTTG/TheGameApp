@@ -126,6 +126,10 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dodajMnieDoTurnieju/$1/$2');
     $routes->post('serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
     
+    //zapisywanie preferencji
+    $routes->post('profil/zapiszPreferencje', 'Profil::zapiszPreferencje');
+
+    
     //wylogowywanie?
     $routes->get('auth/logout', 'Auth::logout');
 

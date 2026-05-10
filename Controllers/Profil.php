@@ -79,6 +79,22 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
     return redirect()->to('/profil'); // Zastąp '/miejscePrzekierowania' odpowiednim URL
 }
 
+    public function zapiszPreferencje()
+    {
+    $userModel = model(UserModel::class);
+    $loggedInUserId = session()->get('loggedInUser');
+
+    $userModel->where('uniID', $loggedInUserId)->set([
+        'notify_bet_saved' => (int)($this->request->getPost('notify_bet_saved') === 'on'),
+        'notify_reminder'  => (int)($this->request->getPost('notify_reminder') === 'on'),
+    ])->update();
+
+    session()->setFlashdata('success', 'Preferencje zapisane.');
+    return redirect()->to('/profil');
+    }
+
+
+
     public function index()
     {
         $common = new Common();

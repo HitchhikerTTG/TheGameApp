@@ -14,7 +14,11 @@ class UserModel extends Model{
         'activated',
         'activatedON',
         'uniID',
-        'PlaysTheActiveTournament'
+        'PlaysTheActiveTournament',
+    'notify_bet_saved',   // ← dodaj
+    'notify_reminder',    // ← dodaj
+];
+
 
     ];
 
@@ -64,9 +68,15 @@ public function setActiveTournamentFlagForUsers($userIds)
 
     public function getGameUserData($userUniId) {
         // Określenie, które pola mają zostać pobrane
-        return $this->select('id, nick, activated,PlaysTheActiveTournament, uniID') // Zakładając, że chcesz tylko te trzy pola
+        return $this->select('id, nick, activated, PlaysTheActiveTournament, uniID, notify_bet_saved, notify_reminder') // Zakładając, że chcesz tylko te trzy pola
                     ->where('uniID', $userUniId)
                     ->first();
+                    
+        
+
+                    
+                    
+                    
     }
     // Nowa metoda do pobierania użytkownika na podstawie nicku
     public function getUserByNick($nick) {
