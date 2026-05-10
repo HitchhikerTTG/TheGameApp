@@ -118,13 +118,16 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('AdminDash/assignUserToClub', 'AdminDash::assignUserToClub');
     $routes->get('AdminDash/assignUserToClubView', 'AdminDash::assignUserToClubView');
     $routes->post('AdminDash/removeUserFromClub', 'AdminDash::removeUserFromClub');
-    $routes->get('AdminDash/removeUserFromClub', 'AdminDash::removeUserFromClub');
+    $routes->get('AdminDash/removeUserFromClub', 'AdminDash::removeUserFromClub'); 
 
     $routes->post('TheGame/zapiszOdpowiedzNaPytanie', 'TheGame::zapiszOdpowiedzNaPytanie');
     $routes->post('theGame/nowyZapisTypu', 'TheGame::nowyZapisTypu');
 
     $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dodajMnieDoTurnieju/$1/$2');
     $routes->post('serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+    
+    //wylogowywanie?
+    $routes->get('auth/logout', 'Auth::logout');
 
 
 });
