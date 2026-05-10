@@ -16,9 +16,7 @@ class UserModel extends Model{
         'uniID',
         'PlaysTheActiveTournament',
     'notify_bet_saved',   // ← dodaj
-    'notify_reminder',    // ← dodaj
-];
-
+    'notify_reminder',    // ← dodakj
 
     ];
 
