@@ -394,8 +394,9 @@ font-weight:300;
     <!-- <a class="nav-link" href="/tabelaPytania" id="Ekstraklasa">Ranking (same pytania)</a>-->
     <!-- <a class="nav-link" href="/strzelcy" id="Strzelcy" >Najlepsi strzelcy turnieju</a>-->
     <!-- <a class="nav-link" href="/fazaGrupowa" id="Faza Grupowa" >Mecze fazy grupowej</a>-->
-    <a class="nav-link" href="/zasady" id="1st_Liga" >Zasady typera</a>
+    <a class="nav-link" href="/zasady" id="1st_Liga" >Zasady typera</a> 
     <!-- <a class="nav-link" href="/komentarzDoTypera" id="1st_Liga" >Komentarz odautorski</a>-->
+    <a class="nav-link" href="/profil" id="profil">edycja preferencji</a>
     <a class="nav-link" href="/auth/logout" id="1_Bundesliga">Wyloguj Się</a>
     <!-- <a class="nav-link" href="/rozgrywki/93/27" id="2_Bundesliga">2. Bundesliga</a>
     <a class="nav-link" href="/rozgrywki/2/20" id="Bundesliga">Premiership</a>
