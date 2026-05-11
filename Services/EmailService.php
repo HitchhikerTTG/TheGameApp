@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Libraries\Postmark;
 use App\Models\UserModel;
+use App\Models\TerminarzModel;
 use CodeIgniter\Database\BaseConnection;
 
 class EmailService
@@ -19,7 +20,10 @@ class EmailService
     /**
      * Dodaje/aktualizuje wpis w kolejce z 3-minutowym rolling window.
      */
-    public function queueBetSaved(string $uniID, int $gameID, string $homeScore, string $awayScore): void
+     
+     
+    public function queueBetSaved(string $uniID, int $gameID, string $homeScore, string $awayScore, int $goldenGame = 0): void
+
     {
         $userModel = model(UserModel::class);
         $user = $userModel->select('email, nick, notify_bet_saved')
@@ -31,7 +35,16 @@ class EmailService
         }
 
         $sendAfter = date('Y-m-d H:i:s', strtotime('+3 minutes'));
-        $body      = "Mecz #{$gameID}: {$homeScore}:{$awayScore}";
+        $terminarzModel = model(\App\Models\TerminarzModel::class);
+        $mecz = $terminarzModel->getMeczById($gameID);
+
+        $dataMeczu   = $mecz ? date('d.m.Y', strtotime($mecz['Date'])) . ' ' . substr($mecz['Time'], 0, 5) : "mecz #{$gameID}";
+        $nazwyDruzyn = $mecz ? "{$mecz['HomeName']} - {$mecz['AwayName']}" : '';
+        $zlotaPilka  = $goldenGame ? ' ⚽ Złota Piłka!' : '';
+
+        $sendAfter = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+        $body      = "{$dataMeczu} | {$nazwyDruzyn} | Twój typ: {$homeScore}:{$awayScore}{$zlotaPilka}";
+
 
         $existing = $this->db->table('email_queue')
             ->where('uniID', $uniID)

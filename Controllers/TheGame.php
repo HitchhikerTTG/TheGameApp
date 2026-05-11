@@ -506,8 +506,7 @@ foreach ($meczeArchiwalne as &$mecz) {
             session()->set('usedGoldenBall', $gameID);
         }
         //przekazanie maila do kolejki do wysyłki
-        (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore);
-
+        (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
 
         return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
     } else {
