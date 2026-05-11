@@ -14,3 +14,17 @@ ALTER TABLE uzytkownicy
 ADD COLUMN notify_bet_saved TINYINT(1) DEFAULT 1 AFTER PlaysTheActiveTournament,
 ADD COLUMN notify_reminder  TINYINT(1) DEFAULT 1 AFTER notify_bet_saved;
 -- ----------------------------------------
+
+-- [2026-05-11] Kolejka emaili
+CREATE TABLE email_queue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uniID VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT,
+    send_after DATETIME NOT NULL,
+    sent TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_queue (uniID, type, sent)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

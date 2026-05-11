@@ -12,6 +12,8 @@ use App\Models\KtoWCoGraModel;
 use App\Services\MeczService;
 use App\Models\PytaniaModel;
 use App\Models\OdpowiedziModel;
+use App\Services\EmailService;
+
 $session = \Config\Services::session();
 
 use DateTime;
@@ -459,7 +461,10 @@ foreach ($meczeArchiwalne as &$mecz) {
     }
     
     public function nowyZapisTypu() {
-    $userUniId = $this->request->getPost('userUID');
+    //$userUniId = $this->request->getPost('userUID');
+    // MA BYĆ:
+    $userUniId = session()->get('loggedInUser');
+
     $gameID = $this->request->getPost('gameID');
     $homeScore = $this->request->getPost('H');
     $awayScore = $this->request->getPost('A');
@@ -500,27 +505,8 @@ foreach ($meczeArchiwalne as &$mecz) {
         } elseif ($goldenGame == 1) {
             session()->set('usedGoldenBall', $gameID);
         }
-        
-        if ($userInfo && $userInfo['notify_bet_saved']) {
-            $mecz = model(TerminarzModel::class)->find($gameID);
-
-            $curl = \Config\Services::curlrequest();
-            $curl->post('<https://api.postmarkapp.com/email>', [
-                'headers' => [
-                    'X-Postmark-Server-Token' => $_ENV['postmark_api_key'],
-                    'Content-Type'            => 'application/json',
-                ],
-                'json' => [
-                    'From'     => 'typuj@jakiwynik.com',
-                    'To'       => $userInfo['email'],
-                    'Subject'  => 'Typ zapisany: ' . $mecz['HomeName'] . ' vs ' . $mecz['AwayName'],
-                    'TextBody' => "Cześć!\n\nZapisano Twój typ:\n" .
-                                  $mecz['HomeName'] . ' ' . $homeScore . ':' . $awayScore . ' ' . $mecz['AwayName'] . "\n\n" .
-                                  "Powodzenia!\<nJakiWynik.com>",
-                ],
-            ]);
-        }
-
+        //przekazanie maila do kolejki do wysyłki
+        (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore);
 
 
         return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
