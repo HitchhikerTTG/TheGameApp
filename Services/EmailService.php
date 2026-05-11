@@ -81,7 +81,7 @@ class EmailService
                   . "<p>Twój typ został zapisany:<br><strong>{$item['body']}</strong></p>"
                   . "<p>Powodzenia!</p>";
 
-            if ($this->postmark->sendEmail($user['email'], $item['subject'], $html)) {
+            if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', $item['subject'], $html)) {
                 $this->db->table('email_queue')->where('id', $item['id'])->update(['sent' => 1]);
                 $sent++;
             }
