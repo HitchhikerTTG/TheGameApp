@@ -85,33 +85,6 @@ class EmailService
             ]);
         }
 
-
-    
-
-
-        $body      = "{$dataMeczu} | {$nazwyDruzyn} | Twój typ: {$homeScore}:{$awayScore}{$zlotaPilka}";
-
-
-        $existing = $this->db->table('email_queue')
-            ->where('uniID', $uniID)
-            ->where('type', 'bet_saved')
-            ->where('sent', 0)
-            ->get()->getRow();
-
-        if ($existing) {
-            $this->db->table('email_queue')->where('id', $existing->id)->update([
-                'body'       => $body,
-                'send_after' => $sendAfter,
-            ]);
-        } else {
-            $this->db->table('email_queue')->insert([
-                'uniID'      => $uniID,
-                'type'       => 'bet_saved',
-                'subject'    => 'Typ zapisany - JakiWynik.com',
-                'body'       => $body,
-                'send_after' => $sendAfter,
-            ]);
-        }
     }
 
     /**
@@ -135,16 +108,15 @@ class EmailService
             if (!$user) {
                 continue;
             }
-            
-            $typy = json_decode($item['body'], true);
+            $typy = json_decode($item['body'], true) ?: [];
                 $pozycje = '';
                 foreach ($typy as $typ) {
-                    $golden = $typ['zlotaPilka'] ? ' ⚽ Złota Piłka!' : '';
+                    $golden = ($typ['zlotaPilka'] ?? false) ? ' ⚽ Złota Piłka!' : '';
                     $pozycje .= "<li>{$typ['data']} | {$typ['mecz']} | Twój typ: {$typ['typH']}:{$typ['typA']}{$golden}</li>";
                 }
 
             $html = "<p>Hej <strong>{$user['nick']}</strong>!</p>"
-                  . "<p>Twój typ został zapisany:<br><strong>{$item['body']}</strong></p>"
+                  . "<p>Twoje typy zostały zapisane:<br><ul>{$pozycje}</ul></p>"
                   . "<p>May the odds be in your favour!</p><i>Wit</i><br><br><p>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na stronie. ";
 
             if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', $item['subject'], $html)) {
