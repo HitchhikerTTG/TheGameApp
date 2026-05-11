@@ -86,17 +86,10 @@ class EmailService
         }
 
 
-        $typy = json_decode($item['body'], true);
-            $pozycje = '';
-            foreach ($typy as $typ) {
-                $golden = $typ['zlotaPilka'] ? ' ⚽ Złota Piłka!' : '';
-                $pozycje .= "<li>{$typ['data']} | {$typ['mecz']} | Twój typ: {$typ['typH']}:{$typ['typA']}{$golden}</li>";
-            }
-            $body = "<p>Hej <strong>{$user['nick']}</strong>!</p>"
-                  . "<p>Twoje zapisane typy:</p>"
-                  . "<ul>{$pozycje}</ul>"
-                  . "<p>May the odds be in your favur!</p><i>Wit</i><br><br><p>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na stronie.</p>";
+    
 
+
+        $body      = "{$dataMeczu} | {$nazwyDruzyn} | Twój typ: {$homeScore}:{$awayScore}{$zlotaPilka}";
 
 
         $existing = $this->db->table('email_queue')
@@ -142,10 +135,17 @@ class EmailService
             if (!$user) {
                 continue;
             }
+            
+            $typy = json_decode($item['body'], true);
+                $pozycje = '';
+                foreach ($typy as $typ) {
+                    $golden = $typ['zlotaPilka'] ? ' ⚽ Złota Piłka!' : '';
+                    $pozycje .= "<li>{$typ['data']} | {$typ['mecz']} | Twój typ: {$typ['typH']}:{$typ['typA']}{$golden}</li>";
+                }
 
             $html = "<p>Hej <strong>{$user['nick']}</strong>!</p>"
                   . "<p>Twój typ został zapisany:<br><strong>{$item['body']}</strong></p>"
-                  . "<p>Powodzenia!</p>";
+                  . "<p>May the odds be in your favour!</p><i>Wit</i><br><br><p>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na stronie. ";
 
             if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', $item['subject'], $html)) {
                 $this->db->table('email_queue')->where('id', $item['id'])->update(['sent' => 1]);
@@ -156,3 +156,5 @@ class EmailService
         return $sent;
     }
 }
+
+
