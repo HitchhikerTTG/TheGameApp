@@ -501,27 +501,26 @@ foreach ($meczeArchiwalne as &$mecz) {
             session()->set('usedGoldenBall', $gameID);
         }
         
-        // Powiadomienie email o zapisaniu typu
-        $userModel = model(UserModel::class);
-        $userInfo = $userModel->where('uniID', $userUniId)
-                              ->select('email, notify_bet_saved')
-                              ->first();
-
         if ($userInfo && $userInfo['notify_bet_saved']) {
             $mecz = model(TerminarzModel::class)->find($gameID);
-            $mail = \Config\Services::email();
-            $mail->setFrom('typuj@jakiwynik.com', 'JakiWynik Typer');
-            $mail->setTo($userInfo['email']);
-            $mail->setSubject('Typ zapisany: ' . $mecz['HomeName'] . ' vs ' . $mecz['AwayName']);
-            $mail->setMessage(
-                "Cześć!\n\n" .
-                "Zapisano Twój typ:\n" .
-                $mecz['HomeName'] . " " . $homeScore . " : " . $awayScore . " " . $mecz['AwayName'] . "\n\n" .
-                "Powodzenia!\n" .
-                "<JakiWynik.com>"
-            );
-            $mail->send();
+
+            $curl = \Config\Services::curlrequest();
+            $curl->post('<https://api.postmarkapp.com/email>', [
+                'headers' => [
+                    'X-Postmark-Server-Token' => $_ENV['postmark_api_key'],
+                    'Content-Type'            => 'application/json',
+                ],
+                'json' => [
+                    'From'     => 'typuj@jakiwynik.com',
+                    'To'       => $userInfo['email'],
+                    'Subject'  => 'Typ zapisany: ' . $mecz['HomeName'] . ' vs ' . $mecz['AwayName'],
+                    'TextBody' => "Cześć!\n\nZapisano Twój typ:\n" .
+                                  $mecz['HomeName'] . ' ' . $homeScore . ':' . $awayScore . ' ' . $mecz['AwayName'] . "\n\n" .
+                                  "Powodzenia!\<nJakiWynik.com>",
+                ],
+            ]);
         }
+
 
 
         return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
