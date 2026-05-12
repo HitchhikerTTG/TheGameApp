@@ -172,7 +172,7 @@ class EmailService
               . "<ul>{$pozycje}</ul>"
               . "<p><a href=\"{$url}\" style=\"display:inline-block;padding:10px 20px;background:#198754;color:#fff;text-decoration:none;border-radius:5px;\">➡ Obstaw teraz</a></p>"
 
-              . "<p>May the odds be always in your favour!</p><i>Wit</i><br><br><p><small>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na <a href=\"" . base_url('profil') . "\">swoim profilu</a>.</small></p>"";
+              . "<p>May the odds be always in your favour!</p><i>Wit</i><br><br><p><small>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na <a href=\"" . base_url('profil') . "\">swoim profilu</a>.</small></p>";
 
         if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', 'Nie zapomnij obstawić! -- JakiWynik.com', $html)) {
             $sent++;
@@ -180,6 +180,65 @@ class EmailService
     }
     return $sent;
 }
+
+public function sendCampaignTest(string $templateFile, string $subject, string $toEmail): bool
+{
+    $html = @file_get_contents(FCPATH . 'maile/' . basename($templateFile));
+    if ($html === false) {
+        return false;
+    }
+    return $this->postmark->sendEmail(
+        'ogloszenia@jakiwynik.com', $toEmail, '', '[TEST] ' . $subject, $html
+    );
+}
+
+public function sendCampaign(string $templateFile, string $subject, string $targetGroup): int
+{
+    $html = @file_get_contents(FCPATH . 'maile/' . basename($templateFile));
+    if ($html === false) {
+        return 0;
+    }
+    $recipients = $this->getCampaignRecipients($targetGroup);
+    $sent = 0;
+    foreach ($recipients as $user) {
+        $personalHtml = str_replace('{nick}', esc($user['nick'] ?? ''), $html);
+        if ($this->postmark->sendEmail(
+            'ogloszenia@jakiwynik.com', $user['email'], '', $subject, $personalHtml
+        )) {
+            $sent++;
+        }
+    }
+    \Config\Database::connect()->table('email_campaigns')->insert([
+        'template_file'    => $templateFile,
+        'subject'          => $subject,
+        'target_group'     => $targetGroup,
+        'sent_at'          => date('Y-m-d H:i:s'),
+        'recipients_count' => $sent,
+    ]);
+    return $sent;
+}
+
+private function getCampaignRecipients(string $targetGroup): array
+{
+    $userModel = model(UserModel::class);
+    if ($targetGroup === 'active') {
+        return $userModel->select('email, nick')
+                         ->where('PlaysTheActiveTournament', 1)
+                         ->findAll();
+    }
+    if ($targetGroup === 'all') {
+        return $userModel->select('email, nick')->findAll();
+    }
+    if (str_starts_with($targetGroup, 'tournament_')) {
+        $tid = (int)substr($targetGroup, 11);
+        return $userModel->select('uzytkownicy.email, uzytkownicy.nick')
+                         ->join('ktowcogra', '<uzytkownicy.id> = ktowcogra.userID')
+                         ->where('ktowcogra.turniejID', $tid)
+                         ->findAll();
+    }
+    return [];
+}
+
 
 }
 

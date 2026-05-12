@@ -133,6 +133,11 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     //wylogowywanie?
     $routes->get('auth/logout', 'Auth::logout');
 
+    // a bo chcę mieć swoje maile
+    $routes->get('hell/kampanie', 'AdminDash::kampanie');
+    $routes->post('hell/kampanie/test', 'AdminDash::testKampania');
+    $routes->post('hell/kampanie/wyslij', 'AdminDash::wyslijKampanie');
+
 
 });
 

@@ -607,6 +607,67 @@ public function loadClubs(){
     }
 
 
+    public function kampanie()
+{
+    $db = \Config\Database::connect();
+
+    $files   = array_map('basename', glob(FCPATH . 'maile/*.html') ?: []);
+    $sent    = $db->table('email_campaigns')->get()->getResultArray();
+    $sentMap = [];
+    foreach ($sent as $s) {
+        $sentMap[$s['template_file']][$s['target_group']] = $s;
+    }
+
+    return view('administracja/kampanie', [
+        'pageTitle'   => 'Kampanie email',
+        'files'       => $files,
+        'sentMap'     => $sentMap,
+        'activeCount' => model(\App\Models\UserModel::class)->where('PlaysTheActiveTournament', 1)->countAllResults(),
+        'allCount'    => model(\App\Models\UserModel::class)->countAllResults(),
+    ]);
+}
+
+public function testKampania()
+{
+    $ok = (new \App\Services\EmailService())->sendCampaignTest(
+        $this->request->getPost('template_file'),
+        $this->request->getPost('subject'),
+        'wit@nirski.com'
+    );
+    session()->setFlashdata($ok ? 'success' : 'fail',
+        $ok ? 'Test wysłany na wit@nirski.com.' : 'Błąd wysyłki testowej.');
+    return redirect()->to('/hell/kampanie');
+}
+
+public function wyslijKampanie()
+{
+    $db           = \Config\Database::connect();
+    $templateFile = $this->request->getPost('template_file');
+    $subject      = $this->request->getPost('subject');
+    $targetGroup  = $this->request->getPost('target_group');
+
+    if ($targetGroup === 'tournament') {
+        $targetGroup = 'tournament_' . (int)$this->request->getPost('tournament_id');
+    }
+
+    $existing = $db->table('email_campaigns')
+        ->where('template_file', $templateFile)
+        ->where('target_group', $targetGroup)
+        ->where('sent_at IS NOT NULL', null, false)
+        ->get()->getRow();
+
+    if ($existing) {
+        session()->setFlashdata('fail', 'Ta kampania została już wysłana do tej grupy!');
+        return redirect()->to('/hell/kampanie');
+    }
+
+    $count = (new \App\Services\EmailService())->sendCampaign($templateFile, $subject, $targetGroup);
+    session()->setFlashdata('success', "Wysłano do {$count} odbiorców.");
+    return redirect()->to('/hell/kampanie');
+}
+
+
+
 }
 
 
