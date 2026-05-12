@@ -46,7 +46,27 @@ $fail    = $session->getFlashData('fail');
             <option value="<?= esc($f) ?>"><?= esc($f) ?></option>
           <?php endforeach ?>
         </select>
+            <div class="mt-2">
+      <a href="#" id="btnPodglad" class="btn btn-sm btn-outline-info d-none"
+         onclick="openPodglad(event)">👁 Podgląd szablonu</a>
+    </div>
+
       </div>
+
+    <div class="modal fade" id="modalPodglad" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Podgląd: <span id="podgladNazwa"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0" style="height:80vh">
+        <iframe id="podgladIframe" src="" style="width:100%;height:100%;border:none"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       <div class="mb-3">
         <label class="form-label fw-bold">Temat emaila</label>
@@ -199,6 +219,22 @@ function submitSend() {
     document.getElementById('formKampania').action = '/hell/kampanie/wyslij';
     document.getElementById('formKampania').submit();
 }
+
+document.getElementById('selectTemplate').addEventListener('change', function() {
+    const btn = document.getElementById('btnPodglad');
+    btn.classList.toggle('d-none', !this.value);
+});
+
+function openPodglad(e) {
+    e.preventDefault();
+    const tpl = document.getElementById('selectTemplate').value;
+    if (!tpl) return;
+    document.getElementById('podgladNazwa').textContent = tpl;
+    document.getElementById('podgladIframe').src = '/maile/' + tpl;
+    new bootstrap.Modal(document.getElementById('modalPodglad')).show();
+}
+
+
 </script>
 
 </body>
