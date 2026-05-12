@@ -216,6 +216,20 @@ public function czyRozpoczety($gameID) {
     return $result ? $result['Rozpoczety'] : null;
 }
 	
+	public function getMeczeNaReminder(int $turniejID): array
+{
+    return $this->select('Id, Date, Time, HomeName, AwayName')
+        ->where('TurniejID', $turniejID)
+        ->where('zakonczony', 0)
+        ->where('Rozpoczety', 0)
+        ->where('Date >=', date('Y-m-d'))
+        ->where('Date <=', date('Y-m-d', strtotime('+1 day')))
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+}
+
+	
 
 }
 

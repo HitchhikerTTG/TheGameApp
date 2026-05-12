@@ -5,6 +5,8 @@ use App\Libraries\Postmark;
 use App\Models\UserModel;
 use App\Models\TerminarzModel;
 use CodeIgniter\Database\BaseConnection;
+use App\Models\TypyModel;
+
 
 class EmailService
 {
@@ -117,7 +119,7 @@ class EmailService
 
             $html = "<p>Hej <strong>{$user['nick']}</strong>!</p>"
                   . "<p>Twoje typy zostały zapisane:<br><ul>{$pozycje}</ul></p>"
-                  . "<p>May the odds be in your favour!</p><i>Wit</i><br><br><p>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na stronie. ";
+                  . "<p>May the odds be always in your favour!</p><i>Wit</i><br><br><p>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na stronie. ";
 
             if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', $item['subject'], $html)) {
                 $this->db->table('email_queue')->where('id', $item['id'])->update(['sent' => 1]);
@@ -127,6 +129,58 @@ class EmailService
 
         return $sent;
     }
+    
+    public function sendReminders(): int
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    $matches = (new TerminarzModel())->getMeczeNaReminder($turniejID);
+    if (empty($matches)) {
+        return 0;
+    }
+
+    $userModel = model(UserModel::class);
+    $typyModel = model(TypyModel::class);
+
+    $users = $userModel->select('uniID, email, nick')
+                       ->where('PlaysTheActiveTournament', 1)
+                       ->where('notify_reminder', 1)
+                       ->findAll();
+
+    $sent = 0;
+    foreach ($users as $user) {
+        $unbet = [];
+        foreach ($matches as $match) {
+            if (!$typyModel->getTypyByMeczIdAndUserId($match['Id'], $user['uniID'])) {
+                $unbet[] = $match;
+            }
+        }
+        if (empty($unbet)) {
+            continue;
+        }
+
+        $pozycje = '';
+        foreach ($unbet as $match) {
+            $data     = date('d.m.Y', strtotime($match['Date'])) . ' ' . substr($match['Time'], 0, 5);
+            $pozycje .= "<li>{$data} -- {$match['HomeName']} vs {$match['AwayName']}</li>";
+        }
+
+        $url  = base_url('typowanie');
+        $html = "<p>Hej <strong>{$user['nick']}</strong>!</p>"
+              . "<p>Nie obstawiłeś jeszcze wyników następujących meczów:</p>"
+              . "<ul>{$pozycje}</ul>"
+              . "<p><a href=\"{$url}\" style=\"display:inline-block;padding:10px 20px;background:#198754;color:#fff;text-decoration:none;border-radius:5px;\">➡ Obstaw teraz</a></p>"
+
+              . "<p>May the odds be always in your favour!</p><i>Wit</i><br><br><p><small>Otrzymujesz tę wiadomość, ponieważ wspólnie gramy w typera jakiwynik.com. Jeśli nie chcesz otrzymywać tych wiadomości - napisz do mnie lub zmień to w swoich preferencjach na <a href=\"" . base_url('profil') . "\">swoim profilu</a>.</small></p>"";
+
+        if ($this->postmark->sendEmail('ogloszenia@jakiwynik.com', $user['email'], '', 'Nie zapomnij obstawić! -- JakiWynik.com', $html)) {
+            $sent++;
+        }
+    }
+    return $sent;
+}
+
 }
 
 
