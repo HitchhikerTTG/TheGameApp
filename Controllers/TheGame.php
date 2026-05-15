@@ -115,11 +115,6 @@ class TheGame extends BaseController
 
     $loggedInUserId = session()->get('loggedInUser');
 
-    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
-    return view('typowanie/header', ['title' => $turniejName])
-         . view('ukladanka/sg/brakTurnieju')
-         . view('typowanie/footer');
-}
 
 
 
@@ -129,6 +124,13 @@ class TheGame extends BaseController
     //$userModel = model(UserModel::class);
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
+    return view('typowanie/header', ['title' => $turniejName])
+         . view('ukladanka/sg/brakTurnieju')
+         . view('typowanie/footer');
+    }
+
 
     $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "najblizsze");
 
