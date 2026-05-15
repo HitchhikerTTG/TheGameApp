@@ -31,7 +31,7 @@ echo "</pre>";
             <div class="card-header">Aktywny turniej:</div>
             <div class="card-body">
                 <h5 class="card-title"><?= $gdzieGram['active']['CompetitionName']; ?></h5>
-                <p class="card-text">I tu by było fajnie ogarnąć jakąś logikę</p>
+                <!--<p class="card-text">I tu by było fajnie ogarnąć jakąś logikę</p>-->
                 <?php if ($gdzieGram['isActiveParticipant']): ?>
                 <a href="/typowanie" class="btn btn-primary">Typuj mecze turnieju &raquo;</a> <?php else: ?> <a href="/Profil/dodajMnieDoTurnieju/<?= esc($userInfo['id']) ?>/<?= esc($gdzieGram['active']['ID'])?>" class="btn btn-primary">Chcę dołączyć</a> <?php  endif; ?> 
             </div>
