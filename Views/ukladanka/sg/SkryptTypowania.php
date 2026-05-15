@@ -22,15 +22,15 @@ $(document).ready(function() {
     });
 
     $('.accordion-collapse').on('shown.bs.collapse', function () {
-        let id = <this.id>;
+        let id = this.id;
         localStorage.setItem('details-' + id, 'true');
     });
     $('.accordion-collapse').on('hidden.bs.collapse', function () {
-        let id = <this.id>;
+        let id = this.id;
         localStorage.setItem('details-' + id, 'false');
     });
     $('.accordion-collapse').each(function () {
-        let id = <this.id>;
+        let id = this.id;
         if (localStorage.getItem('details-' + id) === 'true') {
             $('#' + id).addClass('show');
         }
@@ -84,7 +84,7 @@ $(document).ready(function() {
 
     $('body').on('change', '.golden-game-checkbox', function() {
         var checkbox  = $(this);
-        var isChecked = <checkbox.is>(':checked');
+        var isChecked = checkbox.is(':checked');
 
         if (isChecked) {
             checkbox.siblings('span').css('opacity', '1');
