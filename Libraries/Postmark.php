@@ -11,7 +11,8 @@ class Postmark
         $this->apiKey = getenv('postmark_api_key'); // Ensure to set this in your .env file
     }
 
-    public function sendEmail($from, $to, $replyto, $subject, $htmlBody, $textBody = '')
+//  public function sendEmail($from, $to, $replyto, $subject, $htmlBody, $textBody = '')
+    public function sendEmail($from, $to, $replyto, $subject, $htmlBody, $textBody = '', $stream = 'outbound')
     {
         $url = 'https://api.postmarkapp.com/email';
         $headers = [
@@ -26,7 +27,7 @@ class Postmark
             'Subject' => $subject,
             'HtmlBody' => $htmlBody,
             'TextBody' => $textBody,
-            'messageStream' => "broadcast",
+            'messageStream' => $stream,
         ];
 
         $ch = curl_init($url);

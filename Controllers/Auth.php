@@ -88,12 +88,14 @@ class Auth extends BaseController
             
             
                 
-            $mail = \Config\Services::email();
-            $mail->setFrom('wit@jakiwynik.com', 'Wit z JakiWynik.com');
-            $mail->setTo($email);
-            $mail->setSubject('Zmiana hasła w serwisie JakiWynik.com');
-            $mail->setMessage($mesydz);
-            $mail->send();
+            (new \App\Libraries\Postmark())->sendEmail(
+                'gospodarz@jakiwynik.com',
+                $email,
+                'typer@jakiwynik.com',
+                'Zmiana hasła w serwisie JakiWynik.com',
+                nl2br(esc($mesydz)),
+                $mesydz
+            );
             
 
                 session()->setFlashdata('success', 'Jak by Ci to powiedzieć... wychodzi na to, że powinieneś dostać na swojego maila w ciągu najbliższych kilku minut link do odświeżenia hasła. Link jest ważny przez 15 minut. Spiesz się powoli. Czekaaaam');
@@ -234,6 +236,18 @@ class Auth extends BaseController
             $mail->setSubject('Potwierdź rejestrację w Typerze JakiWynik.com');
             $mail->setMessage("A więc chcesz sprawdzić swoje szczęście i swoją piłkarska wiedzę? Brrrrawo Ty! \n\n Aktywuj swoje konto klikając w link: \n\n ".base_url()."/aktywuj/".$uniid."\n\n To tyle ode mnie, dziękować. \n\n May the odds be in your flavour; :) \n\n\n\n Nie chciałeś się rejestrować? Nie wiesz o co chodzi? Nie masz ochoty typować - nie przejmuj się tym mailem. Ktoś zrobił Ci psikusa, Twój mail nie jest nigdzie zapisany. Live long and prosper.");
             $mail->send();
+            
+
+            // WSTAW zamiast nich:
+            $tekst = "A więc chcesz sprawdzić swoje szczęście i swoją piłkarską wiedzę? Brrrrawo Ty!\n\nAktywuj swoje konto klikając w link:\n\n" . base_url() . "aktywuj/" . $uniid . "\n\nMay the odds be in your flavour :)\n\nNie chciałeś się rejestrować? Nie przejmuj się tym mailem -- ktoś zrobił Ci psikusa.";
+            (new \App\Libraries\Postmark())->sendEmail(
+            'gospodarz@jakiwynik.com',
+            $email,
+            'typer@jakiwynik.com',
+            'Potwierdź rejestrację w Typerze JakiWynik.com',
+            nl2br(esc($tekst)),
+            $tekst
+            );
 
             session()->setFlashdata('success', 'Nowy użytkownik został zarejestrowany, a ja uczę się wysyłaś maila z potwierdzeniem. Jak klikniesz w link, możesz się tu potem zalogować.');
             return redirect()->to('auth');
