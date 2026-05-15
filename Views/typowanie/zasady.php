@@ -8,11 +8,11 @@ Jedna mała sprawa. To jest idea zasad, która obowiazywała przez ostatnie lata
       <div class="row">
     <div class="col">
     <h3>Zasady Gry</h3>
-<p>Cóż, co do zasady, w tej grze chodzi o to, aby poprawnie wytypować co 25* facetów zdziała na boisku. I jak zawsze w tych sprawach, brzmi to prościej niż jest do przewidzenia. I właśnie dlatego za dobre przewidywanie, przewidujemy punkty. A za największą liczbę zgromadzonych punktów, przewidujemy? ... przewidujemy nagrody. Taki jest plan, na nagrodę. </p></div></div>
+<p>Cóż, co do zasady, w tej grze chodzi o to, aby poprawnie wytypować co 25* facetów zdziała na boisku. I jak zawsze w tych sprawach, brzmi to prościej niż jest do przewidzenia. I właśnie dlatego za dobre przewidywanie, przewidujemy punkty. A za największą liczbę zgromadzonych punktów przewidujemy nagrodę.</p></div></div>
 <div class="row"> <div class="col">
 <h3>Jak grać:</h3>
-<p>Typujemy wyniki wszystkich meczów Mistrzostw Europy. Twój typ na dany mecz możesz wstawić na 5 minut przed rozpoczęciem spotkania. <br><br>Liczy się czas serwera, więc marudzenie nie na wiele się zda. Możesz marudzić na serwer, ale serwer jest strasznie mało przejmujący się.</p>
-<!--<p>Nie wszystkie mecze mają wskazane drużyny (bo jeszcze nie wiemy, kto na ten przykład wyjdzie z danej grupy. Przynajmniej my jeszcze nie wiemy, ale jak masz przecieki - śmiało, możesz typować). Z czasem wszystko się wyjaśni.</p>-->
+<p>Typujemy wyniki wszystkich meczów <?=esc($title); ?>. Twój typ na dany mecz możesz wstawić na 5 minut przed rozpoczęciem spotkania. <br><br>Liczy się czas serwera, więc marudzenie nie na wiele się zda. Możesz marudzić na serwer, ale serwer jest strasznie mało przejmujący się. Na swoim profilu możesz ustalić, czy chcesz otrzymywać powiadomienie o zapisaniu swojego typu.</p> 
+<p>Nie wszystkie mecze mają wskazane drużyny (bo jeszcze nie wiemy, kto na ten przykład wyjdzie z danej grupy. Przynajmniej my jeszcze nie wiemy, ale jak masz przecieki - śmiało, możesz typować). Z czasem wszystko się wyjaśni.</p>
 </div></div>
 <div class="row"> <div class="col">
 <h3>Jak punktujemy:</h3>

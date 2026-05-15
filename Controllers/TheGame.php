@@ -673,6 +673,14 @@ unset($pytanie); // Unset reference
 }
 
 
+    public function pokazZasady(){
+            $data["title"]="Zasady stosowane w typerze";
+            $data["turniej"]= $this->config['activeTournamentName'];
+            return  view('typowanie/header', $data)
+                    . view('typowanie/zasady', $data);
+        
+    }    
+
 }
 ?>
 
