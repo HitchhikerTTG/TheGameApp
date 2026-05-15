@@ -14,6 +14,8 @@ use App\Models\PytaniaModel;
 use App\Models\OdpowiedziModel;
 use App\Services\EmailService;
 
+
+
 $session = \Config\Services::session();
 
 use DateTime;
@@ -26,12 +28,27 @@ class TheGame extends BaseController
     //protected $_secret;
 
     protected $meczService;
+    
+    // DODAĆ (przed konstruktorem):
+    protected array $config  = [];
+    protected $userModel;
+    protected $tabelaModel;
+    protected $pytaniaModel;
+    protected $odpowiedzModel;
 
+    // KONSTRUKTOR -- dodać 3 linie:
     public function __construct()
     {
         $this->meczService = new MeczService();
+        $this->config      = get_active_tournament_config();
+        $this->userModel   = model(UserModel::class);
+        $this->tabelaModel = model(TabelaModel::class);
+        $this->pytaniaModel= model(PytaniaModel::class);
+        $this->odpowiedzModel =model(OdpowiedziModel::class);
+        
     }
- 
+
+
 
     public function index($turniejID = null){
 
@@ -39,12 +56,12 @@ class TheGame extends BaseController
         //$jsonString = file_get_contents($configPath);
         //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
         
-        $config = get_active_tournament_config();
+        //$config = get_active_tournament_config();
             
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
-            $turniejID = $config['activeTournamentId'];
-            $turniejName = $config['activeTournamentName'];
+            $turniejID = $this->config['activeTournamentId'];
+            $turniejName = $this->config['activeTournamentName'];
             } else {
                 $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
             }
@@ -52,11 +69,11 @@ class TheGame extends BaseController
         $loggedInUserId = session()->get('loggedInUser');
 
 
-        $model = model(TabelaModel::class);
-        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+        //$model = model(TabelaModel::class);
+        $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        //$userModel = model(UserModel::class);
+        $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
 
         $mecze = $this->meczService->getMeczeUzytkownikaWTurnieju($loggedInUserId, $turniejID);
        // $mecze = $this->meczService->prepareMeczeTurnieju($turniejID);    
@@ -91,23 +108,23 @@ class TheGame extends BaseController
     //$jsonString = file_get_contents($configPath);
     //$config = json_decode($jsonString, true);
 
-    $config = get_active_tournament_config();
+    //$config = get_active_tournament_config();
 
     if ($turniejID === null) {
-        $turniejID = $config['activeTournamentId'];
-        $turniejName = $config['activeTournamentName'];
-        $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+        $turniejID = $this->config['activeTournamentId'];
+        $turniejName = $this->config['activeTournamentName'];
+        $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
     } else {
         $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
     }
 
     $loggedInUserId = session()->get('loggedInUser');
 
-    $model = model(TabelaModel::class);
-    $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+    //$model = model(TabelaModel::class);
+    $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
-    $userModel = model(UserModel::class);
-    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+    //$userModel = model(UserModel::class);
+    $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
     $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "najblizsze");
@@ -147,15 +164,15 @@ foreach ($mecze4 as &$mecz) {
     $wstep = [
         'title'=> $turniejName
     ];
-    $pytaniaModel= new PytaniaModel();
-    $odpowiedzModel = new OdpowiedziModel();
-    $pytania = $pytaniaModel->getActiveQuestions($turniejID);
+    //$pytaniaModel= new PytaniaModel();
+    //$odpowiedzModel = new OdpowiedziModel();
+    $pytania = $this->pytaniaModel->getActiveQuestions($turniejID);
 
 foreach ($pytania as &$pytanie) {
 
-    $pytanie['liczbaOdpowiedzi'] = $odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+    $pytanie['liczbaOdpowiedzi'] = $this->odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
 
-    $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
+    $odpowiedz = $this->odpowiedzModel->where('idPyt', $pytanie['id'])
                                 ->where('uniidOdp', $loggedInUserId)
                                 ->first();
     if ($odpowiedz) {
@@ -218,13 +235,13 @@ unset($pytanie); // Unset reference
         //$jsonString = file_get_contents($configPath);
         //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
             
-        $config = get_active_tournament_config();
+        //$config = get_active_tournament_config();
         
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
-            $turniejID = $config['activeTournamentId'];
-            $turniejName = $config['activeTournamentName'];
-            $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+            $turniejID = $this->config['activeTournamentId'];
+            $turniejName = $this->config['activeTournamentName'];
+            $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
             } else {
                 $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
             }
@@ -232,11 +249,11 @@ unset($pytanie); // Unset reference
         $loggedInUserId = session()->get('loggedInUser');
 
 
-        $model = model(TabelaModel::class);
-        $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+        //$model = model(TabelaModel::class);
+        $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        //$userModel = model(UserModel::class);
+        $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
         // Pobranie informacji o "GoldenBall" z sesji
 
         $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
@@ -290,8 +307,8 @@ unset($pytanie); // Unset reference
             'title'=> $turniejName
         ];
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        //$userModel = model(UserModel::class);
+        $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
 
         return view('typowanie/header', $wstep)
                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
@@ -309,23 +326,23 @@ unset($pytanie); // Unset reference
     //$jsonString = file_get_contents($configPath);
     //$config = json_decode($jsonString, true);
 
-    $config = get_active_tournament_config();
+//    $config = get_active_tournament_config();
 
     if ($turniejID === null) {
-        $turniejID = $config['activeTournamentId'];
-        $turniejName = $config['activeTournamentName'];
-        $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+        $turniejID = $this->config['activeTournamentId'];
+        $turniejName = $this->config['activeTournamentName'];
+        $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
     } else {
         $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
     }
 
     $loggedInUserId = session()->get('loggedInUser');
 
-        $model = model(TabelaModel::class);
-    $tabelaDanych = $model->gimmeTabelaGraczy($turniejID);
+        //$model = model(TabelaModel::class);
+    $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
-    $userModel = model(UserModel::class);
-    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+    //$userModel = model(UserModel::class);
+    $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
     $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "do_rozegrania");
@@ -390,13 +407,13 @@ unset($pytanie); // Unset reference
         //$jsonString = file_get_contents($configPath);
         //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
         
-        $config = get_active_tournament_config();
+        //$config = get_active_tournament_config();
             
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
-            $turniejID = $config['activeTournamentId'];
-            $turniejName = $config['activeTournamentName'];
-            $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+            $turniejID = $this->config['activeTournamentId'];
+            $turniejName = $this->config['activeTournamentName'];
+            $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
             } else {
                 $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
             }
@@ -407,8 +424,8 @@ unset($pytanie); // Unset reference
             'title'=> $turniejName
             ];
 
-        $userModel = model(UserModel::class);
-        $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+        //$userModel = model(UserModel::class);
+        $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
         $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
         
@@ -520,7 +537,7 @@ foreach ($meczeArchiwalne as &$mecz) {
     
      public function zapiszOdpowiedzNaPytanie()
 {
-    $odpowiedzModel = new OdpowiedziModel();
+    //$odpowiedzModel = new OdpowiedziModel();
 
     $validationRules = [
         'odpowiedz' => [
@@ -542,7 +559,7 @@ foreach ($meczeArchiwalne as &$mecz) {
             'kiedyModyfikowana' => date('Y-m-d H:i:s'),
         ];
 
-        if ($odpowiedzModel->saveAnswer($data)) {
+        if ($this->odpowiedzModel->saveAnswer($data)) {
             return $this->response->setJSON(['status' => 'success']);
         } else {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Wystąpił błąd podczas zapisywania odpowiedzi.']);
@@ -555,10 +572,10 @@ foreach ($meczeArchiwalne as &$mecz) {
      public function wygenerujOdpowiedziNaPytanie($pytanieID)
     {
         // Inicjalizacja modelu
-        $odpowiedziModel = new OdpowiedziModel();
+        //$odpowiedziModel = new OdpowiedziModel();
         
         // Pobierz odpowiedzi na pytanie
-        $odpowiedzi = $odpowiedziModel->pobierzOdpowiedziNaPytanie($pytanieID);
+        $odpowiedzi = $this->odpowiedzModel->pobierzOdpowiedziNaPytanie($pytanieID);
 
         // Konwersja danych do formatu JSON
         $jsonData = json_encode($odpowiedzi);
@@ -580,23 +597,23 @@ foreach ($meczeArchiwalne as &$mecz) {
     //$jsonString = file_get_contents($configPath);
     //$config = json_decode($jsonString, true);
     
-    $config = get_active_tournament_config();
+    //$config = get_active_tournament_config();
     
     $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
     $czasDoPorownania = date('Y-m-d H:i:s');
     
     if ($turniejID === null) {
-        $turniejID = $config['activeTournamentId'];
-        $turniejName = $config['activeTournamentName'];
-        $zewnetrzneIDTurnieju = $config['activeCompetitionId'];
+        $turniejID = $this->config['activeTournamentId'];
+        $turniejName = $this->config['activeTournamentName'];
+        $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
     } else {
         $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
     }
 
     $loggedInUserId = session()->get('loggedInUser');
 
-    $userModel = model(UserModel::class);
-    $daneUzytkownika = $userModel->getGameUserData($loggedInUserId);
+    //$userModel = model(UserModel::class);
+    $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
 
     $daneTurniejowe = [
         'turniejID' => $turniejID,
@@ -606,15 +623,15 @@ foreach ($meczeArchiwalne as &$mecz) {
     $wstep = [
         'title'=> $turniejName
     ];
-    $pytaniaModel= new PytaniaModel();
-    $odpowiedzModel = new OdpowiedziModel();
-    $pytania = $pytaniaModel->getQuestionsArchive($turniejID, $czasDoPorownania);
+    //$pytaniaModel= new PytaniaModel();
+    //$odpowiedzModel = new OdpowiedziModel();
+    $pytania = $this->pytaniaModel->getQuestionsArchive($turniejID, $czasDoPorownania);
 
     foreach ($pytania as &$pytanie) {
 
-    $pytanie['liczbaOdpowiedzi'] = $odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+    $pytanie['liczbaOdpowiedzi'] = $this->odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
 
-    $odpowiedz = $odpowiedzModel->where('idPyt', $pytanie['id'])
+    $odpowiedz = $this->odpowiedzModel->where('idPyt', $pytanie['id'])
                                 ->where('uniidOdp', $loggedInUserId)
                                 ->first();
     if ($odpowiedz) {
