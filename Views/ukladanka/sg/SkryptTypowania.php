@@ -1,7 +1,6 @@
 <script>
 $(document).ready(function() {
 
-    // Obsługa kliknięć przycisków "+" i "-"
     $('body').on('click', '.plus', function(event) {
         event.preventDefault();
         var $scoreDisplay = $(this).closest('.team').find('.score-display');
@@ -22,20 +21,21 @@ $(document).ready(function() {
         $scoreValue.val(currentVal);
     });
 
-    // Obsługa akordeonu z localStorage
     $('.accordion-collapse').on('shown.bs.collapse', function () {
-        localStorage.setItem(`details-${<this.id>}`, 'true');
+        let id = <this.id>;
+        localStorage.setItem('details-' + id, 'true');
     });
     $('.accordion-collapse').on('hidden.bs.collapse', function () {
-        localStorage.setItem(`details-${<this.id>}`, 'false');
+        let id = <this.id>;
+        localStorage.setItem('details-' + id, 'false');
     });
     $('.accordion-collapse').each(function () {
-        if (localStorage.getItem(`details-${<this.id>}`) === 'true') {
-            $(`#${<this.id>}`).addClass('show');
+        let id = <this.id>;
+        if (localStorage.getItem('details-' + id) === 'true') {
+            $('#' + id).addClass('show');
         }
     });
 
-    // Obsługa wysyłania formularza AJAX
     $('body').on('submit', '.betting-form', function(event) {
         event.preventDefault();
 
@@ -52,21 +52,17 @@ $(document).ready(function() {
                     var button = form.closest('.accordion-item').find('.accordion-button');
                     var score  = response.newTypText.replace('Twój typ: ', '');
 
-                    // aktualizuj wynik w środkowej strefie
                     var $center = button.find('.flex-grow-1');
                     $center.find('.text-muted').replaceWith('<strong>' + score + '</strong>');
                     $center.find('strong').text(score);
 
-                    // aktualizuj badge
                     button.find('.badge')
                         .removeClass('bg-warning text-dark')
                         .addClass('bg-success')
-                        .text('✓ Wytypowany');
+                        .text('Wytypowany');
 
-                    // animacja
                     button.css('background-color', 'lightgreen');
                     setTimeout(function() { button.css('background-color', ''); }, 1000);
-
                 } else {
                     alert(response.message);
                 }
@@ -81,23 +77,19 @@ $(document).ready(function() {
             }
         });
 
-        // zwiń akordeon po zapisie
         var accordionId = form.closest('.accordion-collapse').attr('id');
-        $(`#${accordionId}`).collapse('hide');
-        localStorage.setItem(`details-${accordionId}`, 'false');
+        $('#' + accordionId).collapse('hide');
+        localStorage.setItem('details-' + accordionId, 'false');
     });
 
-    // Obsługa Złotej Piłki
     $('body').on('change', '.golden-game-checkbox', function() {
         var checkbox  = $(this);
         var isChecked = <checkbox.is>(':checked');
 
         if (isChecked) {
-            // aktywna gwiazdka
             checkbox.siblings('span').css('opacity', '1');
-            checkbox.siblings('small').text('To mój szczęśliwy mecz (pkt ×2)');
+            checkbox.siblings('small').text('To mój szczęśliwy mecz (pkt x2)');
 
-            // pozostałe -- wygaszone i zablokowane
             $('.golden-game-checkbox').not(checkbox)
                 .prop('checked', false)
                 .prop('disabled', true)
@@ -105,12 +97,11 @@ $(document).ready(function() {
             $('.golden-game-checkbox').not(checkbox)
                 .siblings('small').text('Inny mecz wybrałem jako szczęśliwy');
         } else {
-            // odblokuj wszystkie
             $('.golden-game-checkbox')
                 .prop('disabled', false)
                 .siblings('span').css('opacity', '0.22');
             $('.golden-game-checkbox')
-                .siblings('small').text('Za ten mecz chcę 2× więcej punktów');
+                .siblings('small').text('Za ten mecz chcę 2x więcej punktów');
         }
     });
 
