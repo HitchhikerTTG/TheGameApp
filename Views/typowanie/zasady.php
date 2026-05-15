@@ -11,12 +11,12 @@ Jedna mała sprawa. To jest idea zasad, która obowiazywała przez ostatnie lata
 <p>Cóż, co do zasady, w tej grze chodzi o to, aby poprawnie wytypować co 25* facetów zdziała na boisku. I jak zawsze w tych sprawach, brzmi to prościej niż jest do przewidzenia. I właśnie dlatego za dobre przewidywanie, przewidujemy punkty. A za największą liczbę zgromadzonych punktów przewidujemy nagrodę.</p></div></div>
 <div class="row"> <div class="col">
 <h3>Jak grać:</h3>
-<p>Typujemy wyniki wszystkich meczów <?=esc($turniej); ?>. Twój typ na dany mecz możesz wstawić na 5 minut przed rozpoczęciem spotkania. <br><br>Liczy się czas serwera, więc marudzenie nie na wiele się zda. Możesz marudzić na serwer, ale serwer jest strasznie mało przejmujący się. Na swoim profilu możesz ustalić, czy chcesz otrzymywać powiadomienie o zapisaniu swojego typu.</p> 
-<p>Nie wszystkie mecze mają wskazane drużyny (bo jeszcze nie wiemy, kto na ten przykład wyjdzie z danej grupy. Przynajmniej my jeszcze nie wiemy, ale jak masz przecieki - śmiało, możesz typować). Z czasem wszystko się wyjaśni.</p>
+<p>Typujemy wyniki wszystkich meczów turnieju <b><?=esc($turniej); ?></b>. Twój typ na dany mecz możesz zapisać / zmienić do <b>pięciu minut</b> przed rozpoczęciem spotkania. <br><br>Na swoim profilu możesz ustalić, czy chcesz otrzymywać powiadomienie email o tym, że Twój typ został zapisany.</p> 
+<p>Nie wszystkie mecze mają    wskazane drużyny (bo jeszcze nie wiemy, kto na ten przykład wyjdzie z danej grupy. Przynajmniej my jeszcze nie wiemy, ale jak masz przecieki - śmiało, możesz typować). Z czasem wszystko się wyjaśni.</p>
 </div></div>
 <div class="row"> <div class="col">
 <h3>Jak punktujemy:</h3>
-<p>Po pierwsze, obstawiamy wynik spotkania. Czyli to, jakie cyferki widnieją na tablicy wyników po ostatnim gwizdku sędziego. <Br><Br>Innymi słowy - jak będzie dogrywka, punktujemy wynik po dogrywce. Możesz dostać punkty za prawidłowe wskazanie zwycięzcy, możesz dostać punkty za właściwe wytypowanie wyniku.</p>
+<p>Po pierwsze, <b>obstawiamy wynik spotkania</b>. Czyli to, jakie cyferki widnieją na tablicy wyników po ostatnim gwizdku sędziego. <Br><Br>Jeśli w fazie pucharowej będzie będzie dogrywka, punktujemy <b>wynik na koniec dogrywki</b>. Punkty są przyznawane za prawidłowe wskazanie zwycięzcy (remisu), więcej punktów jest przyznawanych za wytypowanie dokładnego wyniku.</p>
 <p>Na ten moment punktowanie wygląda następująco:</p>
 <figure><table>
 <thead>
@@ -26,11 +26,11 @@ Jedna mała sprawa. To jest idea zasad, która obowiazywała przez ostatnie lata
 </div></div>
 <div class="row"> <div class="col">
 <h3>Złota piłka**</h3>
-<p>Masz graczu <b>jedną złotą piłkę</b>. Obchodź się z nią rozważnie, gdyż wiąże sie z nią ważna opcja. Jak ją zaznaczysz przy wybrany meczu, wynik jaki przy danym meczu osiągniesz zostanie podwojony.<br><br> Także tego, jest moc. Możesz przyłożyć tę piłeczkę przy dowolnym meczu i zmieniać ją tak długo, jak możliwa jest zmiana wyniku danego meczu. </p>
+<p>Masz graczu <b>jedną złotą piłkę</b>. Obchodź się z nią rozważnie, gdyż wiąże sie z nią ważna opcja. Jak ją zaznaczysz przy wybranym meczu, wynik jaki przy danym meczu osiągniesz zostanie podwojony.<br><br> Także tego, jest moc. Możesz przyłożyć tę piłeczkę przy dowolnym meczu i zmieniać ją tak długo, jak możliwa jest zmiana wyniku danego meczu. </p>
 </div></div>
 <div class="row"> <div class="col">
 <h3>Pytania dodatkowe</h3>
-<p>A wraz z nimi dodatkowe punkty. W każdym dniu turnieju pojawi się pytanie warte 1 punkt. Wyjątkiem są pytania dotyczące całego turnieju (Zwycięzca, najlepszy strzelec, końcowa pozycja polskiej reprezentacji) - te pytania są warte trzy punkty.</p>
+<p>A wraz z nimi dodatkowe punkty. W każdym dniu turnieju pojawi się pytanie warte 1 punkt. Wyjątkiem są pytania dotyczące całego turnieju (Zwycięzca, najlepszy strzelec) - te pytania są warte trzy punkty i odpowiedzi na te pytania trzeba dać przed rozpoczęciem pierwszego meczu turnieju.</p>
 </div></div>
 <div class="row"> <div class="col">
 <h3>Jak dołączyć do gry?</h3>
