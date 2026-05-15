@@ -28,3 +28,17 @@ CREATE TABLE email_queue (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_queue (uniID, type, sent)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- [2026-05-13] Kampanie mailowe
+
+CREATE TABLE email_campaigns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    template_file VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    target_group VARCHAR(50) NOT NULL,
+    test_sent_at DATETIME NULL,
+    sent_at DATETIME NULL,
+    recipients_count INT DEFAULT 0,
+    UNIQUE KEY uq_template_target (template_file, target_group)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
