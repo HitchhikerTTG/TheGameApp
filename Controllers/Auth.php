@@ -230,12 +230,12 @@ class Auth extends BaseController
         }
         else
         {
-            $mail = \Config\Services::email();
-            $mail->setFrom('wit@jakiwynik.com', 'Wit z JakiWynik.com');
-            $mail->setTo($email);
-            $mail->setSubject('Potwierdź rejestrację w Typerze JakiWynik.com');
-            $mail->setMessage("A więc chcesz sprawdzić swoje szczęście i swoją piłkarska wiedzę? Brrrrawo Ty! \n\n Aktywuj swoje konto klikając w link: \n\n ".base_url()."/aktywuj/".$uniid."\n\n To tyle ode mnie, dziękować. \n\n May the odds be in your flavour; :) \n\n\n\n Nie chciałeś się rejestrować? Nie wiesz o co chodzi? Nie masz ochoty typować - nie przejmuj się tym mailem. Ktoś zrobił Ci psikusa, Twój mail nie jest nigdzie zapisany. Live long and prosper.");
-            $mail->send();
+            //$mail = \Config\Services::email();
+            //$mail->setFrom('wit@jakiwynik.com', 'Wit z JakiWynik.com');
+            //$mail->setTo($email);
+            //$mail->setSubject('Potwierdź rejestrację w Typerze JakiWynik.com');
+            //$mail->setMessage("A więc chcesz sprawdzić swoje szczęście i swoją piłkarska wiedzę? Brrrrawo Ty! \n\n Aktywuj swoje konto klikając w link: \n\n ".base_url()."/aktywuj/".$uniid."\n\n To tyle ode mnie, dziękować. \n\n May the odds be in your flavour; :) \n\n\n\n Nie chciałeś się rejestrować? Nie wiesz o co chodzi? Nie masz ochoty typować - nie przejmuj się tym mailem. Ktoś zrobił Ci psikusa, Twój mail nie jest nigdzie zapisany. Live long and prosper.");
+            //$mail->send();
             
 
             // WSTAW zamiast nich:
