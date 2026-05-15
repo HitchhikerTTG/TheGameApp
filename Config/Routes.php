@@ -54,7 +54,7 @@ $routes->get('dejnowehaslo/(:any)','Auth::newPassStart/$1');
 $routes->get('przeliczMecz/(:num)','Serwisant::policzPunktyDlaMeczu/$1');
 $routes->get('/mecze/(:num)/(:num)', 'JsonFileController::serveJson/$1/$2');
 $routes->get('/typy/(:num)', 'JsonFileController::serveTypy/$1');
-$routes->get('/zasady', 'theGame::pokazZasady');
+$routes->get('/zasady', 'TheGame::pokazZasady');
 $routes->get('auth', 'Auth::index');
 $routes->post('auth/loginUser', 'Auth::loginUser'); 
 
