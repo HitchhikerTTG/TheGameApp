@@ -203,7 +203,7 @@ public function sendCampaign(string $templateFile, string $subject, string $targ
     foreach ($recipients as $user) {
         $personalHtml = str_replace('{nick}', esc($user['nick'] ?? ''), $html);
         if ($this->postmark->sendEmail(
-            'ogloszenia@jakiwynik.com', $user['email'], '', $subject, $personalHtml, '', 'broadcast'
+            'ogloszenia@jakiwynik.com', $user['email'], 'wit@jakiwynik.com', $subject, $personalHtml, '', 'broadcast'
         )) {
             $sent++;
         }
