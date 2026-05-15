@@ -104,11 +104,6 @@ class TheGame extends BaseController
     }
 
     public function testIndex($turniejID = null) {
-    //$configPath = WRITEPATH . 'ActiveTournament.json'; 
-    //$jsonString = file_get_contents($configPath);
-    //$config = json_decode($jsonString, true);
-
-    //$config = get_active_tournament_config();
 
     if ($turniejID === null) {
         $turniejID = $this->config['activeTournamentId'];
@@ -119,6 +114,14 @@ class TheGame extends BaseController
     }
 
     $loggedInUserId = session()->get('loggedInUser');
+
+    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
+    return view('typowanie/header', ['title' => $turniejName])
+         . view('ukladanka/sg/brakTurnieju')
+         . view('typowanie/footer');
+}
+
+
 
     //$model = model(TabelaModel::class);
     $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
@@ -337,6 +340,13 @@ unset($pytanie); // Unset reference
     }
 
     $loggedInUserId = session()->get('loggedInUser');
+    
+    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
+    return view('typowanie/header', ['title' => $turniejName])
+         . view('ukladanka/sg/brakTurnieju')
+         . view('typowanie/footer');
+    }
+
 
         //$model = model(TabelaModel::class);
     $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
