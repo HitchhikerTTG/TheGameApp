@@ -236,11 +236,6 @@ unset($pytanie); // Unset reference
 }
 
         public function akordeon($turniejID = null){
-        //$configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        //$jsonString = file_get_contents($configPath);
-        //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-            
-        //$config = get_active_tournament_config();
         
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
@@ -267,35 +262,8 @@ unset($pytanie); // Unset reference
 #        $mecze = $this->meczService->getMeczeDnia($turniejID);
        // $mecze = $this->meczService->prepareMeczeTurnieju($turniejID);    
 
-/*       echo "<pre>";
-        print_r($mecze);
-        echo "</pre>";
 
-        $mecze2 = $this->meczService->getMeczeTurnieju($turniejID);
-
-        echo "<p>Aaaa. bo Ty o wszystkie pytałeś:</p><pre>";
-        print_r($mecze2);
-        echo "</pre>";
-
-        $mecze3 = $this->meczService->getMeczeTurniejuDoRozegrania($turniejID);
-
-        echo "<p>A tak po prawdzie, to jeszcze bym chciał wszystkie, które jeszcze nie zostały rozegrane:</p><pre>";
-        print_r($mecze3);
-        echo "</pre>";
-*/
         $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju,"do_rozegrania");
-
-/*      echo "<p>jeszcze sie okaże, że będę śpiewał hallelujah:</p><pre>";
-        print_r($mecze4);
-        echo "</pre>";
-*/
-/*
-        echo "<p>Jeśli widzisz ten kod, to jest duża szansa</p><pre>";
-        $this->meczService->zapiszDaneDoJson($turniejID, $zewnetrzneIDTurnieju);
-        echo "</pre><p>że pojawiły sie nowe katalogi z odpowiednimi danymi... sprawdź i trzymaj kciuki, a w razie czego chwal pana i wołaj Alleluja</p>";
-*/
-    
-
 
         $pytania = [];
         /*
@@ -343,19 +311,19 @@ unset($pytanie); // Unset reference
 
     $loggedInUserId = session()->get('loggedInUser');
     
-    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
-    return view('typowanie/header', ['title' => $turniejName])
-         . view('ukladanka/sg/brakTurnieju')
-         . view('typowanie/footer');
-    }
-
-
         //$model = model(TabelaModel::class);
     $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
     //$userModel = model(UserModel::class);
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+
+        if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
+    return view('typowanie/header', ['title' => $turniejName])
+         . view('ukladanka/sg/brakTurnieju')
+         . view('typowanie/footer');
+    }
 
     $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, "do_rozegrania");
 
@@ -626,6 +594,12 @@ foreach ($meczeArchiwalne as &$mecz) {
 
     //$userModel = model(UserModel::class);
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
+    
+    if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
+    return view('typowanie/header', ['title' => $turniejName])
+         . view('ukladanka/sg/brakTurnieju')
+         . view('typowanie/footer');
+    }
 
     $daneTurniejowe = [
         'turniejID' => $turniejID,
