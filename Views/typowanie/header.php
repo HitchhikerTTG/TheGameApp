@@ -431,10 +431,10 @@ font-weight:300;
 <!-- MA BYĆ: -->
   <div class="icon-group">
     <a href="javascript:void(0);" id="themeToggle" onclick="toggleTheme()" title="Zmień motyw">
-      <h3><i class="bi bi-moon-fill" id="themeIcon"></i></h3>
+      <i class="bi bi-moon-fill" id="themeIcon"></i>
     </a>
     <a href="javascript:void(0);" onclick="myFunction()">
-      <h3><i class="bi bi-list"></i></h3>
+      <i class="bi bi-list"></i>
     </a>
   </div>
 </div>
