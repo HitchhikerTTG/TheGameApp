@@ -52,11 +52,6 @@ class TheGame extends BaseController
 
     public function index($turniejID = null){
 
-        //$configPath =  WRITEPATH . 'ActiveTournament.json'; // Załóżmy, że to Twoja domyślna lokalizacja
-        //$jsonString = file_get_contents($configPath);
-        //$config = json_decode($jsonString, true); // true konwertuje na tablicę asocjacyjną
-        
-        //$config = get_active_tournament_config();
             
         if ($turniejID === null) {
             // Zakładamy, że funkcja pobierzIDAktywnegoTurnieju() zwraca ID aktywnego turnieju
@@ -573,11 +568,6 @@ foreach ($meczeArchiwalne as &$mecz) {
     }
     
     public function archiwumPytan($turniejID = null) {
-    //$configPath = WRITEPATH . 'ActiveTournament.json'; 
-    //$jsonString = file_get_contents($configPath);
-    //$config = json_decode($jsonString, true);
-    
-    //$config = get_active_tournament_config();
     
     $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
     $czasDoPorownania = date('Y-m-d H:i:s');

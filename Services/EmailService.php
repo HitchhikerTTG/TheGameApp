@@ -81,7 +81,7 @@ class EmailService
             $this->db->table('email_queue')->insert([
                 'uniID'      => $uniID,
                 'type'       => 'bet_saved',
-                'subject'    => 'Twoje typy - <JakiWynik.com>',
+                'subject'    => 'Zapisałem Twoje nowe typy',
                 'body'       => json_encode([$nowyTyp]),
                 'send_after' => $sendAfter,
             ]);
