@@ -6,23 +6,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Piłkarski typer na <?=esc($title); ?></title>
-    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">-->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="/public/nowystyl_alpha_017.css">
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Black+Ops+One&display=swap" rel="stylesheet">
 
-<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
+
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+
 
 <style>
   /* Style the navigation menu */
@@ -47,18 +43,27 @@
   display: block;
 }
 
-/* Style the hamburger menu */
-.topnav a.icon {
-  background: black;
-  display: block;
+/* Stylowanie ikonek */
+.topnav .icon-group {
   position: absolute;
   right: 0;
   top: 0;
+  display: flex;
+  background: black;
 }
+.topnav .icon-group a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+
+
 
 /* Add a grey background color on mouse-over */
 .topnav a:hover {
-  background-color: ##AAAE8E;
+  background-color: #AAAE8E;
   color: black;
 }
 
@@ -419,35 +424,29 @@ font-weight:300;
   <a href="/typowanie"><?=$title?> </a>
   <!-- Navigation links (hidden by default) -->
    <div id="myLinks">
-    <!-- <a class="nav-link" href="/typowanie" id="Mecze live">Pierwszy sposób typowania</a>-->
-    <!-- <a class="nav-link" href="/wszystkieMecze" id="Ekstraklasa">Drugi sposob typowania (PL)</a>-->
-    <!-- <a class="nav-link" href="/tabelaMecze" id="Ekstraklasa">Ranking (same mecze)</a>-->
-    <!-- <a class="nav-link" href="/ileDokladnychTypow">Tabela tylko dokładnych typów</a>-->
-    <!-- <a class="nav-link" href="/tabelaPytania" id="Ekstraklasa">Ranking (same pytania)</a>-->
-    <!-- <a class="nav-link" href="/strzelcy" id="Strzelcy" >Najlepsi strzelcy turnieju</a>-->
-    <!-- <a class="nav-link" href="/fazaGrupowa" id="Faza Grupowa" >Mecze fazy grupowej</a>-->
     <a class="nav-link" href="/zasady" id="1st_Liga" >Zasady typera</a> 
-    <!-- <a class="nav-link" href="/komentarzDoTypera" id="1st_Liga" >Komentarz odautorski</a>-->
     <a class="nav-link" href="/profil" id="profil">edycja preferencji</a>
     <a class="nav-link" href="/auth/logout" id="1_Bundesliga">Wyloguj Się</a>
-    <!-- <a class="nav-link" href="/rozgrywki/93/27" id="2_Bundesliga">2. Bundesliga</a>
-    <a class="nav-link" href="/rozgrywki/2/20" id="Bundesliga">Premiership</a>
-    <a class="nav-link" href="/rozgrywki/3/29" id="Bundesliga">La Liga</a>--> 
   </div> 
-  <a href="javascript:void(0);" class="icon" onclick="toggleTheme()" id="themeToggle" title="Zmień motyw">
-    <h3><i class="bi bi-moon-fill" id="themeIcon"></i></h3>
-</a>
+<!-- MA BYĆ: -->
+  <div class="icon-group">
+    <a href="javascript:void(0);" id="themeToggle" onclick="toggleTheme()" title="Zmień motyw">
+      <h3><i class="bi bi-moon-fill" id="themeIcon"></i></h3>
+    </a>
+    <a href="javascript:void(0);" onclick="myFunction()">
+      <h3><i class="bi bi-list"></i></h3>
+    </a>
+  </div>
+</div>
 
-  <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
-   <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-  <h3><i class="bi bi-list"></i></h3>
-  </a>
+
+
 </div>
 
 <script>
 
 var element = document.getElementById("<?=$title?>");
-element.classList.add("active");
+if (element) { element.classList.add("active"); }
 
 /* Toggle between showing and hiding the navigation menu links when the user clicks on the hamburger menu / bar icon */
 function myFunction() {
