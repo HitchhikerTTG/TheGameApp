@@ -9,6 +9,7 @@ $(document).ready(function() {
         currentVal++;
         $scoreDisplay.text(currentVal);
         $scoreValue.val(currentVal);
+        $(this).blur();
     });
 
     $('body').on('click', '.minus', function(event) {
@@ -19,6 +20,7 @@ $(document).ready(function() {
         if (currentVal > 0) { currentVal--; }
         $scoreDisplay.text(currentVal);
         $scoreValue.val(currentVal);
+        $(this).blur();
     });
 
     $('.accordion-collapse').on('shown.bs.collapse', function () {
