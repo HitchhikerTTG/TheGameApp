@@ -1,12 +1,12 @@
 <!doctype html>
-<html>
+<html data-bs-theme="light">
 
 <head>
     <base href="<?= base_url(); ?>">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Piłkarski typer na <?=esc($title); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="/public/nowystyl_alpha_017.css">
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
@@ -15,7 +15,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Black+Ops+One&display=swap" rel="stylesheet">
 
 <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <!-- Load an icon library to show a hamburger menu (bars) on small screens -->
@@ -370,6 +373,35 @@ font-weight:300;
   }
 }
 
+[data-bs-theme="dark"] .topnav {
+    background-color: #1a2e35;
+}
+[data-bs-theme="dark"] .topnav a {
+    color: #e0e0e0;
+}
+[data-bs-theme="dark"] .topnav a.icon {
+    background: #111;
+}
+[data-bs-theme="dark"] .accordion-button {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+}
+[data-bs-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: #1e3a40;
+    color: #fff;
+}
+[data-bs-theme="dark"] .accordion-item {
+    background-color: #1e1e1e;
+    border-color: #444;
+}
+[data-bs-theme="dark"] .score-display {
+    color: #fff;
+}
+[data-bs-theme="dark"] .betting-hints {
+    color: #aaa;
+}
+
+
 </style>
 
 
@@ -402,6 +434,10 @@ font-weight:300;
     <a class="nav-link" href="/rozgrywki/2/20" id="Bundesliga">Premiership</a>
     <a class="nav-link" href="/rozgrywki/3/29" id="Bundesliga">La Liga</a>--> 
   </div> 
+  <a href="javascript:void(0);" class="icon" onclick="toggleTheme()" id="themeToggle" title="Zmień motyw">
+    <h3><i class="bi bi-moon-fill" id="themeIcon"></i></h3>
+</a>
+
   <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
   <h3><i class="bi bi-list"></i></h3>
@@ -422,6 +458,25 @@ function myFunction() {
     x.style.display = "block";
   }
 }
+
+
+function initTheme() {
+    var saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-bs-theme', saved);
+    document.getElementById('themeIcon').className =
+        saved === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+}
+
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-bs-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-bs-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('themeIcon').className =
+        next === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+}
+
+initTheme();
 
 
 </script>
