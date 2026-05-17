@@ -16,10 +16,15 @@
       <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
       <input type="hidden" name="uniid"     value="<?= session()->get('loggedInUser') ?>">
 
-      <label class="odpowiedz-label shout-input w-100 d-block mb-2"
-             style="border-radius:10px;line-height:2.4;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
-        <?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
+      <label class="odpowiedz-label shout-input w-100 d-flex align-items-center justify-content-between mb-2"
+             style="border-radius:10px;line-height:2.4;padding:6px 12px;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
+        <span><?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?></span>
+        <?php if ($hasAnswer && !$isPast): ?>
+          <span class="edit-answer-btn ms-2" style="cursor:pointer;opacity:0.5;flex-shrink:0;"
+                title="Edytuj odpowiedź">✏</span>
+        <?php endif; ?>
       </label>
+
       <input type="text" name="odpowiedz"
              class="shout-input odpowiedz-input w-100 mb-2 <?= $hasAnswer ? 'd-none' : 'd-block' ?>"
              style="border-radius:10px;"
@@ -85,19 +90,19 @@
 <?php endif; ?>
 
 <script>
+$(document).on('click', '.edit-answer-btn', function() {
+    var $form  = $(this).closest('form');
+    var $label = $form.find('.odpowiedz-label');
+    var $input = $form.find('.odpowiedz-input');
+    $label.addClass('d-none');
+    $input.removeClass('d-none');
+    $input[0].focus();
+    $form.find('.action-btn').removeClass('done').addClass('pending').text('Zapisz zmiany →');
+});
+
 $(document).on('click', '.action-btn', function() {
     if ($(this).prop('disabled')) return;
-    var $form  = $(this).closest('form');
-    var $input = $form.find('.odpowiedz-input');
-    var $label = $form.find('.odpowiedz-label');
-    if ($(this).hasClass('done')) {
-        $label.addClass('d-none');
-        $input.removeClass('d-none');
-        $input[0].focus();
-        $(this).removeClass('done').addClass('pending').text('Zapisz zmiany →');
-    } else {
-        $form.submit();
-    }
+    $(this).closest('form').submit();
 });
 
 $(document).on('submit', '.question-form', function(e) {
@@ -106,7 +111,8 @@ $(document).on('submit', '.question-form', function(e) {
     $.post($form.attr('action'), $form.serialize(), function(response) {
         if (response.status === 'success') {
             var newAnswer = $form.find('.odpowiedz-input').val();
-            $form.find('.odpowiedz-label').text(newAnswer).removeClass('d-none');
+            $form.find('.odpowiedz-label').find('span:first').text(newAnswer);
+            $form.find('.odpowiedz-label').removeClass('d-none');
             $form.find('.odpowiedz-input').addClass('d-none');
             $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
         } else {
