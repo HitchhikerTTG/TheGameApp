@@ -45,23 +45,30 @@ function typerToggleShout() {
 $(document).ready(function() {
   var lastMessageId = null;
 
-  function loadMessages() {
-    $.getJSON('<?= site_url('shoutbox/getMessages') ?>', function(data) {
-      if (!data || !data.length) return;
+function loadMessages() {
+  $.getJSON('<?= site_url('shoutbox/getMessages') ?>', function(data) {
+    if (!data) return;
 
-      var newest = data[0];
-      if (lastMessageId !== <newest.id>) {
-        lastMessageId = <newest.id>;
-        var truncated = newest.message.length > 45
-          ? newest.message.substring(0, 45) + '…'
-          : newest.message;
-        $('#shout-preview-avatar').text(initials(newest.username));
-        $('#shout-preview-nick').text(newest.username);
-        $('#shout-preview-msg').html(_emojiReplace(truncated));
-        if (newest.created_at) {
-          $('#shout-preview-time').text(newest.created_at.split(' ')[1].slice(0,5));
-        }
+    /* ── pusta tablica -- brak wiadomości ── */
+    if (!data.length) {
+      $('#shout-preview-nick').text('Brak wiadomości');
+      $('#shout-preview-avatar').text('?');
+      return;
+    }
+
+    var newest = data[0];
+    if (lastMessageId !== <newest.id>) {
+      lastMessageId = <newest.id>;
+      var truncated = newest.message.length > 45
+        ? newest.message.substring(0, 45) + '…'
+        : newest.message;
+      $('#shout-preview-avatar').text(initials(newest.username));
+      $('#shout-preview-nick').text(newest.username);
+      $('#shout-preview-msg').html(_emojiReplace(truncated));
+      if (newest.created_at) {
+        $('#shout-preview-time').text(newest.created_at.split(' ')[1].slice(0,5));
       }
+    }
 
       var html = '';
       data.forEach(function(msg) {
