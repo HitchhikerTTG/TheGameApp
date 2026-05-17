@@ -9,16 +9,25 @@ $(document).ready(function() {
     var $input = $team.find('.score-value');
     var n = (parseInt($val.text()) || 0) + 1;
     $val.text(n); $input.val(n); $(this).blur();
-  });
 
-  $('body').on('click', '.step-btn.minus', function(e) {
+    /* reset przycisku submit */
+    var gameId = $team.closest('form').find('[name="gameID"]').val();
+    $('#btn-submit-' + gameId).removeClass('done').text('Typuję');
+});
+
+$('body').on('click', '.step-btn.minus', function(e) {
     e.preventDefault();
     var $team  = $(this).closest('.team');
     var $val   = $team.find('.step-val');
     var $input = $team.find('.score-value');
     var n = Math.max(0, (parseInt($val.text()) || 0) - 1);
     $val.text(n); $input.val(n); $(this).blur();
-  });
+
+    /* reset przycisku submit */
+    var gameId = $team.closest('form').find('[name="gameID"]').val();
+    $('#btn-submit-' + gameId).removeClass('done').text('Typuję');
+});
+
 
   /* ── GOLDEN BALL TOGGLE ── */
   window.typerToggleGolden = function(id) {
