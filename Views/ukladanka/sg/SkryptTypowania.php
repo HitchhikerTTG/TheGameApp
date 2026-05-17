@@ -30,7 +30,7 @@ $(document).ready(function() {
 
   $('body').on('change', '.golden-game-checkbox', function() {
     var $chk      = $(this);
-    var isChecked = $<chk.is>(':checked');
+    var isChecked = $chk.is(':checked');
     if (isChecked) {
       $('.golden-game-checkbox').not($chk).prop('checked', false).prop('disabled', true);
       $('.golden-game-checkbox').not($chk).each(function() {
@@ -75,7 +75,7 @@ $(document).ready(function() {
   window.typerToggleResults = function(apiId) {
     var $el    = $('#results-' + apiId);
     var $arrow = $('#arrow-' + apiId);
-    var open   = $<el.is>(':visible');
+    var open   = $el.is(':visible');
     $el.toggle(!open);
     $arrow.text(open ? '›' : '‹');
   };
