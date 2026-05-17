@@ -12,7 +12,7 @@ $(document).ready(function() {
 
     /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany »');
 
 });
 
@@ -26,7 +26,7 @@ $('body').on('click', '.step-btn.minus', function(e) {
 
     /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany »');
 });
 
 

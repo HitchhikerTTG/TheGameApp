@@ -80,13 +80,11 @@ $(document).on('click', '.action-btn', function() {
     var $form  = $(this).closest('form');
     var $input = $form.find('.odpowiedz-input');
     var $label = $form.find('.odpowiedz-label');
-if ($(this).hasClass('done')) {
-    $label.addClass('d-none');
-    $input.removeClass('d-none');
-    $input[0].focus();
-    $(this).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
-}
-
+    if ($(this).hasClass('done')) {
+        $label.addClass('d-none');
+        $input.removeClass('d-none');
+        $input[0].focus();
+        $(this).removeClass('done').addClass('pending').text('Zapisz zmiany →');
     } else {
         $form.submit();
     }
@@ -101,11 +99,10 @@ $(document).on('submit', '.question-form', function(e) {
             $form.find('.odpowiedz-label').text(newAnswer).removeClass('d-none');
             $form.find('.odpowiedz-input').addClass('d-none');
             $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
-
         } else {
             alert('Błąd przy zapisywaniu odpowiedzi.');
         }
     }, 'json').fail(function() { alert('Błąd przy zapisywaniu odpowiedzi.'); });
 });
-
 </script>
+
