@@ -20,11 +20,12 @@
              style="border-radius:10px;line-height:2.4;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
         <?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
       </label>
-      <input type="text" name="odpowiedz"
-             class="shout-input odpowiedz-input w-100 d-block mb-2"
-             style="border-radius:10px;<?= $hasAnswer ? 'display:none;' : '' ?>"
-             value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>"
-             <?= !$hasAnswer ? 'required' : '' ?>>
+<input type="text" name="odpowiedz"
+       class="shout-input odpowiedz-input w-100 mb-2 <?= $hasAnswer ? 'd-none' : 'd-block' ?>"
+       style="border-radius:10px;"
+       value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>"
+       <?= !$hasAnswer ? 'required' : '' ?>>
+
 
       <button type="button"
               class="btn-type ff-bebas action-btn <?= $hasAnswer ? 'done' : '' ?> <?= $isPast ? 'disabled-golden' : '' ?>"
