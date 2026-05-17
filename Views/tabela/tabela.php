@@ -1,142 +1,83 @@
+<hr class="my-3" style="border-color:var(--bs-border-color);">
+<p class="section-label mb-2">Tabela</p>
+
+<div class="card match-card mb-3">
+  <div class="d-flex align-items-center justify-content-between px-3 py-2"
+       style="border-bottom:1px solid var(--bs-border-color);">
+    <span class="ff-bebas" style="font-size:18px;">Klasyfikacja</span>
+    <div class="d-flex gap-1" id="lb-tabs">
+      <div class="lb-tab active" data-filtr="punkty"          onclick="lbSetTab(this)">Ogółem</div>
+      <div class="lb-tab"        data-filtr="punktyZaMecze"    onclick="lbSetTab(this)">Mecze</div>
+      <div class="lb-tab"        data-filtr="punktyZaPytania"  onclick="lbSetTab(this)">Pytania</div>
+    </div>
+  </div>
+
+  <div id="lb-container"></div>
+
+  <div class="text-center py-3" style="font-size:13px;color:var(--ty-accent);cursor:pointer;"
+       id="lb-toggle" onclick="lbToggle()">Pokaż wszystkich →</div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var tabelaDanych = <?php echo json_encode($tabelaDanych); ?>;
-    var userID = <?php echo json_encode($userID); ?>;
-    var aktualnyFiltr = 'pelny';
-    var widokSkrócony = true; // Domyślnie skrócony widok
+(function() {
+  var tabelaDanych = <?= json_encode($tabelaDanych) ?>;
+  var userID       = <?= json_encode($userID) ?>;
+  var filtr        = 'punkty';
+  var skrocony     = true;
 
-    function ustalPozycje(dane, filtr) {
-        if (filtr === 'punktyZaMecze') {
-            dane.sort((a, b) => b.punktyZaMecze - a.punktyZaMecze);
-        } else if (filtr === 'punktyZaPytania') {
-            dane.sort((a, b) => b.punktyZaPytania - a.punktyZaPytania);
-        } else {
-            filtr = 'punkty'; // Default case for 'pelny' filter
-            dane.sort((a, b) => b.punkty - a.punkty);
-        }
+  function ustalPozycje(dane, f) {
+    var sorted = dane.slice().sort(function(a, b) { return b[f] - a[f]; });
+    var pos = 1;
+    return sorted.map(function(g, i) {
+      if (i > 0 && g[f] !== sorted[i-1][f]) pos = i + 1;
+      return { uid: g.uid, nick: g.nick, punkty: g[f], pozycja: pos };
+    });
+  }
 
-        let pozycje = [];
-        let aktualnaPozycja = 1;
+  function medalClass(pos) {
+    return pos === 1 ? 'lb-pos-1' : pos === 2 ? 'lb-pos-2' : pos === 3 ? 'lb-pos-3' : '';
+  }
 
-        for (let i = 0; i < dane.length; i++) {
-            if (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) {
-                aktualnaPozycja = i + 1;
-            }
-            pozycje.push({
-                uid: dane[i].uid,
-                nick: dane[i].nick,
-                punkty: dane[i][filtr],
-                pozycja: (i === 0 || dane[i][filtr] !== dane[i - 1][filtr]) ? aktualnaPozycja : '-'
-            });
-        }
+  function render() {
+    var pozycje = ustalPozycje(tabelaDanych, filtr);
+    var limit   = skrocony ? 10 : pozycje.length;
+    var userPos = pozycje.findIndex(function(p) { return p.uid == userID; });
+    var html    = '';
 
-        return pozycje;
-    }
-
-    function getKolor(liczbaGraczyZWiekszaLiczbaPunktow, uid) {
-        if (uid === userID) {
-            if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
-                return 'bg-warning'; // gold
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
-                return 'bg-secondary'; // silver
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
-                return 'bg-danger'; // bronze
-            } else {
-                return 'bg-light'; // szary
-            }
-        } else {
-            if (liczbaGraczyZWiekszaLiczbaPunktow === 0) {
-                return 'bg-warning'; // gold
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 1) {
-                return 'bg-secondary'; // silver
-            } else if (liczbaGraczyZWiekszaLiczbaPunktow === 2) {
-                return 'bg-danger'; // bronze
-            } else {
-                return '';
-            }
-        }
-    }
-
-    function generujTabele(pozycje) {
-        var html = '<table class="table">';
-        html += '<thead><tr><th>#</th><th>Nick</th><th class="text-center">Punkty</th></tr></thead>';
-        html += '<tbody>';
-
-        let pozycjaUzytkownika = pozycje.findIndex(p => p.uid == userID) + 1;
-        let liczbaGraczyZWiekszaLiczbaPunktow = pozycje.filter(p => p.punkty > pozycje.find(p => p.uid == userID).punkty).length;
-        let limit = widokSkrócony ? 10 : pozycje.length;
-
-        pozycje.slice(0, limit).forEach(gracz => {
-            let liczbaGraczyZWiekszaLiczbaPunktowGracz = pozycje.filter(p => p.punkty > gracz.punkty).length;
-            let klasaStylu = getKolor(liczbaGraczyZWiekszaLiczbaPunktowGracz, gracz.uid);
-
-            let wyswietlanaPozycja = gracz.pozycja === '-' && gracz.uid == userID ? liczbaGraczyZWiekszaLiczbaPunktow + 1 : gracz.pozycja;
-            html += `<tr class="${klasaStylu}"><td>${wyswietlanaPozycja}</td><td>${gracz.nick}</td><td class="text-center">${gracz.punkty}</td></tr>`;
-        });
-
-        if (widokSkrócony && pozycjaUzytkownika > 10) {
-            html += '<tr><td colspan="3">&nbsp;</td></tr>'; // Pusty wiersz dla oddzielenia
-            let daneUzytkownika = pozycje.find(p => p.uid == userID);
-            html += `<tr class="user-row ${getKolor(liczbaGraczyZWiekszaLiczbaPunktow, userID)}"><td>${liczbaGraczyZWiekszaLiczbaPunktow + 1}</td><td>${daneUzytkownika.nick}</td><td class="text-center">${daneUzytkownika.punkty}</td></tr>`;
-        }
-
-        html += '</tbody></table>';
-        document.getElementById('tabelaGraczyContainer').innerHTML = html;
-    }
-
-    document.querySelectorAll('.filtr').forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            document.querySelectorAll('.filtr').forEach(lnk => lnk.classList.remove('active'));
-            this.classList.add('active');
-            aktualnyFiltr = this.dataset.filtr;
-            let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-            generujTabele(pozycje);
-        });
+    pozycje.slice(0, limit).forEach(function(g) {
+      var isMe = (g.uid == userID);
+      html += '<div class="lb-row' + (isMe ? ' me' : '') + '">'
+        + '<div class="ff-bebas lb-pos ' + medalClass(g.pozycja) + '">' + g.pozycja + '</div>'
+        + '<div class="lb-nick' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
+        + g.nick + (isMe ? ' ← Ty' : '') + '</div>'
+        + '<div class="ff-bebas lb-pts' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
+        + g.punkty + '</div></div>';
     });
 
-    document.getElementById('przelacznikWidoku').addEventListener('click', function() {
-        widokSkrócony = !widokSkrócony;
-        this.innerText = widokSkrócony ? "Rozwiń tabelę" : "Zwiń tabelę";
-        let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-        generujTabele(pozycje);
-    });
+    if (skrocony && userPos >= 10) {
+      var g = pozycje[userPos];
+      html += '<div class="lb-row" style="border-top:2px dashed var(--bs-border-color);">'
+        + '<div class="ff-bebas lb-pos" style="color:var(--ty-accent);">' + g.pozycja + '</div>'
+        + '<div class="lb-nick" style="color:var(--ty-accent);">' + g.nick + ' ← Ty</div>'
+        + '<div class="ff-bebas lb-pts" style="color:var(--ty-accent);">' + g.punkty + '</div></div>';
+    }
 
-    let pozycje = ustalPozycje(tabelaDanych, aktualnyFiltr);
-    generujTabele(pozycje);
-});
+    document.getElementById('lb-container').innerHTML = html;
+  }
+
+  window.lbSetTab = function(el) {
+    document.querySelectorAll('.lb-tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    filtr = el.dataset.filtr;
+    render();
+  };
+
+  window.lbToggle = function() {
+    skrocony = !skrocony;
+    document.getElementById('lb-toggle').textContent = skrocony ? 'Pokaż wszystkich →' : 'Zwiń tabelę ←';
+    render();
+  };
+
+  render();
+})();
 </script>
-
-
-<style>
-.bg-warning { background-color: #ffd700 !important; } /* Złote tło */
-.bg-secondary { background-color: #c0c0c0 !important; } /* Srebrne tło */
-.bg-danger { background-color: #cd7f32 !important; } /* Brązowe tło */
-.bg-light { background-color: #d3d3d3 !important; } /* Szare tło */
-.user-row { font-weight: bold; }
-</style>
-
-<div class="row">
-  <div class="col mt-3 mb-3">
-    <p>A teraz to, po co wszyscy tu przychodzimy, czyli...</p>
-    <h3>Aktualna tabela Typera Mistrzostw</h3>
-  </div>
-</div>
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link active filtr" data-filtr="pelny" href="#">Ogółem</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link filtr" data-filtr="punktyZaMecze" href="#">Mecze</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link filtr" data-filtr="punktyZaPytania" href="#">Pytania</a>
-  </li>
-</ul>
-<div class="row">
-  <div class="col">
-    <div id="tabelaGraczyContainer" class="table-responsive"></div>
-  </div>
-</div>
-
-<button id="przelacznikWidoku" class="btn btn-primary mt-3">Rozwiń tabelę</button>

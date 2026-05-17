@@ -1,81 +1,89 @@
-        <div id="shoutbox">
-            <div id="lastMessage" style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="lastMessageText" style="flex: 12;"></span>
-                <button id="joinChat" style="flex: 1; height: 30px;">💬</button>
-            </div>
-            <div id="messagesContainer" style="display: none; position: relative;">
-                <button id="minimizeChat" style="position: absolute; top: 1px; right: 10px;"> ✖️ </button>
-                <div id="messages" style="height: 450px; overflow-y: auto; display: flex; flex-direction: column-reverse;"></div>
-                <form id="shoutboxForm" style="display: flex;">
-                    <input type="text" id="message" name="message" placeholder="Twoja wiadomość" required style="flex: 10;">
-                    <button type="submit" style="flex: 1;">➤</button>
-                </form>
-            </div>
-        </div>
+<hr class="my-3" style="border-color:var(--bs-border-color);">
+<p class="section-label mb-2">Shoutbox</p>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
+<div class="card match-card mb-3">
+  <!-- Podgląd ostatniej wiadomości -->
+  <div class="d-flex align-items-center gap-2 px-3 py-2"
+       style="border-bottom:1px solid var(--bs-border-color);cursor:pointer;" onclick="typerToggleShout()">
+    <div class="shout-avatar" id="shout-preview-avatar">??</div>
+    <div class="flex-grow-1 overflow-hidden">
+      <div class="shout-nick" id="shout-preview-nick">Ładowanie…</div>
+      <div class="shout-msg text-truncate" id="shout-preview-msg"></div>
+    </div>
+    <div class="shout-time flex-shrink-0" id="shout-preview-time"></div>
+  </div>
+  <div class="text-end px-3 py-2" style="font-size:13px;color:var(--ty-accent);cursor:pointer;"
+       onclick="typerToggleShout()" id="shout-expand-btn">Rozwiń czat ›</div>
+
+  <!-- Feed -->
+  <div class="shout-feed" id="shoutbox-feed"></div>
+
+  <!-- Input -->
+  <div class="d-flex gap-2 px-3 py-2" style="border-top:1px solid var(--bs-border-color);">
+    <input class="shout-input" id="message" placeholder="Napisz coś…">
+    <button class="shout-send" id="shout-send-btn">Wyślij</button>
+  </div>
+</div>
+
+<script src="<https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js>"></script>
 <script>
-    $(document).ready(function() {
-        var emoji = new EmojiConvertor();
-        emoji.img_sets.apple.path = 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/13.0.1/72x72/';
+$(document).ready(function() {
+  var emoji = new EmojiConvertor();
+  var lastMessageId = null;
 
-        let lastMessageId = null;
-        let initialLoad = true; // Flag to check initial load
+  function initials(name) {
+    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
 
-        function loadMessages() {
-            $.getJSON('<?= site_url('shoutbox/getMessages'); ?>', function(data) {
-                $('#messages').empty();
-                if (data.length > 0) {
-                    const newestMessage = data[0]; // Assuming data is sorted from newest to oldest
-                    if (lastMessageId !== newestMessage.id) {
-                        lastMessageId = newestMessage.id;
-                        const truncatedMessage = newestMessage.message.length > 45 ? newestMessage.message.substring(0, 45) + '...' : newestMessage.message;
-                        $('#lastMessageText').html('<strong>' + newestMessage.username + ':</strong> ' + emoji.replace_colons(truncatedMessage));
-                        if (!initialLoad) { // Apply highlight only if not initial load
-                            $('#lastMessage').addClass('highlight');
-                            setTimeout(function() {
-                                $('#lastMessage').removeClass('highlight');
-                            }, 3000);
-                        }
-                    }
-                }
-                data.forEach(function(message) {
-                    $('#messages').append('<div><strong>' + message.username + ':</strong> ' + emoji.replace_colons(message.message) + '</div>');
-                });
-                //$('#messages').scrollTop($('#messages')[0].scrollHeight); // Scroll to the bottom
+  function loadMessages() {
+    $.getJSON('<?= site_url('shoutbox/getMessages') ?>', function(data) {
+      if (!data.length) return;
 
-                initialLoad = false; // Set the flag to false after initial load
-            });
-        }
+      // Preview (last message)
+      var newest = data[0];
+      if (lastMessageId !== <newest.id>) {
+        lastMessageId = <newest.id>;
+        var truncated = newest.message.length > 45 ? newest.message.substring(0, 45) + '…' : newest.message;
+        $('#shout-preview-avatar').text(initials(newest.username));
+        $('#shout-preview-nick').text(newest.username);
+        $('#shout-preview-msg').html(emoji.replace_colons(truncated));
+        $('#shout-preview-time').text(newest.created_at ? newest.created_at.split(' ')[1].slice(0,5) : '');
+      }
 
-        $('#joinChat').click(function() {
-            $('#lastMessage').hide();
-            $('#messagesContainer').show();
-        });
-
-        $('#minimizeChat').click(function() {
-            $('#messagesContainer').hide();
-            $('#lastMessage').show();
-        });
-
-        $('#shoutboxForm').submit(function(event) {
-            event.preventDefault();
-            $.post('<?= site_url('shoutbox/postMessage'); ?>', { message: $('#message').val() }, function(response) {
-                if (response.status === 'success') {
-                    $('#message').val('');
-                    loadMessages();
-                }
-            }, 'json');
-        });
-
-        $('#message').keypress(function(event) {
-            if (event.which == 13) {
-                event.preventDefault();
-                $('#shoutboxForm').submit();
-            }
-        });
-
-        loadMessages();
-        setInterval(loadMessages, 5000); // Refresh messages every 5 seconds
+      // Full feed
+      var html = '';
+      data.forEach(function(msg) {
+        html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
+          + '<div class="shout-avatar">' + initials(msg.username) + '</div>'
+          + '<div><div class="shout-nick">' + msg.username + '</div>'
+          + '<div class="shout-msg">' + emoji.replace_colons(msg.message) + '</div>'
+          + '<div class="shout-time">' + (msg.created_at || '') + '</div></div></div>';
+      });
+      $('#shoutbox-feed').html(html);
     });
+  }
+
+  function typerToggleShout() {
+    var feed = document.getElementById('shoutbox-feed');
+    var btn  = document.getElementById('shout-expand-btn');
+    feed.classList.toggle('open');
+    btn.textContent = feed.classList.contains('open') ? 'Zwiń czat ‹' : 'Rozwiń czat ›';
+  }
+  window.typerToggleShout = typerToggleShout;
+
+  $('#shout-send-btn').click(function() {
+    var msg = $('#message').val().trim();
+    if (!msg) return;
+    $.post('<?= site_url('shoutbox/postMessage') ?>', { message: msg }, function(response) {
+      if (response.status === 'success') { $('#message').val(''); loadMessages(); }
+    }, 'json');
+  });
+
+  $('#message').keypress(function(e) {
+    if (e.which == 13) { e.preventDefault(); $('#shout-send-btn').click(); }
+  });
+
+  loadMessages();
+  setInterval(loadMessages, 5000);
+});
 </script>
