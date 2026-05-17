@@ -20,12 +20,11 @@
              style="border-radius:10px;line-height:2.4;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
         <?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
       </label>
-<input type="text" name="odpowiedz"
-       class="shout-input odpowiedz-input w-100 mb-2 <?= $hasAnswer ? 'd-none' : 'd-block' ?>"
-       style="border-radius:10px;"
-       value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>"
-       <?= !$hasAnswer ? 'required' : '' ?>>
-
+      <input type="text" name="odpowiedz"
+             class="shout-input odpowiedz-input w-100 mb-2 <?= $hasAnswer ? 'd-none' : 'd-block' ?>"
+             style="border-radius:10px;"
+             value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>"
+             <?= !$hasAnswer ? 'required' : '' ?>>
 
       <button type="button"
               class="btn-type ff-bebas action-btn <?= $hasAnswer ? 'done' : '' ?> <?= $isPast ? 'disabled-golden' : '' ?>"
@@ -35,10 +34,21 @@
       </button>
     </form>
 
-    <p class="social-proof mt-2 mb-0">
-      Odpowiedzi przed: <?= esc($pytanie['wazneDoLocal']) ?>
-      &nbsp;·&nbsp; Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
-    </p>
+    <?php if ($hasAnswer && !$isPast): ?>
+      <p class="social-proof text-center mt-2 mb-0">
+        ✏ Możesz edytować · termin: <?= esc($pytanie['wazneDoLocal']) ?>
+        &nbsp;·&nbsp; Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php elseif (!$hasAnswer && $isPast): ?>
+      <p class="social-proof text-center mt-2 mb-0" style="color:var(--ty-red);">
+        ⏱ Czas na odpowiedź minął · Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php else: ?>
+      <p class="social-proof mt-2 mb-0">
+        Odpowiedzi przed: <?= esc($pytanie['wazneDoLocal']) ?>
+        &nbsp;·&nbsp; Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php endif; ?>
 
     <?php if ($isPast && !empty($pytanie['odpowiedzi'])): ?>
       <button type="button" class="btn btn-outline-secondary btn-sm mt-3"
@@ -105,4 +115,3 @@ $(document).on('submit', '.question-form', function(e) {
     }, 'json').fail(function() { alert('Błąd przy zapisywaniu odpowiedzi.'); });
 });
 </script>
-
