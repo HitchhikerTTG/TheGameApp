@@ -2,8 +2,9 @@
 <p class="section-label mb-2">Shoutbox</p>
 
 <div class="card match-card mb-3">
-  <div class="d-flex align-items-center gap-2 px-3 py-2"
-       style="border-bottom:1px solid var(--bs-border-color);cursor:pointer;" onclick="typerToggleShout()">
+<div class="d-flex align-items-center gap-2 px-3 py-2"
+     id="shout-preview"
+     style="border-bottom:1px solid var(--bs-border-color);cursor:pointer;" onclick="typerToggleShout()">
     <div class="shout-avatar" id="shout-preview-avatar">??</div>
     <div class="flex-grow-1 overflow-hidden">
       <div class="shout-nick" id="shout-preview-nick">Ładowanie…</div>
@@ -43,12 +44,16 @@ function initials(name) {
 
 /* wyciągnięte poza ready – onclick może to wywołać od razu */
 function typerToggleShout() {
-  var feed = document.getElementById('shoutbox-feed');
-  var btn  = document.getElementById('shout-expand-btn');
+  var feed    = document.getElementById('shoutbox-feed');
+  var btn     = document.getElementById('shout-expand-btn');
+  var preview = document.getElementById('shout-preview');
   if (!feed) return;
   feed.classList.toggle('open');
-  btn.textContent = feed.classList.contains('open') ? 'Zwiń czat ‹' : 'Rozwiń czat ›';
+  var isOpen = feed.classList.contains('open');
+  btn.textContent = isOpen ? 'Zwiń czat ‹' : 'Rozwiń czat ›';
+  if (preview) preview.style.display = isOpen ? 'none' : '';
 }
+
 
 $(document).ready(function() {
   var lastMessageId = null;
