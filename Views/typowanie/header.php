@@ -8,7 +8,7 @@
     <title>Piłkarski typer na <?=esc($title); ?></title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" type="text/css" href="/public/nowystyl_alpha_017.css">
+    <link rel="stylesheet" type="text/css" href="/public/newStyle2026.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Black+Ops+One&display=swap" rel="stylesheet">
