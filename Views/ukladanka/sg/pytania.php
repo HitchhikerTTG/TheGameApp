@@ -1,152 +1,123 @@
-<div class="section my-3 pt-3 question-section">
-    <h4>Tu odpowiadamy na pytania</h4>
+<?php if (!empty($pytania)): ?>
+<hr class="my-3" style="border-color:var(--bs-border-color);">
+<p class="section-label mb-2">Pytanie dnia</p>
 
-    <div class="container mt-3 px-0 mx-0">
-        <?php foreach ($pytania as $pytanie): ?>
-            <?php
-            // Konwersja daty na timestamp
-            $wazneDoTimestamp = strtotime($pytanie['wazneDo']);
-            $currentTimestamp = time();
-            $isPast = $currentTimestamp > $wazneDoTimestamp;
-            $hasAnswer = !empty($pytanie['dotychczasowa_odpowiedz']);
-            ?>
-            <div class="card mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-question-circle"></i> <?= esc($pytanie['tresc']) ?></span>
-                    <span class="badge text-bg-secondary"><?= esc($pytanie['pkt']) ?> pkt</span>
-                </div>
-                <div class="card-body">
-                    <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
-                        <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
-                        <input type="hidden" name="uniid" value="<?= session()->get('loggedInUser') ?>">
-                        <div class="form-group">
-                            <label class="static-label">Twoja odpowiedź</label>
-                            <div class="input-group d-flex align-items-center">
-                                <span class="flex-grow-1 odpowiedz-container">
-                                    <label class="odpowiedz-label form-control-plaintext" style="display: <?= $hasAnswer ? 'block' : 'none' ?>;">
-                                        <?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>
-                                    </label>
-                                    <input type="text" class="form-control odpowiedz-input" id="odpowiedz_<?= $pytanie['id'] ?>" name="odpowiedz" value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>" style="<?= $hasAnswer ? 'display: none;' : 'display: inline-block;' ?>" required>
-                                </span>
-                                <button type="button" class="btn btn-outline-secondary action-btn flex-shrink-0 <?= $isPast ? 'disabled' : '' ?>" <?= $isPast ? 'disabled' : '' ?>>
-                                    <?= $hasAnswer ? 'Zmień' : 'Zapisz' ?>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    <?php if ($isPast): ?>
-                        <div class="row mt-3">
-                            <div class="col text-center">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#odpowiedziModal<?= $pytanie['id']; ?>">
-                                    Pokaż odpowiedzi użytkowników
-                                </button>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <div class="card-footer text-muted">
-                    <div class="row">
-                        <div class="col">
-                            Odpowiedz przed: <?= esc($pytanie['wazneDoLocal']) ?>
-                        </div>
-                        <div class="col">
-                            Udzielonych odpowiedzi: <?= esc($pytanie['liczbaOdpowiedzi']) ?>
-                        </div>
-                    </div>
-                </div>
+<?php foreach ($pytania as $pytanie):
+    $wazneDoTimestamp = strtotime($pytanie['wazneDo']);
+    $isPast    = (time() > $wazneDoTimestamp);
+    $hasAnswer = !empty($pytanie['dotychczasowa_odpowiedz']);
+?>
+<div class="card match-card mb-3">
+  <div class="card-body px-3 py-3">
+    <div class="question-badge mb-3">⚡ <?= (int)$pytanie['pkt'] ?> pkt</div>
+    <p style="font-size:16px;font-weight:500;line-height:1.4;" class="mb-3"><?= esc($pytanie['tresc']) ?></p>
+
+    <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
+      <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
+      <input type="hidden" name="uniid"     value="<?= session()->get('loggedInUser') ?>">
+
+      <label class="odpowiedz-label shout-input w-100 d-flex align-items-center justify-content-between mb-2"
+             style="border-radius:10px;line-height:2.4;padding:6px 12px;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
+        <span><?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?></span>
+        <?php if ($hasAnswer && !$isPast): ?>
+          <span class="edit-answer-btn ms-2" style="cursor:pointer;opacity:0.5;flex-shrink:0;"
+                title="Edytuj odpowiedź">✏</span>
+        <?php endif; ?>
+      </label>
+
+      <input type="text" name="odpowiedz"
+             class="shout-input odpowiedz-input w-100 mb-2 <?= $hasAnswer ? 'd-none' : 'd-block' ?>"
+             style="border-radius:10px;"
+             value="<?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?>"
+             <?= !$hasAnswer ? 'required' : '' ?>>
+
+      <button type="button"
+              class="btn-type ff-bebas action-btn <?= $hasAnswer ? 'done' : '' ?> <?= $isPast ? 'disabled-golden' : '' ?>"
+              style="font-size:17px;padding:12px;"
+              <?= $isPast ? 'disabled' : '' ?>>
+        <?= $hasAnswer ? '✓ Zapisano' : 'Zapisuję' ?>
+      </button>
+    </form>
+
+    <?php if ($hasAnswer && !$isPast): ?>
+      <p class="social-proof text-center mt-2 mb-0">
+        ✏ Możesz edytować · termin: <?= esc($pytanie['wazneDoLocal']) ?>
+        &nbsp;·&nbsp; Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php elseif (!$hasAnswer && $isPast): ?>
+      <p class="social-proof text-center mt-2 mb-0" style="color:var(--ty-red);">
+        ⏱ Czas na odpowiedź minął · Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php else: ?>
+      <p class="social-proof mt-2 mb-0">
+        Odpowiedzi przed: <?= esc($pytanie['wazneDoLocal']) ?>
+        &nbsp;·&nbsp; Udzielono: <?= (int)$pytanie['liczbaOdpowiedzi'] ?>
+      </p>
+    <?php endif; ?>
+
+    <?php if ($isPast && !empty($pytanie['odpowiedzi'])): ?>
+      <button type="button" class="btn btn-outline-secondary btn-sm mt-3"
+              data-bs-toggle="modal" data-bs-target="#odpowiedziModal<?= $pytanie['id'] ?>">
+        Pokaż odpowiedzi użytkowników
+      </button>
+      <div class="modal fade" id="odpowiedziModal<?= $pytanie['id'] ?>" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"><?= esc($pytanie['tresc']) ?></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <?php if ($isPast): ?>
-                <div class="modal fade" id="odpowiedziModal<?= $pytanie['id']; ?>" tabindex="-1" aria-labelledby="odpowiedziModalLabel<?= $pytanie['id']; ?>" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="odpowiedziModalLabel<?= $pytanie['id']; ?>">Odpowiedzi użytkowników na pytanie: <?= esc($pytanie['tresc']); ?></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <?php if (!empty($pytanie['odpowiedzi'])): ?>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Nick</th>
-                                                <th>Odpowiedź</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($pytanie['odpowiedzi'] as $odpowiedz): ?>
-                                                <tr>
-                                                    <td><?= esc($odpowiedz['nick']); ?></td>
-                                                    <td><?= esc($odpowiedz['odp']); ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                <?php else: ?>
-                                    <p>Brak odpowiedzi.</p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
+            <div class="modal-body">
+              <table class="table table-sm">
+                <thead><tr><th>Nick</th><th>Odpowiedź</th></tr></thead>
+                <tbody>
+                  <?php foreach ($pytanie['odpowiedzi'] as $o): ?>
+                    <tr><td><?= esc($o['nick']) ?></td><td><?= esc($o['odp']) ?></td></tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <?php endif; ?>
+  </div>
 </div>
-
-<div class="container mt-3 px-0 mx-0">
-<div class="row">
-    <div class="col">
-        <button type="button" class="btn btn-outline-secondary"><a href="/archiwalnePytania">Wcześniejsze pytania turnieju</a></button>
-    </div>
-</div>
-</div>
-</div>
+<?php endforeach; ?>
+<?php endif; ?>
 
 <script>
-$(document).ready(function() {
-    $('.question-section').on('click', '.action-btn', function() {
-        var $btn = $(this);
-        if ($btn.hasClass('disabled')) {
-            return;
-        }
-        var $form = $btn.closest('form');
-        var $input = $form.find('.odpowiedz-input');
-        var $label = $form.find('.odpowiedz-label');
-        var isEditing = $btn.text() === 'Zmień';
+$(document).on('click', '.edit-answer-btn', function() {
+    var $form  = $(this).closest('form');
+    var $label = $form.find('.odpowiedz-label');
+    var $input = $form.find('.odpowiedz-input');
+    $label.addClass('d-none');
+    $input.removeClass('d-none');
+    $input[0].focus();
+    $form.find('.action-btn').removeClass('done').addClass('pending').text('Zapisz zmiany →');
+});
 
-        if (isEditing) {
-            $label.hide();
-            $input.show().focus();
-            $btn.text('Zapisz');
+$(document).on('click', '.action-btn', function() {
+    if ($(this).prop('disabled')) return;
+    $(this).closest('form').submit();
+});
+
+$(document).on('submit', '.question-form', function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    $.post($form.attr('action'), $form.serialize(), function(response) {
+        if (response.status === 'success') {
+            var newAnswer = $form.find('.odpowiedz-input').val();
+            $form.find('.odpowiedz-label').find('span:first').text(newAnswer);
+            $form.find('.odpowiedz-label').removeClass('d-none');
+            $form.find('.odpowiedz-input').addClass('d-none');
+            $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
         } else {
-            $form.submit();
-        }
-    });
-
-    $('.question-section').on('submit', '.question-form', function(event) {
-        event.preventDefault();
-        var $form = $(this);
-        $.post($form.attr('action'), $form.serialize(), function(response) {
-            console.log("Response from server:", response);
-            if (response.status === 'success') {
-                var newAnswer = $form.find('.odpowiedz-input').val();
-                var $label = $form.find('.odpowiedz-label');
-                var $input = $form.find('.odpowiedz-input');
-                $label.text(newAnswer).show();
-                $input.hide();
-                $form.find('.action-btn').text('Zmień');
-            } else {
-                alert('Błąd przy zapisywaniu odpowiedzi.');
-            }
-        }, 'json').fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("AJAX call failed: ", textStatus, errorThrown);
-            console.log("Response from server:", jqXHR.responseText);
             alert('Błąd przy zapisywaniu odpowiedzi.');
-        });
-    });
+        }
+    }, 'json').fail(function() { alert('Błąd przy zapisywaniu odpowiedzi.'); });
 });
 </script>

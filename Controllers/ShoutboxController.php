@@ -55,7 +55,7 @@ class ShoutboxController extends BaseController
         }
 
         // Convert to HTML entities
-        $message = htmlentities($message);
+        //$message = htmlentities($message);
 
         $data = [
             'user_id' => $userId,
