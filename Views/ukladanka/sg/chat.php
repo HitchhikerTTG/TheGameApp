@@ -26,8 +26,16 @@
 <script>
 /* ── bezpieczna emoji – działa nawet bez biblioteki ── */
 var _emoji = null;
-try { _emoji = new EmojiConvertor(); } catch(e) {}
-function _emojiReplace(text) { return _emoji ? _emoji.replace_colons(text) : text; }
+try {
+  _emoji = new EmojiConvertor();
+  _emoji.replace_mode = 'unified';   // unicode natywny, bez <img>
+  _emoji.allow_native = true;
+} catch(e) {}
+function _emojiReplace(text) {
+  if (!_emoji) return text;
+  return _emoji.replace_colons(_emoji.replace_emoticons(text));
+}
+
 
 function initials(name) {
   return (name || '?').split(' ').map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0,2) || '??';
@@ -71,14 +79,18 @@ function loadMessages() {
     }
 
       var html = '';
-      data.forEach(function(msg) {
+      data.slice().reverse().forEach(function(msg) {
+
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
           + '<div class="shout-avatar">' + initials(msg.username) + '</div>'
           + '<div><div class="shout-nick">' + msg.username + '</div>'
           + '<div class="shout-msg">' + _emojiReplace(msg.message) + '</div>'
           + '</div></div>';
       });
-      $('#shoutbox-feed').html(html);
+        $('#shoutbox-feed').html(html);
+        var feed = document.getElementById('shoutbox-feed');
+        if (feed) feed.scrollTop = feed.scrollHeight;
+
     }).fail(function() {
       $('#shout-preview-nick').text('Błąd ładowania czatu');
     });
