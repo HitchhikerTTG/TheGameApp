@@ -10,13 +10,11 @@ $(document).ready(function() {
     var n = (parseInt($val.text()) || 0) + 1;
     $val.text(n); $input.val(n); $(this).blur();
 
-    /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany »');
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany →');
+  });
 
-});
-
-$('body').on('click', '.step-btn.minus', function(e) {
+  $('body').on('click', '.step-btn.minus', function(e) {
     e.preventDefault();
     var $team  = $(this).closest('.team');
     var $val   = $team.find('.step-val');
@@ -24,11 +22,9 @@ $('body').on('click', '.step-btn.minus', function(e) {
     var n = Math.max(0, (parseInt($val.text()) || 0) - 1);
     $val.text(n); $input.val(n); $(this).blur();
 
-    /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany »');
-});
-
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany →');
+  });
 
   /* ── GOLDEN BALL TOGGLE ── */
   window.typerToggleGolden = function(id) {
@@ -36,11 +32,13 @@ $('body').on('click', '.step-btn.minus', function(e) {
     var $chk = $('#goldenGame' + id);
     $row.toggleClass('active');
     $chk.prop('checked', $row.hasClass('active'));
+
+    $('#btn-submit-' + id).removeClass('done').addClass('pending').text('Zapisz zmiany →');
   };
 
   $('body').on('change', '.golden-game-checkbox', function() {
     var $chk      = $(this);
-    var isChecked = $chk.is(':checked');
+    var isChecked = $<chk.is>(':checked');
     if (isChecked) {
       $('.golden-game-checkbox').not($chk).prop('checked', false).prop('disabled', true);
       $('.golden-game-checkbox').not($chk).each(function() {
@@ -68,7 +66,6 @@ $('body').on('click', '.step-btn.minus', function(e) {
         if (response.success) {
           var gameId = $form.find('[name="gameID"]').val();
           var $btn   = $('#btn-submit-' + gameId);
-          var score  = response.newTypText.replace('Twój typ: ', '');
           $btn.removeClass('pending').addClass('done').text('✓ Wytypowano');
         } else {
           alert(response.message);
@@ -85,7 +82,7 @@ $('body').on('click', '.step-btn.minus', function(e) {
   window.typerToggleResults = function(apiId) {
     var $el    = $('#results-' + apiId);
     var $arrow = $('#arrow-' + apiId);
-    var open   = $el.is(':visible');
+    var open   = $<el.is>(':visible');
     $el.toggle(!open);
     $arrow.text(open ? '›' : '‹');
   };
