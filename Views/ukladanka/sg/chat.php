@@ -51,7 +51,7 @@ function typerToggleShout() {
   feed.classList.toggle('open');
   var isOpen = feed.classList.contains('open');
   btn.textContent = isOpen ? 'Zwiń czat ‹' : 'Rozwiń czat ›';
-  if (preview) preview.style.display = isOpen ? 'none' : '';
+  if (preview) preview.classList.toggle('d-none', isOpen);
 }
 
 
