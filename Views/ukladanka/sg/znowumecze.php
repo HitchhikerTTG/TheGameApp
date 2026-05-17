@@ -70,27 +70,31 @@
         <input type="hidden" name="gameID"    value="<?= $match['Id'] ?>">
         <input type="hidden" name="turniejID" value="<?= $turniejID ?>">
 
-        <div class="d-grid mb-3" style="grid-template-columns:1fr 20px 1fr; gap:8px; align-items:center;">
-          <div class="team h_<?= $match['details']['home_team']['id'] ?? '' ?>">
-            <div class="text-center team-name mb-2"><?= esc($homeTeamName) ?></div>
-            <div class="stepper">
-              <button type="button" class="step-btn minus">−</button>
-              <span class="ff-bebas step-val"><?= (int)($userHome ?? 0) ?></span>
-              <button type="button" class="step-btn plus">+</button>
-            </div>
-            <input type="hidden" name="H" class="score-value" value="<?= (int)($userHome ?? 0) ?>">
-          </div>
-          <div class="ff-bebas text-center vs-div">:</div>
-          <div class="team a_<?= $match['details']['away_team']['id'] ?? '' ?>">
-            <div class="text-center team-name mb-2"><?= esc($awayTeamName) ?></div>
-            <div class="stepper">
-              <button type="button" class="step-btn minus">−</button>
-              <span class="ff-bebas step-val"><?= (int)($userAway ?? 0) ?></span>
-              <button type="button" class="step-btn plus">+</button>
-            </div>
-            <input type="hidden" name="A" class="score-value" value="<?= (int)($userAway ?? 0) ?>">
-          </div>
-        </div>
+        <div class="d-grid mb-1" style="grid-template-columns:1fr 20px 1fr; gap:8px;">
+  <div class="text-center team-name"><?= esc($homeTeamName) ?></div>
+  <div></div>
+  <div class="text-center team-name"><?= esc($awayTeamName) ?></div>
+</div>
+<div class="d-grid mb-3" style="grid-template-columns:1fr 20px 1fr; gap:8px; align-items:center;">
+  <div class="team h_<?= $match['details']['home_team']['id'] ?? '' ?>">
+    <div class="stepper">
+      <button type="button" class="step-btn minus">−</button>
+      <span class="ff-bebas step-val"><?= (int)($userHome ?? 0) ?></span>
+      <button type="button" class="step-btn plus">+</button>
+    </div>
+    <input type="hidden" name="H" class="score-value" value="<?= (int)($userHome ?? 0) ?>">
+  </div>
+  <div class="ff-bebas text-center vs-div">:</div>
+  <div class="team a_<?= $match['details']['away_team']['id'] ?? '' ?>">
+    <div class="stepper">
+      <button type="button" class="step-btn minus">−</button>
+      <span class="ff-bebas step-val"><?= (int)($userAway ?? 0) ?></span>
+      <button type="button" class="step-btn plus">+</button>
+    </div>
+    <input type="hidden" name="A" class="score-value" value="<?= (int)($userAway ?? 0) ?>">
+  </div>
+</div>
+
 
         <?php
         if ($usedGoldenBall == 0)               { $goldenLabel = '⚽ Złota piłka -- 2× punkty'; $goldenDisabled = false; }
