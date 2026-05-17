@@ -75,33 +75,34 @@
 <?php endif; ?>
 
 <script>
-$(document).ready(function() {
-  $(document).on('click', '.action-btn', function() {
+$(document).on('click', '.action-btn', function() {
     if ($(this).prop('disabled')) return;
     var $form  = $(this).closest('form');
     var $input = $form.find('.odpowiedz-input');
     var $label = $form.find('.odpowiedz-label');
     if ($(this).hasClass('done')) {
-      $label.hide(); $input.show().focus();
-      $(this).removeClass('done').text('Zapisuję');
+        $label.addClass('d-none');
+        $input.removeClass('d-none');
+        $input[0].focus();
+        $(this).removeClass('done').text('Zapisuję');
     } else {
-      $form.submit();
+        $form.submit();
     }
-  });
+});
 
-  $(document).on('submit', '.question-form', function(e) {
+$(document).on('submit', '.question-form', function(e) {
     e.preventDefault();
     var $form = $(this);
     $.post($form.attr('action'), $form.serialize(), function(response) {
-      if (response.status === 'success') {
-        var newAnswer = $form.find('.odpowiedz-input').val();
-        $form.find('.odpowiedz-label').text(newAnswer).show();
-        $form.find('.odpowiedz-input').hide();
-        $form.find('.action-btn').addClass('done').text('✓ Zapisano');
-      } else {
-        alert('Błąd przy zapisywaniu odpowiedzi.');
-      }
+        if (response.status === 'success') {
+            var newAnswer = $form.find('.odpowiedz-input').val();
+            $form.find('.odpowiedz-label').text(newAnswer).removeClass('d-none');
+            $form.find('.odpowiedz-input').addClass('d-none');
+            $form.find('.action-btn').addClass('done').text('✓ Zapisano');
+        } else {
+            alert('Błąd przy zapisywaniu odpowiedzi.');
+        }
     }, 'json').fail(function() { alert('Błąd przy zapisywaniu odpowiedzi.'); });
-  });
 });
+
 </script>
