@@ -80,11 +80,13 @@ $(document).on('click', '.action-btn', function() {
     var $form  = $(this).closest('form');
     var $input = $form.find('.odpowiedz-input');
     var $label = $form.find('.odpowiedz-label');
-    if ($(this).hasClass('done')) {
-        $label.addClass('d-none');
-        $input.removeClass('d-none');
-        $input[0].focus();
-        $(this).removeClass('done').text('Zapisuję');
+if ($(this).hasClass('done')) {
+    $label.addClass('d-none');
+    $input.removeClass('d-none');
+    $input[0].focus();
+    $(this).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
+}
+
     } else {
         $form.submit();
     }
@@ -98,7 +100,8 @@ $(document).on('submit', '.question-form', function(e) {
             var newAnswer = $form.find('.odpowiedz-input').val();
             $form.find('.odpowiedz-label').text(newAnswer).removeClass('d-none');
             $form.find('.odpowiedz-input').addClass('d-none');
-            $form.find('.action-btn').addClass('done').text('✓ Zapisano');
+            $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
+
         } else {
             alert('Błąd przy zapisywaniu odpowiedzi.');
         }

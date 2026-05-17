@@ -12,7 +12,8 @@ $(document).ready(function() {
 
     /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').text('Typuję');
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
+
 });
 
 $('body').on('click', '.step-btn.minus', function(e) {
@@ -25,7 +26,7 @@ $('body').on('click', '.step-btn.minus', function(e) {
 
     /* reset przycisku submit */
     var gameId = $team.closest('form').find('[name="gameID"]').val();
-    $('#btn-submit-' + gameId).removeClass('done').text('Typuję');
+    $('#btn-submit-' + gameId).removeClass('done').addClass('pending').text('Zapisz zmiany &raquo;');
 });
 
 
@@ -68,7 +69,7 @@ $('body').on('click', '.step-btn.minus', function(e) {
           var gameId = $form.find('[name="gameID"]').val();
           var $btn   = $('#btn-submit-' + gameId);
           var score  = response.newTypText.replace('Twój typ: ', '');
-          $btn.addClass('done').text('✓ Wytypowano');
+          $btn.removeClass('pending').addClass('done').text('✓ Wytypowano');
         } else {
           alert(response.message);
         }
