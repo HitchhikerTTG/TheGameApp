@@ -39,7 +39,7 @@ $(document).ready(function () {
       .removeClass('active disabled-golden')
       .attr('onclick', 'typerToggleGolden(' + id + ')');
     $('#goldenGame' + id).prop({ checked: false, disabled: false });
-    $('#golden-row-' + id + ' .golden-label').text('⚽ Złota piłka -- 2× punkty');
+    $('#golden-row-' + id + ' .golden-label').text('⚽ Złota piłka: punkty x2');
   }
 
   window.typerToggleGolden = function (id) {
@@ -54,7 +54,7 @@ $(document).ready(function () {
   $('body').on('change', '.golden-game-checkbox', function () {
     var $chk      = $(this);
     var id        = parseInt($chk.data('game-id'));
-    var isChecked = $<chk.is>(':checked');
+    var isChecked = $chk.is(':checked');
 
     if (isChecked) {
       // Jeśli jest NIEZAPISANA złota piłka na innym meczu → zresetuj ją
@@ -87,7 +87,7 @@ $(document).ready(function () {
             .removeClass('disabled-golden')
             .attr('onclick', 'typerToggleGolden(' + oid + ')');
           if (oid !== savedGoldenGameID) {
-            $('#golden-row-' + oid + ' .golden-label').text('⚽ Złota piłka -- 2× punkty');
+            $('#golden-row-' + oid + ' .golden-label').text('⚽ Złota piłka: punkty x 2');
           }
         }
       });
@@ -136,7 +136,7 @@ $(document).ready(function () {
                 $('#golden-row-' + oid)
                   .removeClass('disabled-golden')
                   .attr('onclick', 'typerToggleGolden(' + oid + ')');
-                $('#golden-row-' + oid + ' .golden-label').text('⚽ Złota piłka -- 2× punkty');
+                $('#golden-row-' + oid + ' .golden-label').text('⚽ Złota piłka: punkty x 2');
               }
             });
           }
