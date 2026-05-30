@@ -501,12 +501,20 @@ foreach ($meczeArchiwalne as &$mecz) {
 
     if ($typyModel->zapiszTyp($data)) {
         $currentGoldenGame = session()->get('usedGoldenBall');
+
         if ($currentGoldenGame == $gameID && $goldenGame == 0) {
+            // Zdejmowanie złotej piłki z tego meczu
             $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
             session()->set('usedGoldenBall', 0);
+
         } elseif ($goldenGame == 1) {
+            // Przenoszenie złotej piłki -- wyczyść stary mecz w bazie
+            if ($currentGoldenGame && $currentGoldenGame != $gameID) {
+                $typyModel->removeGoldenGame($userUniId, $currentGoldenGame, $turniejID);
+            }
             session()->set('usedGoldenBall', $gameID);
         }
+
         //przekazanie maila do kolejki do wysyłki
         (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
 

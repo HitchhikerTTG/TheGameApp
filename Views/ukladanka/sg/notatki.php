@@ -26,9 +26,6 @@ function renderMarkdown(string $src): string {
 
 <div class="card match-card mb-4" id="notatki-card">
   <div class="px-3 pt-3 pb-1">
-
-    <div class="oglos-badge">📣 Ogłoszenie</div>
-
     <?php foreach ($notatki as $idx => $n): ?>
     <div class="notatka-a" data-idx="<?= $idx ?>"
          <?= $idx > 0 ? 'style="display:none;"' : '' ?>>
