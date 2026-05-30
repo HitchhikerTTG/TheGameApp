@@ -137,6 +137,11 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('hell/kampanie', 'AdminDash::kampanie');
     $routes->post('hell/kampanie/test', 'AdminDash::testKampania');
     $routes->post('hell/kampanie/wyslij', 'AdminDash::wyslijKampanie');
+    
+    // notatki
+    $routes->post('AdminDash/dodajNotatke',      'AdminDash::dodajNotatke');
+$routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
+
 
 
 });
