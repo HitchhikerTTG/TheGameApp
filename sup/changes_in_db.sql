@@ -42,3 +42,19 @@ CREATE TABLE email_campaigns (
     recipients_count INT DEFAULT 0,
     UNIQUE KEY uq_template_target (template_file, target_group)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- [2026-05-30] Notatki / micro-posty admina
+-- Krótkie ogłoszenia wyświetlane na stronie głównej, per turniej i opcjonalnie per klub
+-- KlubID NULL = widoczne dla wszystkich graczy turnieju
+-- ----------------------------------------
+CREATE TABLE notatki (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tresc        TEXT         NOT NULL,
+    opublikowana TINYINT(1)   NOT NULL DEFAULT 1,
+    TurniejID    INT UNSIGNED NOT NULL,
+    KlubID       INT UNSIGNED NULL DEFAULT NULL,
+    created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ----------------------------------------

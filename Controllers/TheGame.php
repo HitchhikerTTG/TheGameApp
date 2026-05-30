@@ -13,6 +13,9 @@ use App\Services\MeczService;
 use App\Models\PytaniaModel;
 use App\Models\OdpowiedziModel;
 use App\Services\EmailService;
+use App\Models\NotatkiModel;
+use App\Models\ClubMembersModel;
+
 
 
 
@@ -35,6 +38,9 @@ class TheGame extends BaseController
     protected $tabelaModel;
     protected $pytaniaModel;
     protected $odpowiedzModel;
+    protected $notatkiModel;
+    protected $clubMembersModel;
+
 
     // KONSTRUKTOR -- dodać 3 linie:
     public function __construct()
@@ -45,6 +51,9 @@ class TheGame extends BaseController
         $this->tabelaModel = model(TabelaModel::class);
         $this->pytaniaModel= model(PytaniaModel::class);
         $this->odpowiedzModel =model(OdpowiedziModel::class);
+        $this->notatkiModel     = model(NotatkiModel::class);
+        $this->clubMembersModel = model(ClubMembersModel::class);
+
         
     }
 
@@ -210,14 +219,15 @@ unset($pytanie); // Unset reference
 
 
 
+    $userClub = $this->clubMembersModel->getClubsByUser($loggedInUserId);
+    $klubID   = $userClub ? (int)$userClub['klubID'] : null;
+    $notatki  = $this->notatkiModel->getLatestPublished($turniejID, $klubID, 10);
 
-
-
-    
 
     return view('typowanie/header', $wstep)
            .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
            .view('ukladanka/sg/chat')
+           .view('ukladanka/sg/notatki', ['notatki' => $notatki]) 
            .view('ukladanka/sg/znowumecze', [
                'mecze' => $mecze4,
                'turniejID' => $turniejID,
@@ -490,20 +500,35 @@ foreach ($meczeArchiwalne as &$mecz) {
 
 
     if ($typyModel->zapiszTyp($data)) {
-        $currentGoldenGame = session()->get('usedGoldenBall');
-        if ($currentGoldenGame == $gameID && $goldenGame == 0) {
-            $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
-            session()->set('usedGoldenBall', 0);
-        } elseif ($goldenGame == 1) {
-            session()->set('usedGoldenBall', $gameID);
-        }
-        //przekazanie maila do kolejki do wysyłki
-        (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
 
-        return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
-    } else {
-        return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
+    $previousGoldenGameID = 0;
+    $currentGoldenGame    = session()->get('usedGoldenBall');
+
+    if ($goldenGame == 1) {
+        // Automatycznie przenieś -- wyczyść poprzedni mecz w DB
+        if ($currentGoldenGame && $currentGoldenGame != $gameID) {
+            $typyModel->removeGoldenGame($userUniId, $currentGoldenGame, $turniejID);
+            $previousGoldenGameID = $currentGoldenGame;
+        }
+        session()->set('usedGoldenBall', $gameID);
+
+    } elseif ($goldenGame == 0 && $currentGoldenGame == $gameID) {
+        $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
+        session()->set('usedGoldenBall', 0);
     }
+
+    (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
+
+    return $this->response->setJSON([
+        'success'              => true,
+        'message'              => 'No i gites! Udało się zapisać dane w bazie',
+        'newTypText'           => "Twój typ: $homeScore:$awayScore",
+        'goldenBallSetOn'      => ($goldenGame == 1) ? (int)$gameID : 0,
+        'goldenBallRemoved'    => ($goldenGame == 0 && $currentGoldenGame == $gameID),
+        'previousGoldenGameID' => $previousGoldenGameID,
+    ]);
+}
+
 }
     
     

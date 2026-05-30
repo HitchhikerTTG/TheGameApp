@@ -14,6 +14,8 @@ use App\Libraries\Common;
 use App\Models\KtoWCoGraModel;
 use App\Models\UserModel;
 use App\Models\PytaniaModel;
+use App\Models\NotatkiModel;
+
 
 
 class AdminDash extends BaseController
@@ -434,6 +436,54 @@ public function loadClubs(){
         return redirect()->to('/hell');
     }
 
+    public function dodajNotatke()
+{
+    $notatkiModel = model(NotatkiModel::class);
+    $config       = get_active_tournament_config();
+
+    $validated = $this->validate([
+        'tresc' => [
+            'rules'  => 'required|min_length[10]|max_length[4000]',
+            'errors' => [
+                'required'   => 'Treść notatki jest wymagana.',
+                'min_length' => 'Notatka musi mieć co najmniej 10 znaków.',
+                'max_length' => 'Notatka nie może przekraczać 4000 znaków.',
+            ],
+        ],
+    ]);
+
+    if (!$validated) {
+        session()->setFlashdata('fail', $this->validator->listErrors());
+        return redirect()->to('/hell');
+    }
+
+    $klubIDRaw = $this->request->getPost('KlubID');
+    $data = [
+        'tresc'        => $this->request->getPost('tresc'),
+        'opublikowana' => (int)($this->request->getPost('opublikowana') ?? 0),
+        'TurniejID'    => (int)$config['activeTournamentId'],
+        'KlubID'       => ($klubIDRaw !== '' && $klubIDRaw !== null) ? (int)$klubIDRaw : null,
+    ];
+
+    if ($notatkiModel->addNotatka($data)) {
+        session()->setFlashdata('success', 'Notatka została opublikowana.');
+    } else {
+        session()->setFlashdata('fail', 'Nie udało się zapisać notatki.');
+    }
+
+    return redirect()->to('/hell');
+}
+
+public function ukryjNotatke(int $id)
+{
+    $notatkiModel = model(NotatkiModel::class);
+    $notatkiModel->ukryj($id);
+    session()->setFlashdata('success', 'Notatka ukryta.');
+    return redirect()->to('/hell');
+}
+
+
+
     /* TU ZARZĄDZAMY KLUBAMI I UŻYTKOWNIKAMI */
     
     /*public function listClubMembers()
@@ -571,6 +621,9 @@ public function loadClubs(){
             'kluby' => $kluby,
             'config' => $config,
             'pytania' => $this->getTourmanentQuestions($config['activeTournamentId']),
+            'notatki'  => model(NotatkiModel::class)->getForAdmin($config['activeTournamentId']), 
+            'allKluby' => model(KlubyModel::class)->getAllClubs(),
+
         ];
 
         $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
@@ -586,8 +639,8 @@ public function loadClubs(){
                .view('administracja/listaKlubow', $data)
                .view('administracja/listaMeczow', ['mecze' => $mecze])
                .view('administracja/zarzadzajPytaniami', $data)
-               .view('administracja/dodajPytanie');
-               
+               .view('administracja/dodajPytanie')
+               .view('administracja/dodajNotatke', $data);               
     }
 
     public function pokazMiAdresy($turniejID){
