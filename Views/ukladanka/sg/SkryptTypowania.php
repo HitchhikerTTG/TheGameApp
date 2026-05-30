@@ -156,7 +156,7 @@ $(document).ready(function () {
   window.typerToggleResults = function (apiId) {
     var $el    = $('#results-' + apiId);
     var $arrow = $('#arrow-' + apiId);
-    var open   = $<el.is>(':visible');
+    var open   = $el.is(':visible');
     $el.toggle(!open);
     $arrow.text(open ? '›' : '‹');
   };
