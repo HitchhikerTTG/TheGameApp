@@ -500,28 +500,35 @@ foreach ($meczeArchiwalne as &$mecz) {
 
 
     if ($typyModel->zapiszTyp($data)) {
-        $currentGoldenGame = session()->get('usedGoldenBall');
 
-        if ($currentGoldenGame == $gameID && $goldenGame == 0) {
-            // Zdejmowanie złotej piłki z tego meczu
-            $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
-            session()->set('usedGoldenBall', 0);
+    $previousGoldenGameID = 0;
+    $currentGoldenGame    = session()->get('usedGoldenBall');
 
-        } elseif ($goldenGame == 1) {
-            // Przenoszenie złotej piłki -- wyczyść stary mecz w bazie
-            if ($currentGoldenGame && $currentGoldenGame != $gameID) {
-                $typyModel->removeGoldenGame($userUniId, $currentGoldenGame, $turniejID);
-            }
-            session()->set('usedGoldenBall', $gameID);
+    if ($goldenGame == 1) {
+        // Automatycznie przenieś -- wyczyść poprzedni mecz w DB
+        if ($currentGoldenGame && $currentGoldenGame != $gameID) {
+            $typyModel->removeGoldenGame($userUniId, $currentGoldenGame, $turniejID);
+            $previousGoldenGameID = $currentGoldenGame;
         }
+        session()->set('usedGoldenBall', $gameID);
 
-        //przekazanie maila do kolejki do wysyłki
-        (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
-
-        return $this->response->setJSON(['success' => true, 'message' => 'No i gites! Udało się zapisać dane w bazie', 'newTypText' => "Twój typ: $homeScore:$awayScore"]);
-    } else {
-        return $this->response->setJSON(['success' => false, 'message' => 'Nie udało się zapisać typu']);
+    } elseif ($goldenGame == 0 && $currentGoldenGame == $gameID) {
+        $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
+        session()->set('usedGoldenBall', 0);
     }
+
+    (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
+
+    return $this->response->setJSON([
+        'success'              => true,
+        'message'              => 'No i gites! Udało się zapisać dane w bazie',
+        'newTypText'           => "Twój typ: $homeScore:$awayScore",
+        'goldenBallSetOn'      => ($goldenGame == 1) ? (int)$gameID : 0,
+        'goldenBallRemoved'    => ($goldenGame == 0 && $currentGoldenGame == $gameID),
+        'previousGoldenGameID' => $previousGoldenGameID,
+    ]);
+}
+
 }
     
     

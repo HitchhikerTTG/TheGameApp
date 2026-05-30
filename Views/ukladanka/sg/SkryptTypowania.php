@@ -27,14 +27,15 @@ $(document).ready(function() {
   });
 
   /* ── GOLDEN BALL TOGGLE ── */
-  window.typerToggleGolden = function(id) {
-    var $row = $('#golden-row-' + id);
-    var $chk = $('#goldenGame' + id);
-    $row.toggleClass('active');
-    $chk.prop('checked', $row.hasClass('active'));
-
-    $('#btn-submit-' + id).removeClass('done').addClass('pending').text('Zapisz zmiany →');
-  };
+/* ── GOLDEN BALL TOGGLE ── */
+window.typerToggleGolden = function(id) {
+  var $row = $('#golden-row-' + id);
+  var $chk = $('#goldenGame' + id);
+  $row.toggleClass('active');
+  $chk.prop('checked', $row.hasClass('active'));
+  $chk.trigger('change');   // ← to było brakujące
+  $('#btn-submit-' + id).removeClass('done').addClass('pending').text('Zapisz zmiany →');
+};
 
   $('body').on('change', '.golden-game-checkbox', function() {
     var $chk      = $(this);
@@ -55,28 +56,52 @@ $(document).ready(function() {
   });
 
   /* ── BETTING FORM AJAX ── */
-  $('body').on('submit', '.betting-form', function(e) {
-    e.preventDefault();
-    var $form = $(this);
-    $.ajax({
-      type: 'POST',
-      url:  $form.attr('action'),
-      data: $form.serialize(),
-      success: function(response) {
-        if (response.success) {
-          var gameId = $form.find('[name="gameID"]').val();
-          var $btn   = $('#btn-submit-' + gameId);
-          $btn.removeClass('pending').addClass('done').text('✓ Wytypowano');
-        } else {
-          alert(response.message);
-        }
-      },
-      error: function(xhr) {
-        try { alert(JSON.parse(xhr.responseText).message || 'Błąd.'); }
-        catch(e) { alert('Nie udało się przesłać formularza.'); }
+/* ── BETTING FORM AJAX ── */
+success: function(response) {
+  if (response.success) {
+    var gameId = $form.find('[name="gameID"]').val();
+    $('#btn-submit-' + gameId).removeClass('pending').addClass('done').text('✓ Wytypowano');
+
+    // Synchronizacja złotej piłki po zapisie
+    if (response.goldenBallSetOn) {
+      // Wyczyść poprzednią kartę (jeśli serwer ją przeniósł)
+      if (response.previousGoldenGameID) {
+        var prev = response.previousGoldenGameID;
+        $('#golden-row-' + prev)
+          .removeClass('active disabled-golden')
+          .attr('onclick', 'typerToggleGolden(' + prev + ')');
+        $('#goldenGame' + prev).prop({ checked: false, disabled: false });
+        $('#golden-row-' + prev + ' .golden-label').text('⚽ Złota piłka -- 2× punkty');
       }
-    });
-  });
+      // Zablokuj wszystkie pozostałe
+      $('.golden-game-checkbox').not('#goldenGame' + gameId).each(function() {
+        var oid = $(this).data('game-id');
+        $(this).prop({ checked: false, disabled: true });
+        $('#golden-row-' + oid)
+          .removeClass('active')
+          .addClass('disabled-golden')
+          .removeAttr('onclick');
+        $('#golden-row-' + oid + ' .golden-label').text('Złota piłka użyta na inny mecz');
+      });
+
+    } else if (response.goldenBallRemoved) {
+      // Odblokuj wszystkie
+      $('.golden-game-checkbox').each(function() {
+        var oid = $(this).data('game-id');
+        if (oid != gameId) {
+          $(this).prop({ disabled: false });
+          $('#golden-row-' + oid)
+            .removeClass('disabled-golden')
+            .attr('onclick', 'typerToggleGolden(' + oid + ')');
+          $('#golden-row-' + oid + ' .golden-label').text('⚽ Złota piłka -- 2× punkty');
+        }
+      });
+    }
+  } else {
+    alert(response.message);
+  }
+},
+
 
   /* ── COLLAPSE WYNIKÓW ── */
   window.typerToggleResults = function(apiId) {
