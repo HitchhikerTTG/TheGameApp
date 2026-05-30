@@ -1,100 +1,81 @@
 <?php
-/**
- * Minimal markdown → HTML (server-side, no external lib).
- * Obsługuje: # nagłówki, **bold**, *italic*, `code`, \n\n akapity.
- */
 function renderMarkdown(string $src): string {
     $s = htmlspecialchars($src, ENT_QUOTES, 'UTF-8');
-
-    // Obrazki – PRZED innymi regexami
-    $s = preg_replace(
-        '/!\[([^\]]*)\]\(([^)]+)\)/',
-        '<img src="$2" alt="$1" class="img-fluid rounded my-2">',
-        $s
-    );
-
-    // Nagłówki
-    $s = preg_replace('/^### (.+)$/m', '<h5 class="mt-3 mb-1">$1</h5>', $s);
-    $s = preg_replace('/^## (.+)$/m',  '<h4 class="mt-3 mb-1">$1</h4>', $s);
-    $s = preg_replace('/^# (.+)$/m',   '<h3 class="mt-3 mb-1">$1</h3>', $s);
-    // Bold / italic / inline code
+    $s = preg_replace('/!\[([^\]]*)\]\(([^)]+)\)/', '<img src="$2" alt="$1" class="img-fluid rounded my-2">', $s);
+    $s = preg_replace('/^### (.+)$/m', '<h5>$1</h5>', $s);
+    $s = preg_replace('/^## (.+)$/m',  '<h4>$1</h4>', $s);
+    $s = preg_replace('/^# (.+)$/m',   '<h3>$1</h3>', $s);
     $s = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $s);
     $s = preg_replace('/\*(.+?)\*/s',     '<em>$1</em>',         $s);
     $s = preg_replace('/`(.+?)`/',        '<code>$1</code>',     $s);
-    // Linki
     $s = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $s);
-
     $paragraphs = preg_split('/\n{2,}/', trim($s));
     $html = '';
     foreach ($paragraphs as $p) {
         $p = trim($p);
         if ($p === '') continue;
-        $html .= preg_match('/^<h[1-6]/', $p)
-            ? nl2br($p)
-            : '<p class="mb-2">' . nl2br($p) . '</p>';
+        $html .= preg_match('/^<h[1-6]/', $p) ? nl2br($p) : '<p>' . nl2br($p) . '</p>';
     }
     return $html;
 }
-
 ?>
 
 <?php if (!empty($notatki)): ?>
 <hr class="my-3" style="border-color:var(--bs-border-color);">
 <p class="section-label mb-2">Ogłoszenia</p>
 
-<div class="card match-card mb-3">
+<div class="card match-card mb-4" id="notatki-card">
+  <div class="px-3 pt-3 pb-1">
 
-  <?php foreach ($notatki as $idx => $n): ?>
-  <div class="notatka-item px-3 pt-3 pb-2" data-idx="<?= $idx ?>"
-       style="<?= $idx > 0 ? 'display:none;' : '' ?>">
-    <div style="font-size:15px;line-height:1.6;">
+    <div class="oglos-badge">📣 Ogłoszenie</div>
+
+    <?php foreach ($notatki as $idx => $n): ?>
+    <div class="notatka-a" data-idx="<?= $idx ?>"
+         <?= $idx > 0 ? 'style="display:none;"' : '' ?>>
       <?= renderMarkdown($n['tresc']) ?>
     </div>
-    <div class="text-end mt-1" style="font-size:12px;color:var(--bs-tertiary-color);">
-      <?= esc(substr($n['created_at'], 0, 10)) ?>
+    <?php endforeach; ?>
+
+    <div class="notatka-meta">
+      <span class="notatka-date"><?= esc(substr($notatki[0]['created_at'], 0, 10)) ?></span>
       &nbsp;·&nbsp;
-      <span class="notatka-counter"><?= ($idx + 1) ?> / <?= count($notatki) ?></span>
+      <span class="notatka-counter">1 / <?= count($notatki) ?></span>
     </div>
+
   </div>
-  <?php endforeach; ?>
 
   <?php if (count($notatki) > 1): ?>
-  <div class="d-flex justify-content-between px-3 py-2"
-       style="border-top:1px solid var(--bs-border-color);font-size:13px;">
-    <button class="btn-type ff-bebas action-btn"
-            onclick="notatkiNav(1)"
-            style="font-size:14px;padding:6px 12px;">
-      ‹ Poprzednia
-    </button>
-    <button class="btn-type ff-bebas action-btn"
-            id="notatki-next-btn"
-            onclick="notatkiNav(-1)"
-            style="font-size:14px;padding:6px 12px;"
-            disabled>
-      Następna ›
-    </button>
+  <div class="notatka-nav">
+    <button class="btn-nav" onclick="notatkiNav(1)">‹ Poprzednia</button>
+    <button class="btn-nav" id="notatki-next-btn" onclick="notatkiNav(-1)" disabled>Następna ›</button>
   </div>
   <?php endif; ?>
-
 </div>
 
 <script>
-(function() {
-  var items   = document.querySelectorAll('.notatka-item');
+(function () {
+  var card    = document.getElementById('notatki-card');
+  var items   = card.querySelectorAll('.notatka-a');
+  var dates   = <?= json_encode(array_column(array_values($notatki), 'created_at')) ?>;
   var total   = items.length;
   var current = 0;
 
-  window.notatkiNav = function(dir) {
+  function sync() {
+    card.querySelector('.notatka-date').textContent    = dates[current].slice(0, 10);
+    card.querySelector('.notatka-counter').textContent = (current + 1) + ' / ' + total;
+    var btnPrev = card.querySelector('[onclick="notatkiNav(1)"]');
+    var btnNext = document.getElementById('notatki-next-btn');
+    if (btnPrev) btnPrev.disabled = (current >= total - 1);
+    if (btnNext) btnNext.disabled = (current <= 0);
+  }
+
+  window.notatkiNav = function (dir) {
     var next = current + dir;
     if (next < 0 || next >= total) return;
     items[current].style.display = 'none';
     items[next].style.display    = '';
     current = next;
-
-    var prevBtn = document.querySelector('[onclick="notatkiNav(1)"]');
-    var nextBtn = document.getElementById('notatki-next-btn');
-    if (prevBtn) prevBtn.disabled = (current >= total - 1);
-    if (nextBtn) nextBtn.disabled = (current <= 0);
+    sync();
   };
 })();
 </script>
