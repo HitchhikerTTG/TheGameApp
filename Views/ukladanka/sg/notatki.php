@@ -5,29 +5,37 @@
  */
 function renderMarkdown(string $src): string {
     $s = htmlspecialchars($src, ENT_QUOTES, 'UTF-8');
+
+    // Obrazki – PRZED innymi regexami
+    $s = preg_replace(
+        '/!\[([^\]]*)\]\(([^)]+)\)/',
+        '<img src="$2" alt="$1" class="img-fluid rounded my-2">',
+        $s
+    );
+
     // Nagłówki
     $s = preg_replace('/^### (.+)$/m', '<h5 class="mt-3 mb-1">$1</h5>', $s);
     $s = preg_replace('/^## (.+)$/m',  '<h4 class="mt-3 mb-1">$1</h4>', $s);
     $s = preg_replace('/^# (.+)$/m',   '<h3 class="mt-3 mb-1">$1</h3>', $s);
-    // Bold / italic / code
+    // Bold / italic / inline code
     $s = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $s);
     $s = preg_replace('/\*(.+?)\*/s',     '<em>$1</em>',         $s);
     $s = preg_replace('/`(.+?)`/',        '<code>$1</code>',     $s);
-    // Podwójny newline → nowy akapit
+    // Linki
+    $s = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $s);
+
     $paragraphs = preg_split('/\n{2,}/', trim($s));
     $html = '';
     foreach ($paragraphs as $p) {
         $p = trim($p);
         if ($p === '') continue;
-        // Jeśli to nagłówek, nie owijaj w <p>
-        if (preg_match('/^<h[1-6]/', $p)) {
-            $html .= nl2br($p);
-        } else {
-            $html .= '<p class="mb-2">' . nl2br($p) . '</p>';
-        }
+        $html .= preg_match('/^<h[1-6]/', $p)
+            ? nl2br($p)
+            : '<p class="mb-2">' . nl2br($p) . '</p>';
     }
     return $html;
 }
+
 ?>
 
 <?php if (!empty($notatki)): ?>
