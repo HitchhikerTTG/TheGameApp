@@ -465,7 +465,6 @@ public function wygenerujTypyDlaMeczu($matchId) {
 
     $this->common->custom_log("Tak, próbuję wygenerować te typy: ");
 
-    // Inicjalizacja zmiennych do przechowywania statystyk
     $countWin1 = 0;
     $countWin2 = 0;
     $countDraw = 0;
@@ -475,7 +474,6 @@ public function wygenerujTypyDlaMeczu($matchId) {
     $correctPredictions = 0;
     $doublePointsPlayers = 0;
 
-    // Przetwarzanie typów
     foreach ($types as $typ) {
         if ($typ['HomeTyp'] > $typ['AwayTyp']) {
             $countWin1++;
@@ -495,8 +493,7 @@ public function wygenerujTypyDlaMeczu($matchId) {
         } else {
             $typeCounts[$typeKey] = 1;
         }
-        
-         // Sprawdzanie punktów graczy
+
         $pkt = intval($typ['pkt']);
         if ($pkt > 0) {
             $playersWithPoints++;
@@ -509,46 +506,47 @@ public function wygenerujTypyDlaMeczu($matchId) {
         }
     }
 
-    // Znajdowanie najpopularniejszego typu
-    $mostPopularType = array_search(max($typeCounts), $typeCounts);
-    $mostPopularTypeCount = $typeCounts[$mostPopularType];
-    
-    // Przygotowanie sekcji summary
+    // ── POPRAWKA: guard przed pustą tablicą ──
+    if (!empty($typeCounts)) {
+        $mostPopularType = array_search(max($typeCounts), $typeCounts);
+        $mostPopularTypeCount = $typeCounts[$mostPopularType];
+    } else {
+        $mostPopularType = null;
+        $mostPopularTypeCount = 0;
+    }
+
     $summary = [
-        'mostPopularType' => $mostPopularType,
-        'mostPopularTypeCount'=>$mostPopularTypeCount,
-        'countWin1' => $countWin1,
-        'countWin2' => $countWin2,
-        'countDraw' => $countDraw,
-        'goldenBallCount' => $goldenBallCount
+        'mostPopularType'      => $mostPopularType,
+        'mostPopularTypeCount' => $mostPopularTypeCount,
+        'countWin1'            => $countWin1,
+        'countWin2'            => $countWin2,
+        'countDraw'            => $countDraw,
+        'goldenBallCount'      => $goldenBallCount
     ];
-    
+
     $zakonczone = [
-        'playersWithPoints' => $playersWithPoints,
-        'correctPredictions' => $correctPredictions,
+        'playersWithPoints'   => $playersWithPoints,
+        'correctPredictions'  => $correctPredictions,
         'doublePointsPlayers' => $doublePointsPlayers
-        ];
-        
-    // Przygotowanie danych JSON do zapisu
+    ];
+
     $data = [
-        'types' => $types,
-        'summary' => $summary,
-        'zakonczone' =>$zakonczone
+        'types'     => $types,
+        'summary'   => $summary,
+        'zakonczone' => $zakonczone
     ];
 
     $jsonData = json_encode($data, JSON_PRETTY_PRINT);
 
-    // Bazowy katalog dla plików JSON
-    $baseDir = WRITEPATH . "typy"; 
+    $baseDir = WRITEPATH . "typy";
 
-    // Sprawdź, czy katalog istnieje, a jeśli nie, to go stwórz
     if (!is_dir($baseDir)) {
         mkdir($baseDir, 0755, true);
     }
 
-    // Zapisz dane JSON do pliku
     file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
 }
+
 }
 
 ?>
