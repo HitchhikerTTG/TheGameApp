@@ -640,7 +640,7 @@ public function ukryjNotatke(int $id)
                .view('administracja/listaKlubow', $data)
                .view('administracja/listaMeczow', ['mecze' => $mecze])
                .view('administracja/zarzadzajPytaniami', $data)
-               .view('administracja/dodajPytanie');
+               .view('administracja/dodajPytanie')
                .view('administracja/dodajNotatke', $data)
 
                
