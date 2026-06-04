@@ -421,30 +421,49 @@ unset($pytanie); // Unset reference
 
 
         // Fetch JSON data for each match
+// Fetch JSON data for each match
 foreach ($meczeArchiwalne as &$mecz) {
-        $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
-        if (file_exists($jsonPath)) {
-            $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
+    $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
+    if (file_exists($jsonPath)) {
+        $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
+    } else {
+        // Fallback: buduj details z danych DB gdy brakuje cache
+        $dbMecz = model(TerminarzModel::class)->getMeczById($mecz['Id']);
+        if ($dbMecz) {
+            $mecz['details'] = [
+                'date'        => $dbMecz['Date'],
+                'time'        => $dbMecz['Time'],
+                'naszCzas'    => $dbMecz['Time'],
+                'home_team'   => [
+                    'name'  => $dbMecz['HomeName'],
+                    'score' => $dbMecz['ScoreHome'],
+                ],
+                'away_team'   => [
+                    'name'  => $dbMecz['AwayName'],
+                    'score' => $dbMecz['ScoreAway'],
+                ],
+                'status'      => $dbMecz['zakonczony'] ? 'Zakonczony' : '',
+                'competition' => $dbMecz['CompetitionName'] ?? '',
+            ];
         } else {
             $mecz['details'] = null;
         }
-        if($mecz['rozpoczety']){
-            $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
-            if (file_exists($jsonPath)) {
-            
-            
-                $data = json_decode(file_get_contents($jsonPath), true);
-                $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
-                $mecz['podsumowanieTypow'] = isset($data['summary']) ? $data['summary'] : [];
-                $mecz['naKoniec'] = isset($data['zakonczone']) ? $data['zakonczone'] : [];
-                }
-            else {
-                $mecz['typyGraczy'] = null;
-                $mecz['podsumowanieTypow'] = null;
-                $mecz['naKoniec'] = null;
-            }
+    }
+    if ($mecz['rozpoczety']) {
+        $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
+        if (file_exists($jsonPath)) {
+            $data = json_decode(file_get_contents($jsonPath), true);
+            $mecz['typyGraczy']        = isset($data['types'])     ? $data['types']     : [];
+            $mecz['podsumowanieTypow'] = isset($data['summary'])   ? $data['summary']   : [];
+            $mecz['naKoniec']          = isset($data['zakonczone']) ? $data['zakonczone'] : [];
+        } else {
+            $mecz['typyGraczy']        = null;
+            $mecz['podsumowanieTypow'] = null;
+            $mecz['naKoniec']          = null;
         }
     }
+}
+
 
         return view('typowanie/header', $wstep)
                .view('ukladanka/sg/belkausera', ['daneUzytkownika'=>$daneUzytkownika])
