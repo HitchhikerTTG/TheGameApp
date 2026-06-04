@@ -114,6 +114,9 @@ class MeczService {
         
         
         }
+        // ── NOWE: odśwież live dane dla rozpoczętych meczów ──
+        $this->odswiezLiveMecze($wypelniona_lista, $turniejID, $zewnetrznyTurniejID);
+
 
         return $wypelniona_lista;
     
@@ -457,6 +460,62 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
     }
 }
 
+private function odswiezLiveMecze(array $mecze, int $turniejID, string $competitionApiId): void
+{
+    $startedMecze = array_filter($mecze, fn($m) => !empty($m['rozpoczety']));
+    if (empty($startedMecze)) return;
+
+    // Sprawdź czy którykolwiek potrzebuje odświeżenia (próg: 2 minuty)
+    $needsRefresh = false;
+    foreach ($startedMecze as $mecz) {
+        $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
+        if (!file_exists($jsonPath) || (time() - filemtime($jsonPath)) > 120) {
+            $needsRefresh = true;
+            break;
+        }
+    }
+    if (!$needsRefresh) return;
+
+    // Jeden request do API dla wszystkich live meczów turnieju
+    try {
+        $liveController = new \App\Controllers\LiveScore();
+        $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $competitionApiId]);
+    } catch (\Exception $e) {
+        $this->common->custom_log("Live API error: " . $e->getMessage());
+        return;
+    }
+
+    $liveIndex = [];
+    foreach ($liveMecze as $lm) {
+        $liveIndex[$lm['id']] = $lm;
+    }
+
+    foreach ($startedMecze as $mecz) {
+        $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
+        if (!file_exists($jsonPath)) continue;
+
+        $existing = json_decode(file_get_contents($jsonPath), true) ?? [];
+
+        if (isset($liveIndex[$mecz['ApiID']])) {
+            $live  = $liveIndex[$mecz['ApiID']];
+            $parts = explode('-', $live['score'] ?? '0-0');
+            $existing['status']              = 'Live';
+            $existing['minute']              = $live['time'] ?? null;
+            $existing['home_team']['score']  = trim($parts[0] ?? '0');
+            $existing['away_team']['score']  = trim($parts[1] ?? '0');
+        } else {
+            // Nie ma w live -- sprawdź czy minęły 3h od startu
+            if (!empty($existing['date']) && !empty($existing['time'])) {
+                $matchTime = strtotime($existing['date'] . ' ' . $existing['time']);
+                if ($matchTime && time() > $matchTime + 10800) {
+                    $existing['status'] = 'Zakonczony';
+                }
+            }
+        }
+
+        file_put_contents($jsonPath, json_encode($existing, JSON_PRETTY_PRINT));
+    }
+}
 
 
 public function wygenerujTypyDlaMeczu($matchId) {
