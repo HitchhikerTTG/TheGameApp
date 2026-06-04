@@ -124,7 +124,8 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('theGame/nowyZapisTypu', 'TheGame::nowyZapisTypu');
 
     $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dodajMnieDoTurnieju/$1/$2');
-    $routes->post('serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+    $routes->match(['get', 'post'], 'serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+
     
     //zapisywanie preferencji
     $routes->post('profil/zapiszPreferencje', 'Profil::zapiszPreferencje');
