@@ -19,10 +19,12 @@
     <h4>Archiwum meczów</h4>
     <div class="container mt-3 px-0 mx-0">
         <div id="matchesAccordion" class="accordion">
-            <?php 
-            $lastDate = null;
-            foreach ($mecze as $match): 
-                $matchDate = date('Y-m-d', strtotime($match['details']['date']));
+      <?php 
+      $lastDate = null;
+      foreach ($mecze as $match):
+          if (!isset($match['details'])) continue;
+          $matchDate = date('Y-m-d', strtotime($match['details']['date'])); 
+
                 $matchTime = date('H:i', strtotime($match['details']['time']));
                 $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
                 if ($lastDate !== $matchDate): 
