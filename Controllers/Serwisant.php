@@ -536,7 +536,13 @@ protected $_key;
          print_r($WszystkieTypy);
          echo "</pre>";
 
-        $this->updateJsonFile($daneMeczu);
+        $this->updateJsonFile($daneMeczu);  
+        
+        // Wymuś regenerację typy JSON przy następnym wejściu na stronę
+        $typyPath = WRITEPATH . "typy/{$mecz}.json";
+        if (file_exists($typyPath)) {
+            unlink($typyPath);
+        }
 
     }
 
@@ -589,6 +595,19 @@ protected $_key;
     print_r($config['activeTournamentId']);
     
     $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
+    
+    // W zapiszWynikMeczu(), po pobraniu $terminarz -- dodaj enrichment z JSON:
+foreach ($terminarz as &$mecz) {
+    if (empty($mecz['ScoreHome']) && empty($mecz['ScoreAway'])) {
+        $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            $json = json_decode(file_get_contents($jsonPath), true);
+            $mecz['ScoreHome'] = $json['home_team']['score'] ?? null;
+            $mecz['ScoreAway'] = $json['away_team']['score'] ?? null;
+        }
+    }
+}
+
     
     echo "<pre>";
     print_r($terminarz);
