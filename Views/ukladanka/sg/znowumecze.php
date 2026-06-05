@@ -6,12 +6,13 @@
     $matchDate    = date('Y-m-d', strtotime($match['details']['date']));
     $naszCzas     = date('H:i',   strtotime($match['details']['naszCzas']));
     $homeTeamName = $match['details']['home_team']['plName'] ?? $match['details']['home_team']['name'] ?? '?';
-    $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';
-
+    $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';    
+    
     $statusRaw  = $match['details']['status'] ?? '';
-    $isFinished = ($statusRaw === 'Zakonczony');
-    $isLive     = ($match['rozpoczety'] == 1 && !$isFinished);
-    $isUpcoming = ($match['rozpoczety'] == 0);
+    $isScored   = !empty($match['zakonczony']);
+    $isFinished = ($statusRaw === 'Zakonczony') && !$isScored;
+    $isLive     = ($match['rozpoczety'] == 1 && !$isFinished && !$isScored);
+    $isUpcoming = ($match['rozpoczety'] == 0 && !$isScored);
 
     $homeScore = $match['details']['home_team']['score'] ?? null;
     $awayScore = $match['details']['away_team']['score'] ?? null;
@@ -19,6 +20,11 @@
     $userAway  = $match['typy']['AwayTyp'] ?? null;
     $isGolden  = ($match['Id'] == $usedGoldenBall);
     $userPkt   = $match['typy']['pkt'] ?? null;
+    
+    
+    
+    
+    
 
     $isExact = $isFinished && $userHome !== null
         && (string)$userHome === (string)$homeScore
@@ -44,21 +50,27 @@
       <?= $naszCzas ?>
       <?php if ($isLive && isset($match['details']['minute'])): ?>
         · <span style="color:var(--ty-red)">●</span> <?= (int)$match['details']['minute'] ?>'
-      <?php elseif ($isFinished): ?>
+      <?php elseif ($isFinished || $isScored): ?>
         · Zakończony
+
       <?php endif; ?>
     </span>
-    <?php if ($isUpcoming): ?>
-      <span class="status-badge status-upcoming">Przyjmuje typy</span>
-    <?php elseif ($isLive): ?>
-      <span class="status-badge status-live">Na żywo</span>
-    <?php elseif ($isFinished): ?>
-      <span class="status-badge status-done">
-        <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Zakończony' ?>
-      </span>
-    <?php else: ?>
-      <span class="status-badge status-locked">Zamknięty</span>
-    <?php endif; ?>
+      <?php if ($isUpcoming): ?>
+        <span class="status-badge status-upcoming">Przyjmuje typy</span>
+      <?php elseif ($isLive): ?>
+        <span class="status-badge status-live">Na żywo</span>
+      <?php elseif ($isFinished): ?>
+        <span class="status-badge status-done">
+          <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Zakończony' ?>
+        </span>
+      <?php elseif ($isScored): ?>
+        <span class="status-badge status-scored">
+          <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Przeliczony' ?>
+        </span>
+      <?php else: ?>
+        <span class="status-badge status-locked">Zamknięty</span>
+      <?php endif; ?>
+
   </div>
 
   <div class="card-body px-3 py-3">
@@ -132,20 +144,28 @@
           <p class="social-proof text-center mt-2 mb-0"><?= (int)$match['liczbaTypow'] ?> graczy już wytypowało</p>
         <?php endif; ?>
       </form>
+      
+<?php else: /* ── LIVE or FINISHED: wynik ── */ ?>
 
-    <?php else: /* ── LIVE or FINISHED: wynik ── */ ?>
-
-      <div class="d-grid mb-2" style="grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;">
-        <div class="text-center">
-          <div class="team-name mb-1"><?= esc($homeTeamName) ?></div>
-          <?php if ($homeScore !== null): ?><div class="ff-bebas score-display"><?= (int)$homeScore ?></div><?php endif; ?>
+  <div class="d-grid mb-2" style="grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;">
+    <div class="text-center">
+      <div class="team-name mb-1"><?= esc($homeTeamName) ?></div>
+      <?php if ($isLive || $homeScore !== null): ?>
+        <div class="ff-bebas score-display<?= $isLive ? ' score-live' : '' ?>">
+          <?= $homeScore !== null ? (int)$homeScore : 0 ?>
         </div>
-        <div class="ff-bebas vs-div">:</div>
-        <div class="text-center">
-          <div class="team-name mb-1"><?= esc($awayTeamName) ?></div>
-          <?php if ($awayScore !== null): ?><div class="ff-bebas score-display"><?= (int)$awayScore ?></div><?php endif; ?>
+      <?php endif; ?>
+    </div>
+    <div class="ff-bebas vs-div<?= $isLive ? ' score-live' : '' ?>">:</div>
+    <div class="text-center">
+      <div class="team-name mb-1"><?= esc($awayTeamName) ?></div>
+      <?php if ($isLive || $awayScore !== null): ?>
+        <div class="ff-bebas score-display<?= $isLive ? ' score-live' : '' ?>">
+          <?= $awayScore !== null ? (int)$awayScore : 0 ?>
         </div>
-      </div>
+      <?php endif; ?>
+    </div>
+  </div>
 
       <?php if ($userHome !== null): ?>
         <p class="text-center mb-0" style="font-size:13px;">
@@ -161,7 +181,8 @@
   <!-- COLLAPSE: jak typowali? -->
   <?php if ($match['rozpoczety'] && !empty($match['typyGraczy'])): ?>
     <div class="collapse-trigger" onclick="typerToggleResults(<?= $match['ApiID'] ?>)">
-      <span><?= $isFinished ? 'Wyniki graczy' : 'Jak typowali inni?' ?></span>
+      <span><?= ($isFinished || $isScored) ? 'Wyniki graczy' : 'Jak typowali inni?' ?></span>
+
       <span id="arrow-<?= $match['ApiID'] ?>">›</span>
     </div>
     <div id="results-<?= $match['ApiID'] ?>" class="px-3 pb-3" style="display:none;">
