@@ -476,18 +476,36 @@ private function odswiezLiveMecze(array $mecze, int $turniejID, string $competit
     }
     if (!$needsRefresh) return;
 
-    // Jeden request do API dla wszystkich live meczów turnieju
+    $liveController = new \App\Controllers\LiveScore();
+    $today = date('Y-m-d');
+
     try {
-        $liveController = new \App\Controllers\LiveScore();
         $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $competitionApiId]);
     } catch (\Exception $e) {
+        $liveMecze = [];
         $this->common->custom_log("Live API error: " . $e->getMessage());
-        return;
     }
 
+    try {
+        $historyMecze = $liveController->getHistory([
+            'competition_id' => $competitionApiId,
+            'from' => $today,
+            'to'   => $today,
+        ]);
+    } catch (\Exception $e) {
+        $historyMecze = [];
+        $this->common->custom_log("History API error: " . $e->getMessage());
+    }
+
+    // Indeksuj po home_id_away_id -- spójne między wszystkimi endpointami
     $liveIndex = [];
     foreach ($liveMecze as $lm) {
-        $liveIndex[$lm['id']] = $lm;
+        $liveIndex[$lm['home_id'] . '_' . $lm['away_id']] = $lm;
+    }
+
+    $historyIndex = [];
+    foreach ($historyMecze as $hm) {
+        $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;
     }
 
     foreach ($startedMecze as $mecz) {
@@ -495,16 +513,26 @@ private function odswiezLiveMecze(array $mecze, int $turniejID, string $competit
         if (!file_exists($jsonPath)) continue;
 
         $existing = json_decode(file_get_contents($jsonPath), true) ?? [];
+        $key = $mecz['HomeID'] . '_' . $mecz['AwayID'];
 
-        if (isset($liveIndex[$mecz['ApiID']])) {
-            $live  = $liveIndex[$mecz['ApiID']];
-            $parts = explode('-', $live['score'] ?? '0-0');
-            $existing['status']              = 'Live';
-            $existing['minute']              = $live['time'] ?? null;
-            $existing['home_team']['score']  = trim($parts[0] ?? '0');
-            $existing['away_team']['score']  = trim($parts[1] ?? '0');
+        if (isset($historyIndex[$key])) {
+            // Mecz zakończony -- wynik z API
+            $parts = explode('-', $historyIndex[$key]['score'] ?? '0-0');
+            $existing['status']             = 'Zakonczony';
+            $existing['home_team']['score'] = trim($parts[0] ?? '0');
+            $existing['away_team']['score'] = trim($parts[1] ?? '0');
+            unset($existing['minute']);
+
+        } elseif (isset($liveIndex[$key])) {
+            // Mecz trwa -- aktualizuj wynik i minutę
+            $parts = explode('-', $liveIndex[$key]['score'] ?? '0-0');
+            $existing['status']             = 'Live';
+            $existing['minute']             = $liveIndex[$key]['time'] ?? null;
+            $existing['home_team']['score'] = trim($parts[0] ?? '0');
+            $existing['away_team']['score'] = trim($parts[1] ?? '0');
+
         } else {
-            // Nie ma w live -- sprawdź czy minęły 3h od startu
+            // Fallback: nie ma w live ani history po 3h → zakończony
             if (!empty($existing['date']) && !empty($existing['time'])) {
                 $matchTime = strtotime($existing['date'] . ' ' . $existing['time']);
                 if ($matchTime && time() > $matchTime + 10800) {

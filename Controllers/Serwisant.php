@@ -658,6 +658,32 @@ if ($this->request->getMethod() === 'POST') {
     }
 
     $data['terminarz'] = $terminarz;
+    
+    // Po pobraniu $terminarz, przed $data['terminarz'] = $terminarz:
+$liveController = new \App\Controllers\LiveScore();
+try {
+    $dzisiajHistory = $liveController->getHistory([
+        'competition_id' => $config['activeCompetitionId'],
+        'from' => date('Y-m-d'),
+        'to'   => date('Y-m-d'),
+    ]);
+    $historyIndex = [];
+    foreach ($dzisiajHistory as $hm) {
+        $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;
+    }
+} catch (\Exception $e) {
+    $historyIndex = [];
+}
+
+foreach ($terminarz as &$mecz) {
+    $key = $mecz['HomeID'] . '_' . $mecz['AwayID'];
+    if (empty($mecz['ScoreHome']) && isset($historyIndex[$key])) {
+        $parts = explode('-', $historyIndex[$key]['score'] ?? '');
+        $mecz['ScoreHome'] = trim($parts[0] ?? '');
+        $mecz['ScoreAway'] = trim($parts[1] ?? '');
+    }
+}
+
 
     return view('serwisant/meczoweCzaryMary', $data);
 }

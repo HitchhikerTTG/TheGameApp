@@ -155,4 +155,10 @@ class LiveScore extends BaseController
         echo view('live/komentarz', $data);
         echo view('live/footer', $data);
     }
+    public function getHistory(array $params = []): array {
+    $url  = $this->_buildUrl('scores/history.json', $params);
+    $data = $this->_makeRequest($url);
+    return $data['match'] ?? [];
+    }
+
 }
