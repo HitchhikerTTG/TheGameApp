@@ -673,6 +673,12 @@ try {
         'from' => date('Y-m-d'),
         'to'   => date('Y-m-d'),
     ]);
+    
+    // ← DODAJ TUTAJ:
+    log_message('debug', 'activeCompetitionId: ' . $config['activeCompetitionId']);
+    log_message('debug', 'History count: ' . count($dzisiajHistory));
+    log_message('debug', 'History keys: ' . json_encode(array_column($dzisiajHistory, 'score', 'home_id')));
+
     $historyIndex = [];
     foreach ($dzisiajHistory as $hm) {
         $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;
