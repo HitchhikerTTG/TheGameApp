@@ -42,14 +42,14 @@
   </div>
 <?php endif; ?>
 
-<div class="card match-card mb-3">
+<div class="card match-card mb-3" data-api-id="<?= $match['ApiID'] ?>">
 
   <!-- HEAD -->
   <div class="match-head d-flex align-items-center justify-content-between px-3 py-2">
     <span class="match-time">
       <?= $naszCzas ?>
       <?php if ($isLive && isset($match['details']['minute'])): ?>
-        · <span style="color:var(--ty-red)">●</span> <?= (int)$match['details']['minute'] ?>'
+        · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
       <?php elseif ($isFinished || $isScored): ?>
         · Zakończony
 

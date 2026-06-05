@@ -160,6 +160,29 @@ $(document).ready(function () {
     $el.toggle(!open);
     $arrow.text(open ? '›' : '‹');
   };
+  
+    /* ── LIVE POLL (co 60s gdy jest mecz na żywo) ──────────────── */
+  if ($('.status-live').length > 0) {
+    function refreshLiveScores() {
+      $.getJSON('/livepoll', function(data) {
+        if (!data || !data.length) return;
+        data.forEach(function(match) {
+          var $card = $('[data-api-id="' + match.apiId + '"]');
+          if (!$card.length) return;
+
+          var $scores = $card.find('.score-display.score-live');
+          if (match.homeScore !== null) $scores.eq(0).text(parseInt(match.homeScore));
+          if (match.awayScore !== null) $scores.eq(1).text(parseInt(match.awayScore));
+
+          if (match.minute) {
+            $card.find('.match-minute').text(parseInt(match.minute));
+          }
+        });
+      });
+    }
+    setInterval(refreshLiveScores, 60000);
+  }
+
 
 });
 </script>
