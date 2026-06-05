@@ -118,7 +118,7 @@ public function getNajblizszeMecze($turniejId, $onlyIds =false)
 				  ->orderBy('Date', 'asc');
 
     if ($onlyIds) {
-        $query->select('Id, ApiID');
+            $query->select('Id, ApiID, HomeID, AwayID, zakonczony');
     }
 
     return $query->findAll();
