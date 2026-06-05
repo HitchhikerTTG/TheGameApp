@@ -1,4 +1,0 @@
-public function getActiveQuestions($turniejID)
-    {
-        return $this->where(['TurniejeID' => $turniejID, 'aktywny' => 1])->findAll();
-    }
