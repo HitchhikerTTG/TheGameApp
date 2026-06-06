@@ -460,7 +460,7 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
     }
 }
 
-private function odswiezLiveMecze(array $mecze, int $turniejID, string $competitionApiId): void
+public function odswiezLiveMecze(array $mecze, int $turniejID, string $competitionApiId): void
 {
     $startedMecze = array_filter($mecze, fn($m) => !empty($m['rozpoczety']));
     if (empty($startedMecze)) return;

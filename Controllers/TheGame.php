@@ -240,6 +240,39 @@ unset($pytanie); // Unset reference
            .view('typowanie/footer');
 }
 
+    public function livePoll(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        if (!file_exists($configPath)) {
+            return $this->response->setJSON([]);
+        }
+        $config    = json_decode(file_get_contents($configPath), true);
+        $turniejID = $config['activeTournamentId'];
+        $compID    = $config['activeCompetitionId'];
+
+        $terminarz = model(\App\Models\TerminarzModel::class)->getRozpoczeteNieZakonczone($turniejID);
+
+        if (!empty($terminarz)) {
+            $service = new \App\Services\MeczService();
+            $service->odswiezLiveMecze($terminarz, (int)$turniejID, (string)$compID);
+        }
+
+        $result = [];
+        foreach ($terminarz as $mecz) {
+            $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
+            if (!file_exists($jsonPath)) continue;
+            $data = json_decode(file_get_contents($jsonPath), true) ?? [];
+            $result[] = [
+                'apiId'     => $mecz['ApiID'],
+                'homeScore' => $data['home_team']['score'] ?? null,
+                'awayScore' => $data['away_team']['score'] ?? null,
+                'minute'    => $data['minute'] ?? null,
+                'status'    => $data['status'] ?? null,
+            ];
+        }
+        return $this->response->setJSON($result);
+    }
+
         public function akordeon($turniejID = null){
         
         if ($turniejID === null) {

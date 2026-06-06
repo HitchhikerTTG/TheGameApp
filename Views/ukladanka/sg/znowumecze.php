@@ -9,9 +9,10 @@
     $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';
 
     $statusRaw  = $match['details']['status'] ?? '';
-    $isFinished = ($statusRaw === 'Zakonczony');
-    $isLive     = ($match['rozpoczety'] == 1 && !$isFinished);
-    $isUpcoming = ($match['rozpoczety'] == 0);
+    $isScored   = !empty($match['zakonczony']);
+    $isFinished = ($statusRaw === 'Zakonczony') && !$isScored;
+    $isLive     = ($match['rozpoczety'] == 1 && !$isFinished && !$isScored);
+    $isUpcoming = ($match['rozpoczety'] == 0 && !$isScored);
 
     $homeScore = $match['details']['home_team']['score'] ?? null;
     $awayScore = $match['details']['away_team']['score'] ?? null;
@@ -20,7 +21,7 @@
     $isGolden  = ($match['Id'] == $usedGoldenBall);
     $userPkt   = $match['typy']['pkt'] ?? null;
 
-    $isExact = $isFinished && $userHome !== null
+    $isExact = ($isFinished || $isScored) && $userHome !== null
         && (string)$userHome === (string)$homeScore
         && (string)$userAway === (string)$awayScore;
 
@@ -36,15 +37,15 @@
   </div>
 <?php endif; ?>
 
-<div class="card match-card mb-3">
+<div class="card match-card mb-3" data-api-id="<?= $match['ApiID'] ?>">
 
   <!-- HEAD -->
   <div class="match-head d-flex align-items-center justify-content-between px-3 py-2">
     <span class="match-time">
       <?= $naszCzas ?>
       <?php if ($isLive && isset($match['details']['minute'])): ?>
-        · <span style="color:var(--ty-red)">●</span> <?= (int)$match['details']['minute'] ?>'
-      <?php elseif ($isFinished): ?>
+        · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
+      <?php elseif ($isFinished || $isScored): ?>
         · Zakończony
       <?php endif; ?>
     </span>
@@ -52,6 +53,10 @@
       <span class="status-badge status-upcoming">Przyjmuje typy</span>
     <?php elseif ($isLive): ?>
       <span class="status-badge status-live">Na żywo</span>
+    <?php elseif ($isScored): ?>
+      <span class="status-badge status-scored">
+        <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Przeliczony' ?>
+      </span>
     <?php elseif ($isFinished): ?>
       <span class="status-badge status-done">
         <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Zakończony' ?>
@@ -133,17 +138,21 @@
         <?php endif; ?>
       </form>
 
-    <?php else: /* ── LIVE or FINISHED: wynik ── */ ?>
+    <?php else: /* ── LIVE / FINISHED / SCORED: wynik ── */ ?>
 
       <div class="d-grid mb-2" style="grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;">
         <div class="text-center">
           <div class="team-name mb-1"><?= esc($homeTeamName) ?></div>
-          <?php if ($homeScore !== null): ?><div class="ff-bebas score-display"><?= (int)$homeScore ?></div><?php endif; ?>
+          <?php if ($homeScore !== null): ?>
+            <div class="ff-bebas score-display <?= $isLive ? 'score-live' : '' ?>"><?= (int)$homeScore ?></div>
+          <?php endif; ?>
         </div>
         <div class="ff-bebas vs-div">:</div>
         <div class="text-center">
           <div class="team-name mb-1"><?= esc($awayTeamName) ?></div>
-          <?php if ($awayScore !== null): ?><div class="ff-bebas score-display"><?= (int)$awayScore ?></div><?php endif; ?>
+          <?php if ($awayScore !== null): ?>
+            <div class="ff-bebas score-display <?= $isLive ? 'score-live' : '' ?>"><?= (int)$awayScore ?></div>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -161,7 +170,7 @@
   <!-- COLLAPSE: jak typowali? -->
   <?php if ($match['rozpoczety'] && !empty($match['typyGraczy'])): ?>
     <div class="collapse-trigger" onclick="typerToggleResults(<?= $match['ApiID'] ?>)">
-      <span><?= $isFinished ? 'Wyniki graczy' : 'Jak typowali inni?' ?></span>
+      <span><?= ($isFinished || $isScored) ? 'Wyniki graczy' : 'Jak typowali inni?' ?></span>
       <span id="arrow-<?= $match['ApiID'] ?>">›</span>
     </div>
     <div id="results-<?= $match['ApiID'] ?>" class="px-3 pb-3" style="display:none;">

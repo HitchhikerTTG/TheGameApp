@@ -141,7 +141,14 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     
     // notatki
     $routes->post('AdminDash/dodajNotatke',      'AdminDash::dodajNotatke');
-$routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
+    $routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
+
+    // live poll AJAX
+    $routes->get('livepoll', 'TheGame::livePoll');
+
+    // poranny digest
+    $routes->get('hell/digest',         'AdminDash::digest');
+    $routes->post('hell/digest/wyslij', 'AdminDash::wyslijDigest');
 
 
 
