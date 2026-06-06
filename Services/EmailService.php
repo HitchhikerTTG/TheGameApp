@@ -218,6 +218,128 @@ public function sendCampaign(string $templateFile, string $subject, string $targ
     return $sent;
 }
 
+public function sendDigest(array $users, int $turniejID, string $adminKomentarz): int
+{
+    $digestService = new \App\Services\DigestService();
+    $url  = base_url('typowanie');
+    $sent = 0;
+
+    foreach ($users as $user) {
+        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz);
+        $html    = $this->buildDigestHtml($data, $url);
+        $subject = 'Dzień dobry, ' . ($user['nick'] ?? '') . '! Co w trawce piszczy?';
+
+        if ($this->postmark->sendEmail(
+            'Typer <digest@jakiwynik.com>',
+            $user['email'],
+            'wit@jakiwynik.com',
+            $subject,
+            $html,
+            '',
+            'broadcast'
+        )) {
+            $sent++;
+        }
+    }
+
+    $this->db->table('email_campaigns')->insert([
+        'template_file'    => 'digest',
+        'subject'          => 'Poranny digest ' . date('d.m.Y'),
+        'target_group'     => 'active',
+        'sent_at'          => date('Y-m-d H:i:s'),
+        'recipients_count' => $sent,
+    ]);
+
+    return $sent;
+}
+
+private function buildDigestHtml(array $data, string $url): string
+{
+    $nick = esc($data['nick']);
+
+    $komentarzHtml = '';
+    if (!empty($data['adminKomentarz'])) {
+        $komentarzHtml = '<p style="background:#f0f4ff;border-left:3px solid #4f46e5;padding:10px 14px;'
+                       . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz']) . '</p>';
+    }
+
+    // ── Wczorajsze mecze ──
+    $wczorajHtml = '';
+    if (!empty($data['wczorajMecze'])) {
+        $rows = '';
+        foreach ($data['wczorajMecze'] as $m) {
+            $wynik   = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
+            $typTxt  = $m['userHome'] !== null
+                ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' ⚽' : '')
+                : '<em style="color:#6b7280;">brak</em>';
+            $pktTxt  = $m['pkt'] > 0 ? '+' . $m['pkt'] . ' pkt' : '0 pkt';
+            $rows   .= '<tr style="border-bottom:1px solid #f3f4f6;">'
+                     . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
+                     . '<td style="padding:6px 8px;text-align:center;font-weight:700;">' . $wynik . '</td>'
+                     . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
+                     . '<td style="padding:6px 8px;text-align:center;font-weight:700;color:#4f46e5;">' . $pktTxt . '</td>'
+                     . '</tr>';
+        }
+        $sumPkt      = (int)$data['wczorajPkt'];
+        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Ostatnie wyniki</h3>'
+                     . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+                     . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
+                     . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
+                     . '<th style="padding:6px 8px;text-align:center;">Wynik</th>'
+                     . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
+                     . '<th style="padding:6px 8px;text-align:center;">Pkt</th>'
+                     . '</tr></thead><tbody>' . $rows . '</tbody></table>'
+                     . '<p style="text-align:right;font-size:13px;color:#4f46e5;font-weight:700;margin-top:6px;">'
+                     . 'Razem za te mecze: +' . $sumPkt . ' pkt</p>';
+    }
+
+    // ── Nadchodzące mecze (następne 24h) ──
+    $dzisiajHtml = '';
+    if (!empty($data['dzisiajMecze'])) {
+        $rows = '';
+        foreach ($data['dzisiajMecze'] as $m) {
+            $typTxt = $m['hasTyp']
+                ? '<strong>' . (int)$m['userHome'] . ':' . (int)$m['userAway'] . '</strong>' . ($m['isGolden'] ? ' ⚽' : '')
+                : '<a href="' . $url . '" style="color:#ef4444;font-weight:700;">Obstaw!</a>';
+            $rows  .= '<tr style="border-bottom:1px solid #f3f4f6;">'
+                    . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;">' . esc($m['naszCzas']) . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
+                    . '</tr>';
+        }
+        $dzisiajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Nadchodzące mecze (24h)</h3>'
+                     . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+                     . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
+                     . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
+                     . '<th style="padding:6px 8px;text-align:center;">Godzina</th>'
+                     . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
+                     . '</tr></thead><tbody>' . $rows . '</tbody></table>';
+    }
+
+    // ── Pytanie dnia ──
+    $pytanieHtml = '';
+    if (!empty($data['pytanie'])) {
+        $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
+                     . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;margin:0;">'
+                     . esc($data['pytanie']['tresc']) . '</p>';
+    }
+
+    return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
+         . '<body style="font-family:sans-serif;background:#f9fafb;margin:0;padding:0;">'
+         . '<div style="max-width:600px;margin:24px auto;background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.07);">'
+         . '<p style="margin:0 0 16px;font-size:16px;">Hej <strong>' . $nick . '</strong>! 👋</p>'
+         . $komentarzHtml
+         . $wczorajHtml
+         . $dzisiajHtml
+         . $pytanieHtml
+         . '<hr style="border:none;border-top:1px solid #f3f4f6;margin:24px 0;">'
+         . '<p style="font-size:12px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
+         . '<p style="font-size:11px;color:#d1d5db;margin:8px 0 0;">PS. Podoba Ci się jakiwynik.com? Postaw mi kawę ☕ → '
+         . '<a href="https://buymeacoffee.com/jakiwynik" style="color:#d1d5db;">buymeacoffee.com/jakiwynik</a></p>'
+         . '</div></body></html>';
+}
+    
+
 private function getCampaignRecipients(string $targetGroup): array
 {
     $userModel = model(UserModel::class);

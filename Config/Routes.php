@@ -127,6 +127,10 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
 
     $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dodajMnieDoTurnieju/$1/$2');
     $routes->match(['GET', 'POST'], 'serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+    
+    
+    $routes->get('hell/digest',         'AdminDash::digest');
+    $routes->post('hell/digest/wyslij', 'AdminDash::wyslijDigest');
 
     
     //zapisywanie preferencji

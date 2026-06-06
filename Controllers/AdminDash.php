@@ -692,6 +692,40 @@ public function testKampania()
     return redirect()->to('/hell/kampanie');
 }
 
+public function digest()
+{
+    $config = get_active_tournament_config();
+    return view('administracja/digest', [
+        'pageTitle'   => 'Poranny digest',
+        'config'      => $config,
+        'activeCount' => model(\App\Models\UserModel::class)
+                            ->where('PlaysTheActiveTournament', 1)
+                            ->countAllResults(),
+    ]);
+}
+
+public function wyslijDigest()
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+    $komentarz = trim(strip_tags($this->request->getPost('komentarz') ?? ''));
+
+    $users = model(\App\Models\UserModel::class)
+        ->select('uniID, nick, email')
+        ->where('PlaysTheActiveTournament', 1)
+        ->findAll();
+
+    if (empty($users)) {
+        session()->setFlashdata('fail', 'Brak aktywnych graczy w tym turnieju.');
+        return redirect()->to('/hell/digest');
+    }
+
+    $sent = (new \App\Services\EmailService())->sendDigest($users, $turniejID, $komentarz);
+    session()->setFlashdata('success', "Wysłano digest do {$sent} graczy.");
+    return redirect()->to('/hell/digest');
+}
+
+
 public function wyslijKampanie()
 {
     $db           = \Config\Database::connect();
