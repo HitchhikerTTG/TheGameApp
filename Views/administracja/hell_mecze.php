@@ -26,6 +26,21 @@
               <button class="btn btn-sm btn-primary">Zapisz</button>
             </form>
           </td>
+          <td><?php if ($m['apiScoreH'] !== null): ?>
+  <span class="text-muted small ms-2">
+    API: <?= (int)$m['apiScoreH'] ?>:<?= (int)$m['apiScoreA'] ?>
+    <?php if ($m['apiStatus'] === 'Zakonczony'): ?>
+      <span class="badge bg-success">FT</span>
+    <?php elseif ($m['apiStatus'] === 'Live'): ?>
+      <span class="badge bg-danger">Live</span>
+    <?php endif ?>
+  </span>
+  <button type="button" class="btn btn-sm btn-outline-success ms-1"
+          onclick="this.closest('form').querySelector('[name=scoreH]').value=<?= (int)$m['apiScoreH'] ?>;
+                   this.closest('form').querySelector('[name=scoreA]').value=<?= (int)$m['apiScoreA'] ?>">
+    Użyj
+  </button>
+<?php endif ?></td>
           <td><a href="<?= site_url('Serwisant/przeliczMecz/' . (int)$m['Id']) ?>" class="btn btn-sm btn-outline-secondary">Przelicz pkt</a></td>
         </tr>
         <?php endforeach ?>

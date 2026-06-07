@@ -585,14 +585,20 @@ public function mecze()
     $mecze     = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
     $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
 
-    foreach ($terminarz as &$mecz) {
-        $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
-        if (file_exists($jsonPath)) {
-            $json = json_decode(file_get_contents($jsonPath), true);
-            $mecz['ScoreHome'] = $mecz['ScoreHome'] ?? ($json['home_team']['score'] ?? null);
-            $mecz['ScoreAway'] = $mecz['ScoreAway'] ?? ($json['away_team']['score'] ?? null);
+foreach ([&$terminarz, &$wszystkie] as &$lista) {
+    foreach ($lista as &$m) {
+        $path = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
+        if (file_exists($path)) {
+            $d = json_decode(file_get_contents($path), true) ?? [];
+            $m['plHomeName']  = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
+            $m['plAwayName']  = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
+            $m['naszCzas']    = $d['naszCzas'] ?? null;
+            $m['apiScoreH']   = $d['home_team']['score'] ?? null;  // ← nowe
+            $m['apiScoreA']   = $d['away_team']['score'] ?? null;  // ← nowe
+            $m['apiStatus']   = $d['status'] ?? null;              // ← nowe
         }
     }
+}
 
     return view('administracja/hell_mecze', [
         'pageTitle' => 'Mecze',
