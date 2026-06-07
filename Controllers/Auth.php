@@ -229,17 +229,8 @@ class Auth extends BaseController
             return redirect()->back();
         }
         else
-        {
-            //$mail = \Config\Services::email();
-            //$mail->setFrom('wit@jakiwynik.com', 'Wit z JakiWynik.com');
-            //$mail->setTo($email);
-            //$mail->setSubject('Potwierdź rejestrację w Typerze JakiWynik.com');
-            //$mail->setMessage("A więc chcesz sprawdzić swoje szczęście i swoją piłkarska wiedzę? Brrrrawo Ty! \n\n Aktywuj swoje konto klikając w link: \n\n ".base_url()."/aktywuj/".$uniid."\n\n To tyle ode mnie, dziękować. \n\n May the odds be in your flavour; :) \n\n\n\n Nie chciałeś się rejestrować? Nie wiesz o co chodzi? Nie masz ochoty typować - nie przejmuj się tym mailem. Ktoś zrobił Ci psikusa, Twój mail nie jest nigdzie zapisany. Live long and prosper.");
-            //$mail->send();
-            
-
-            // WSTAW zamiast nich:
-            $tekst = "A więc chcesz sprawdzić swoje szczęście i swoją piłkarską wiedzę? Brrrrawo Ty!\n\nAktywuj swoje konto klikając w link:\n\n" . base_url() . "aktywuj/" . $uniid . "\n\nMay the odds be in your flavour :)\n\nNie chciałeś się rejestrować? Nie przejmuj się tym mailem -- ktoś zrobił Ci psikusa.";
+        {   
+            $tekst = "A więc chcesz sprawdzić swoje szczęście i swoją piłkarską wiedzę? Brrrrawo Ty!\n\nAktywuj swoje konto klikając w link:\n\n" . base_url() . "aktywuj/" . $uniid . "\n\nMay the odds be in your flavour :)\n\nNie chciałeś się rejestrować? Nie przejmuj się tym mailem, ktoś zrobił Ci psikusa.";
             (new \App\Libraries\Postmark())->sendEmail(
             'gospodarz@jakiwynik.com',
             $email,
@@ -248,7 +239,18 @@ class Auth extends BaseController
             nl2br(esc($tekst)),
             $tekst
             );
-
+            
+            (new \App\Libraries\Postmark())->sendEmail(
+            'gospodarz@jakiwynik.com',
+            'wit@jakiwynik.com',
+            'typer@jakiwynik.com',
+            'Nowa rejestracja: ' . $nick,
+            'Zarejestrował się nowy użytkownik: <strong>' . esc($nick) . '</strong><br>'
+            . 'Email: ' . esc($email) . '<br><br>'
+            . '<a href="<https://jakiwynik.com/hell/gracze>">Przypisz do klubu →</a>',
+            'Nowy użytkownik: ' . $nick . ' (' . $email . '). Przypisz do klubu: <https://jakiwynik.com/hell/gracze'>
+        );
+            
             session()->setFlashdata('success', 'Nowy użytkownik został zarejestrowany, a ja uczę się wysyłaś maila z potwierdzeniem. Jak klikniesz w link, możesz się tu potem zalogować.');
             return redirect()->to('auth');
         }
