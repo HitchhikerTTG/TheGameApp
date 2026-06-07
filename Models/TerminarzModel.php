@@ -151,8 +151,9 @@ public function getMeczeDoRozegrania($turniejID, $onlyIds = false){
 				  ->orderBy('Date', 'asc');
 
     if ($onlyIds) {
-        $query->select('Id, ApiID,Date,Time');
+        $query->select('Id, ApiID, Date, Time, HomeID, AwayID, zakonczony');
     }
+
 
     return $query->findAll();
 }
@@ -198,7 +199,8 @@ public function czyRozpoczety($gameID) {
 
     if ($result['Rozpoczety'] == 1) return 1;
 
-    $matchTime = strtotime($result['Date'] . ' ' . $result['Time']);
+    $matchTime = strtotime($result['Date'] . ' ' . $result['Time'] . ' UTC');
+
     if (time() > $matchTime) {
         $this->update($gameID, ['Rozpoczety' => 1]);
         return 1;

@@ -518,6 +518,10 @@ protected $_key;
             } else if ( $typ['HomeTyp']<$typ['AwayTyp']and($wynikHome<$wynikAway)) { $punkty=1;
             } else if ( $typ['HomeTyp']==$typ['AwayTyp']and($wynikHome==$wynikAway)) { $punkty=1;    
             }
+            // DODAĆ TUTAJ:
+            if ($typ['GoldenGame'] == 1) {
+                $punkty *= 2;
+            }
 
 //            echo "<p>Typ nr ".$typ['Id']." przewidywał ".$typ['HomeTyp']." : ".$typ['AwayTyp']." i powinnien zostać przyznane ".$punkty." punkt</p>";
             
@@ -632,7 +636,9 @@ foreach ($terminarz as &$mecz) {
 
 if ($this->request->getMethod() === 'POST') {
         if (!$this->validate($validationRules)) {
-            session()->setFlashdata('error', $validation->listErrors());
+//            session()->setFlashdata('error', $validation->listErrors());
+            session()->setFlashdata('error', $this->validator->listErrors());
+
             return redirect()->back()->withInput();
         }
 
@@ -667,6 +673,12 @@ try {
         'from' => date('Y-m-d'),
         'to'   => date('Y-m-d'),
     ]);
+    
+    // ← DODAJ TUTAJ:
+    log_message('debug', 'activeCompetitionId: ' . $config['activeCompetitionId']);
+    log_message('debug', 'History count: ' . count($dzisiajHistory));
+    log_message('debug', 'History keys: ' . json_encode(array_column($dzisiajHistory, 'score', 'home_id')));
+
     $historyIndex = [];
     foreach ($dzisiajHistory as $hm) {
         $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;

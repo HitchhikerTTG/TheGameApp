@@ -698,7 +698,9 @@ public function digest()
     return view('administracja/digest', [
         'pageTitle'   => 'Poranny digest',
         'config'      => $config,
-        'activeCount' => model(\App\Models\UserModel::class)->where('PlaysTheActiveTournament', 1)->countAllResults(),
+        'activeCount' => model(\App\Models\UserModel::class)
+                            ->where('PlaysTheActiveTournament', 1)
+                            ->countAllResults(),
     ]);
 }
 
@@ -722,6 +724,7 @@ public function wyslijDigest()
     session()->setFlashdata('success', "Wysłano digest do {$sent} graczy.");
     return redirect()->to('/hell/digest');
 }
+
 
 public function wyslijKampanie()
 {

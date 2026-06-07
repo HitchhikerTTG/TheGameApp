@@ -18,13 +18,11 @@ $fail    = $session->getFlashData('fail');
 ?>
 <?php if ($sukces): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        ✅ <?= esc($sukces) ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        ✅ <?= esc($sukces) ?> <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php elseif ($fail): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        ❌ <?= esc($fail) ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        ❌ <?= esc($fail) ?> <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif ?>
 
@@ -35,7 +33,7 @@ $fail    = $session->getFlashData('fail');
 
 <p class="text-muted small mb-4">
     Wyśle spersonalizowany email do <strong><?= (int)$activeCount ?></strong> aktywnych graczy z:
-    wynikami meczów z ostatniej doby, nadchodzącymi spotkaniami i aktywnym pytaniem.
+    wynikami meczów z ostatniej doby, nadchodzącymi spotkaniami (24h) i aktywnym pytaniem.
 </p>
 
 <div class="card border-0 shadow-sm">
@@ -49,21 +47,21 @@ $fail    = $session->getFlashData('fail');
                     <span class="text-muted fw-normal">(opcjonalny, maks. 200 znaków)</span>
                 </label>
                 <input type="text" name="komentarz" class="form-control" maxlength="200"
-                       placeholder="np. Dobry wieczór! Dziś wielkie mecze…">
+                       placeholder="np. Wieczór pełen emocji! Dziś mecz Polska–Niemcy…">
                 <div class="form-text">Pojawi się jako wyróżniony akapit na początku emaila.</div>
             </div>
 
             <div class="bg-light rounded p-3 small mb-4">
                 <div class="row mb-1">
                     <div class="col-5 text-muted">Turniej</div>
-                    <div class="col-7 fw-semibold"><?= esc($config['activeTournamentName'] ?? '—') ?></div>
+                    <div class="col-7 fw-semibold"><?= esc($config['activeTournamentName'] ?? '--') ?></div>
                 </div>
                 <div class="row mb-1">
                     <div class="col-5 text-muted">Odbiorcy</div>
-                    <div class="col-7">Gracze aktywnego turnieju <span class="badge bg-secondary"><?= (int)$activeCount ?></span></div>
+                    <div class="col-7">Aktywni gracze <span class="badge bg-secondary"><?= (int)$activeCount ?></span></div>
                 </div>
                 <div class="row">
-                    <div class="col-5 text-muted">Temat emaila</div>
+                    <div class="col-5 text-muted">Temat</div>
                     <div class="col-7">Dzień dobry, {nick}! Co w trawce piszczy?</div>
                 </div>
             </div>
@@ -77,12 +75,11 @@ $fail    = $session->getFlashData('fail');
 
 </div>
 
-<!-- Modal: potwierdzenie -->
 <div class="modal fade" id="modalPotwierdzenie" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-0 pb-0">
-                <h6 class="modal-title fw-semibold">Potwierdzenie wysyłki digestu</h6>
+                <h6 class="modal-title fw-semibold">Potwierdzenie wysyłki</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -105,6 +102,5 @@ function submitDigest() {
     document.getElementById('formDigest').submit();
 }
 </script>
-
 </body>
 </html>

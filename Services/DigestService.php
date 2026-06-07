@@ -36,6 +36,7 @@ class DigestService
 
     private function getWczorajszeMecze(array $user, int $turniejID): array
     {
+        // zakonczony=1 i data z ostatniej doby (UTC)
         $mecze = \Config\Database::connect()
             ->table('terminarz')
             ->where('TurniejID', $turniejID)
@@ -58,8 +59,8 @@ class DigestService
             $wynik[] = [
                 'homeName'  => $details['home_team']['plName'] ?? $details['home_team']['name'] ?? $mecz['HomeName'],
                 'awayName'  => $details['away_team']['plName'] ?? $details['away_team']['name'] ?? $mecz['AwayName'],
-                'homeScore' => $mecz['ScoreHome'],
-                'awayScore' => $mecz['ScoreAway'],
+                'homeScore' => (int)$mecz['ScoreHome'],
+                'awayScore' => (int)$mecz['ScoreAway'],
                 'userHome'  => $typ['HomeTyp'] ?? null,
                 'userAway'  => $typ['AwayTyp'] ?? null,
                 'pkt'       => (int)($typ['pkt'] ?? 0),
@@ -71,8 +72,17 @@ class DigestService
 
     private function getDzisiajszeMecze(array $user, int $turniejID): array
     {
-        $mecze = $this->terminarzModel->getNajblizszeMecze($turniejID);
-        $mecze = array_filter($mecze, fn($m) => empty($m['zakonczony']) && empty($m['Rozpoczety']));
+        // Mecze z kickoffem w ciągu najbliższych 24h (UTC)
+        $mecze = \Config\Database::connect()
+            ->table('terminarz')
+            ->where('TurniejID', $turniejID)
+            ->where('zakonczony', 0)
+            ->where('Rozpoczety', 0)
+            ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s'))
+            ->where("CONCAT(Date, ' ', Time) <=", date('Y-m-d H:i:s', strtotime('+24 hours')))
+            ->orderBy('Date', 'ASC')
+            ->orderBy('Time', 'ASC')
+            ->get()->getResultArray();
 
         $wynik = [];
         foreach ($mecze as $mecz) {
@@ -83,17 +93,22 @@ class DigestService
 
             $typ = $this->typyModel->getTypyByMeczIdAndUserId($mecz['Id'], $user['uniID']);
 
+            // naszCzas z JSON = czas w Europe/Warsaw (H:i:s)
+            $naszCzas = isset($details['naszCzas'])
+                ? substr($details['naszCzas'], 0, 5)
+                : substr($mecz['Time'], 0, 5) . ' UTC';
+
             $wynik[] = [
                 'homeName' => $details['home_team']['plName'] ?? $details['home_team']['name'] ?? $mecz['HomeName'],
                 'awayName' => $details['away_team']['plName'] ?? $details['away_team']['name'] ?? $mecz['AwayName'],
-                'time'     => substr($mecz['Time'], 0, 5),
+                'naszCzas' => $naszCzas,
                 'userHome' => $typ['HomeTyp'] ?? null,
                 'userAway' => $typ['AwayTyp'] ?? null,
                 'hasTyp'   => $typ !== null,
                 'isGolden' => !empty($typ['GoldenGame']),
             ];
         }
-        return array_values($wynik);
+        return $wynik;
     }
 
     private function getAktywnePytanie(int $turniejID): ?array

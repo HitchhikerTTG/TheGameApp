@@ -56,7 +56,9 @@ $routes->get('/mecze/(:num)/(:num)', 'JsonFileController::serveJson/$1/$2');
 $routes->get('/typy/(:num)', 'JsonFileController::serveTypy/$1');
 $routes->get('/zasady', 'TheGame::pokazZasady');
 $routes->get('auth', 'Auth::index');
-$routes->post('auth/loginUser', 'Auth::loginUser'); 
+$routes->post('auth/loginUser', 'Auth::loginUser');
+$routes->get('/livepoll', 'TheGame::livePoll');
+
 
 // routing bardzo explicite (związane z formularzami)
 
@@ -124,7 +126,11 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('theGame/nowyZapisTypu', 'TheGame::nowyZapisTypu');
 
     $routes->get('Profil/dodajMnieDoTurnieju/(:num)/(:num)', 'Profil::dodajMnieDoTurnieju/$1/$2');
-    $routes->match(['get', 'post'], 'serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+    $routes->match(['GET', 'POST'], 'serwisant/zapiszWynikMeczu', 'Serwisant::zapiszWynikMeczu');
+    
+    
+    $routes->get('hell/digest',         'AdminDash::digest');
+    $routes->post('hell/digest/wyslij', 'AdminDash::wyslijDigest');
 
     
     //zapisywanie preferencji

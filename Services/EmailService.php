@@ -268,9 +268,9 @@ private function buildDigestHtml(array $data, string $url): string
     if (!empty($data['wczorajMecze'])) {
         $rows = '';
         foreach ($data['wczorajMecze'] as $m) {
-            $wynik   = esc((int)$m['homeScore']) . ':' . esc((int)$m['awayScore']);
+            $wynik   = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
             $typTxt  = $m['userHome'] !== null
-                ? esc((int)$m['userHome']) . ':' . esc((int)$m['userAway']) . ($m['isGolden'] ? ' ⚽' : '')
+                ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' ⚽' : '')
                 : '<em style="color:#6b7280;">brak</em>';
             $pktTxt  = $m['pkt'] > 0 ? '+' . $m['pkt'] . ' pkt' : '0 pkt';
             $rows   .= '<tr style="border-bottom:1px solid #f3f4f6;">'
@@ -281,7 +281,7 @@ private function buildDigestHtml(array $data, string $url): string
                      . '</tr>';
         }
         $sumPkt      = (int)$data['wczorajPkt'];
-        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wczorajsze mecze</h3>'
+        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Ostatnie wyniki</h3>'
                      . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
                      . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
                      . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
@@ -293,21 +293,21 @@ private function buildDigestHtml(array $data, string $url): string
                      . 'Razem za te mecze: +' . $sumPkt . ' pkt</p>';
     }
 
-    // ── Nadchodzące mecze ──
+    // ── Nadchodzące mecze (następne 24h) ──
     $dzisiajHtml = '';
     if (!empty($data['dzisiajMecze'])) {
         $rows = '';
         foreach ($data['dzisiajMecze'] as $m) {
             $typTxt = $m['hasTyp']
-                ? '<strong>' . esc((int)$m['userHome']) . ':' . esc((int)$m['userAway']) . '</strong>' . ($m['isGolden'] ? ' ⚽' : '')
+                ? '<strong>' . (int)$m['userHome'] . ':' . (int)$m['userAway'] . '</strong>' . ($m['isGolden'] ? ' ⚽' : '')
                 : '<a href="' . $url . '" style="color:#ef4444;font-weight:700;">Obstaw!</a>';
             $rows  .= '<tr style="border-bottom:1px solid #f3f4f6;">'
                     . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;">' . esc($m['time']) . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;">' . esc($m['naszCzas']) . '</td>'
                     . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
                     . '</tr>';
         }
-        $dzisiajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Nadchodzące mecze</h3>'
+        $dzisiajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Nadchodzące mecze (24h)</h3>'
                      . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
                      . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
                      . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
@@ -320,7 +320,7 @@ private function buildDigestHtml(array $data, string $url): string
     $pytanieHtml = '';
     if (!empty($data['pytanie'])) {
         $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
-                     . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;">'
+                     . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;margin:0;">'
                      . esc($data['pytanie']['tresc']) . '</p>';
     }
 
@@ -338,6 +338,7 @@ private function buildDigestHtml(array $data, string $url): string
          . '<a href="https://buymeacoffee.com/jakiwynik" style="color:#d1d5db;">buymeacoffee.com/jakiwynik</a></p>'
          . '</div></body></html>';
 }
+    
 
 private function getCampaignRecipients(string $targetGroup): array
 {
