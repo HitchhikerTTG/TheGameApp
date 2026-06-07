@@ -5,8 +5,10 @@
     <div class="kluby">
         <?php foreach ($kluby as $klub): ?>
     <div class="klub">
-     <p><?=esc($klub['ID'])?>: <?= esc($klub['Nazwa']) ?> </p>
+    <p><?= esc($klub['id']) ?>: <?= esc($klub['Nazwa']) ?></p>
+
     </div>
     <?php endforeach; ?>
 
 <hr>
+

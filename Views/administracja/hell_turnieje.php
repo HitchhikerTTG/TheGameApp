@@ -11,11 +11,14 @@
   <div class="col-md-6">
     <?= view('administracja/dodajTurniej') ?>
     <?= view('administracja/dodajKlub') ?>
-    <?= view('administracja/listaKlubow') ?>
+    <?= view('administracja/listaKlubow', ['kluby' => $allKluby]) ?>
+
   </div>
 </div>
 
 <hr class="my-4">
 <?= view('administracja/dodajNotatke', ['allKluby' => $allKluby, 'notatki' => $notatki]) ?>
+
+
 
 <?= $this->endSection() ?>

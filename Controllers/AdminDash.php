@@ -616,7 +616,7 @@ public function mecze()
     return view('administracja/hell_mecze', [
         'pageTitle' => 'Mecze',
         'config'    => $config,
-        'mecze'     => $mecze,
+        'wszystkieMecze'     => $mecze,
         'terminarz' => $terminarz,
     ]);
 }
@@ -668,16 +668,32 @@ public function gracze()
     $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
     $usersInClubIds = array_column($usersInAnyClub, 'uniID');
     $users          = $userModel->findAll();
+    $clubs          = $klubyModel->findAll();
+
+    // Buduj $kluby z listą memberów (nick + uniID)
+    $allUsers = $userModel->select('uniID, nick')->findAll();
+    $usersByUniId = array_column($allUsers, null, 'uniID');
+
+    $kluby = $klubyModel->findAll();
+    foreach ($kluby as &$k) {
+        $memberRows  = $clubMembersModel->listClubMembers($k['id']);
+        $k['members'] = array_values(array_map(
+            fn($row) => $usersByUniId[$row['uniID']] ?? ['uniID' => $row['uniID'], 'nick' => '?'],
+            $memberRows
+        ));
+    }
 
     return view('administracja/hell_gracze', [
         'pageTitle'   => 'Gracze',
         'users'       => $users,
         'usersNoClub' => array_values(array_filter($users, fn($u) => !in_array($u['uniID'], $usersInClubIds))),
-        'clubs'       => $klubyModel->findAll(),
+        'clubs'       => $clubs,
         'clubMembers' => $clubMembersModel->getAllClubMembers(),
+        'kluby'       => $kluby,         // ← nowe
         'validation'  => \Config\Services::validation(),
     ]);
 }
+
 
 public function turnieje()
 {
