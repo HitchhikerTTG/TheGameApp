@@ -578,35 +578,41 @@ public function index()
 
 public function mecze()
 {
-    $config      = get_active_tournament_config();
-    $meczService = new MeczService();
-    $terminarzModel = model(TerminarzModel::class);
+    $config    = get_active_tournament_config();
+    $turniejID = (int)($config['activeTournamentId'] ?? 0);
 
-    $mecze     = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
-    $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
+    $terminarz    = [];
+    $wszystkieMecze = [];
 
-foreach ([&$terminarz, &$wszystkie] as &$lista) {
-    foreach ($lista as &$m) {
-        $path = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$m['ApiID']}.json";
-        if (file_exists($path)) {
-            $d = json_decode(file_get_contents($path), true) ?? [];
-            $m['plHomeName']  = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
-            $m['plAwayName']  = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
-            $m['naszCzas']    = $d['naszCzas'] ?? null;
-            $m['apiScoreH']   = $d['home_team']['score'] ?? null;  // ← nowe
-            $m['apiScoreA']   = $d['away_team']['score'] ?? null;  // ← nowe
-            $m['apiStatus']   = $d['status'] ?? null;              // ← nowe
+    if ($turniejID > 0) {
+        $terminarz      = model(\App\Models\TerminarzModel::class)
+                            ->getRozpoczeteNieZakonczone($turniejID) ?? [];
+        $wszystkieMecze = (new \App\Services\MeczService())
+                            ->getRozegraneMeczeTurnieju($turniejID) ?? [];
+
+        foreach ([&$terminarz, &$wszystkieMecze] as &$lista) {
+            foreach ($lista as &$m) {
+                $path = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
+                if (file_exists($path)) {
+                    $d = json_decode(file_get_contents($path), true) ?? [];
+                    $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
+                    $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
+                    $m['naszCzas']   = $d['naszCzas'] ?? null;
+                    $m['apiScoreH']  = $d['home_team']['score'] ?? null;
+                    $m['apiScoreA']  = $d['away_team']['score'] ?? null;
+                    $m['apiStatus']  = $d['status'] ?? null;
+                }
+            }
         }
+        unset($lista, $m);
     }
-}
 
     return view('administracja/hell_mecze', [
-        'pageTitle' => 'Mecze',
-        'config'    => $config,
-        'wszystkieMecze'     => $mecze,
-        'terminarz' => $terminarz,
+        'terminarz'      => $terminarz,
+        'wszystkieMecze' => $wszystkieMecze,
     ]);
 }
+
 
 public function pytania()
 {
