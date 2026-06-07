@@ -9,7 +9,12 @@
     <div class="card border-0 shadow-sm mb-4">
       <div class="card-header fw-semibold">Przypisz gracza do klubu</div>
       <div class="card-body">
-        <?= view('administracja/assignUserToClub') ?>
+<?= view('administracja/assignUserToClub', [
+    'users'       => $users,
+    'clubs'       => $allKluby,
+    'clubMembers' => $clubMembers,
+]) ?>
+
       </div>
     </div>
 

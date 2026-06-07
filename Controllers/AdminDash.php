@@ -665,12 +665,15 @@ public function gracze()
         $allUsers,
         fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
     ));
+    
+    $clubMembers = $clubMembersModel->getAllClubMembers();
 
     return view('administracja/hell_gracze', [
         'kluby'      => $kluby,
         'allKluby'   => $kluby,
         'users'      => $allUsers,
         'usersNoClub'=> $usersNoClub,
+        'clubMembers' => $clubMembers,
     ]);
 }
 
