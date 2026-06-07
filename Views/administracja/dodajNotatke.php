@@ -94,7 +94,7 @@ $activeConfig = get_active_tournament_config();
 </table>
 <?php endif; ?>
 
-<script src="<https://cdn.jsdelivr.net/npm/marked@9/marked.min.js>"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script>
 function notatkiPreview() {
   var src = document.getElementById('notatka-tresc').value;

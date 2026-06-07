@@ -1,73 +1,75 @@
-<!doctype html><html lang="pl">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Odpowiedzi -- Hell</title>
-  <link href="<https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css>" rel="stylesheet" crossorigin="anonymous">
-  <script src="<https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js>" crossorigin="anonymous"></script>
-  <style>body{background:#f8f9fa}.odpowiedz-row:hover{background:#f0f4ff}</style>
-</head>
-<body>
-<?= view('administracja/_navbar') ?>
-<div class="container py-3" style="max-width:700px">
+<?= $this->extend('layouts/hell') ?>
+<?= $this->section('title') ?>Odpowiedzi<?= $this->endSection() ?>
+<?= $this->section('content') ?>
 
-<?php $sukces=session()->getFlashdata('success'); ?>
-<?php if($sukces):?><div class="alert alert-success"><?= esc($sukces) ?></div><?php endif ?>
-
-<div class="d-flex align-items-baseline gap-3 mb-3">
-  <a href="/hell/pytania" class="text-muted small">← Pytania</a>
-  <h5 class="mb-0"><?= esc($pytanie['tresc']) ?></h5>
+<div class="mb-4">
+  <a href="/hell/pytania" class="btn btn-sm btn-outline-secondary mb-3">← Pytania</a>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h5 class="mb-1"><?= esc($pytanie['tresc']) ?></h5>
+      <div class="d-flex gap-3 mt-2 small">
+        <span class="text-muted">Pkt: <strong><?= (int)$pytanie['pkt'] ?></strong></span>
+        <?php if (!empty($pytanie['odpowiedz'])): ?>
+          <span class="badge bg-success align-self-center">Prawidłowa: <?= esc($pytanie['odpowiedz']) ?></span>
+        <?php else: ?>
+          <span class="text-muted">Brak zdefiniowanej prawidłowej odpowiedzi</span>
+        <?php endif ?>
+        <span class="text-muted">Ważne do: <?= esc(substr($pytanie['wazneDo'],0,16)) ?></span>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="mb-3 small text-muted">
-  <span class="badge bg-secondary">Max pkt: <?= (int)$pytanie['pkt'] ?></span>
-  <span class="ms-2">Ważne do: <?= esc($pytanie['wazneDo']) ?></span>
-</div>
-
-<div class="mb-3 d-flex gap-2">
-  <button type="button" class="btn btn-sm btn-outline-success" onclick="setAll(<?= (int)$pytanie['pkt'] ?>)">
-    ✓ Wszystkim prawidłowa (+<?= (int)$pytanie['pkt'] ?> pkt)
-  </button>
-  <button type="button" class="btn btn-sm btn-outline-danger" onclick="setAll(0)">
-    ✗ Wszystkim błędna (0 pkt)
-  </button>
-</div>
-
+<?php if (empty($odpowiedzi)): ?>
+  <div class="alert alert-info">Brak odpowiedzi na to pytanie.</div>
+<?php else: ?>
 <form method="post" action="/hell/pytania/zapiszPunkty">
   <?= csrf_field() ?>
-  <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
+  <input type="hidden" name="pytanieID" value="<?= (int)$pytanie['id'] ?>">
 
-  <?php if (empty($odpowiedzi)): ?>
-    <div class="alert alert-light text-muted">Brak odpowiedzi na to pytanie.</div>
-  <?php else: ?>
-  <div class="card border-0 shadow-sm mb-3">
-    <table class="table mb-0">
-      <thead class="table-light">
-        <tr><th class="ps-3">Nick</th><th>Odpowiedź</th><th style="width:90px">Pkt</th></tr>
-      </thead>
-      <tbody>
-        <?php foreach ($odpowiedzi as $odp): ?>
-        <tr class="odpowiedz-row">
-          <td class="ps-3 fw-semibold"><?= esc($odp['nick']) ?></td>
-          <td><?= esc($odp['odp']) ?></td>
-          <td>
-            <input type="number" name="pkt[<?= $odp['id'] ?>]"
-                   value="<?= (int)$odp['pkt'] ?>"
-                   min="0" max="<?= (int)$pytanie['pkt'] ?>"
-                   class="form-control form-control-sm pkt-input">
-          </td>
-        </tr>
-        <?php endforeach ?>
-      </tbody>
-    </table>
+  <div class="d-flex gap-2 mb-3">
+    <button type="button" class="btn btn-sm btn-success" onclick="setAll(<?= (int)$pytanie['pkt'] ?>)">
+      Zaznacz wszystkich jako poprawne (+<?= (int)$pytanie['pkt'] ?> pkt)
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-danger" onclick="setAll(0)">
+      Zaznacz wszystkich jako niepoprawne (0 pkt)
+    </button>
   </div>
-  <button type="submit" class="btn btn-primary w-100">Zapisz punkty</button>
-  <?php endif ?>
-</form>
 
-</div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light">
+          <tr><th class="ps-3">Nick</th><th>Odpowiedź</th><th style="width:120px">Pkt</th></tr>
+        </thead>
+        <tbody>
+          <?php foreach ($odpowiedzi as $odp): ?>
+          <tr>
+            <td class="ps-3 fw-semibold"><?= esc($odp['nick']) ?></td>
+            <td><?= esc($odp['odp']) ?></td>
+            <td>
+              <input type="number" name="pkt[<?= (int)$odp['id'] ?>]"
+                     value="<?= (int)$odp['pkt'] ?>" min="0" max="<?= (int)$pytanie['pkt'] ?>"
+                     class="form-control form-control-sm pkt-input">
+            </td>
+          </tr>
+          <?php endforeach ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <button type="submit" class="btn btn-primary">Zapisz punkty</button>
+  </div>
+</form>
+<?php endif ?>
+
+<?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
 <script>
 function setAll(val) {
-  document.querySelectorAll('.pkt-input').forEach(el => el.value = val);
+  document.querySelectorAll('.pkt-input').forEach(i => i.value = val);
 }
 </script>
-</body></html>
+<?= $this->endSection() ?>

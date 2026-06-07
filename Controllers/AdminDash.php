@@ -579,27 +579,20 @@ public function ukryjNotatke(int $id)
         ]);
     }
 
-public function index() {
-    $config      = get_active_tournament_config();
-    $meczService = new MeczService();
-    $turniejID   = $config['activeTournamentId'] ?? 0;
-
-    $mecze      = $turniejID ? $meczService->getRozegraneMeczeTurnieju($turniejID) : [];
-    $terminarz  = $turniejID ? model(TerminarzModel::class)->getRozpoczeteNieZakonczone($turniejID) : [];
-    $pytania    = $turniejID ? $this->getTourmanentQuestions($turniejID) : [];
-    $notatki    = $turniejID ? model(NotatkiModel::class)->getForAdmin($turniejID) : [];
-    $allKluby   = model(KlubyModel::class)->getAllClubs();
-
+public function index()
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)($config['activeTournamentId'] ?? 0);
     return view('administracja/hell_dashboard', [
-        'pageTitle'  => 'Hell Dashboard',
-        'config'     => $config,
-        'mecze'      => $mecze,
-        'terminarz'  => $terminarz,
-        'pytania'    => $pytania,
-        'notatki'    => $notatki,
-        'allKluby'   => $allKluby,
+        'config'   => $config,
+        'mecze'    => $turniejID ? (new \App\Services\MeczService())->getRozegraneMeczeTurnieju($turniejID) : [],
+        'pytania'  => $turniejID ? model(\App\Models\PytaniaModel::class)
+                                       ->where('TurniejID', $turniejID)->where('aktywne', 1)->findAll() : [],
+        'notatki'  => $turniejID ? model(\App\Models\NotatkiModel::class)->getForAdmin($turniejID) : [],
+        'allKluby' => model(\App\Models\KlubyModel::class)->getAllClubs(),
     ]);
 }
+
 
 
 public function mecze()
