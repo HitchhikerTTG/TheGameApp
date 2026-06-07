@@ -806,6 +806,70 @@ public function wyslijKampanie()
 }
 
 
+public function zapiszIPrezelicz()
+{
+    $meczId = (int)$this->request->getPost('meczId');
+    $scoreH = $this->request->getPost('scoreH');
+    $scoreA = $this->request->getPost('scoreA');
+
+    if (!$this->validate([
+        'scoreH' => 'required|is_natural',
+        'scoreA' => 'required|is_natural',
+        'meczId' => 'required|is_natural_no_zero',
+    ])) {
+        session()->setFlashdata('fail', $this->validator->listErrors());
+        return redirect()->to('/hell/mecze');
+    }
+
+    $terminarzModel = model(\App\Models\TerminarzModel::class);
+    $typyModel      = model(\App\Models\TypyModel::class);
+
+    $terminarzModel->update($meczId, [
+        'ScoreHome' => (int)$scoreH,
+        'ScoreAway' => (int)$scoreA,
+        'zakonczony' => 1,
+    ]);
+
+    // Przelicz punkty
+    $daneMeczu = $terminarzModel->getMeczById($meczId);
+    $typy      = $typyModel->getTypyByMeczId($meczId);
+
+    foreach ($typy as $typ) {
+        $pkt = 0;
+        if ($typ['HomeTyp'] == $scoreH && $typ['AwayTyp'] == $scoreA) {
+            $pkt = 3;
+        } elseif ($typ['HomeTyp'] > $typ['AwayTyp'] && $scoreH > $scoreA) {
+            $pkt = 1;
+        } elseif ($typ['HomeTyp'] < $typ['AwayTyp'] && $scoreH < $scoreA) {
+            $pkt = 1;
+        } elseif ($typ['HomeTyp'] == $typ['AwayTyp'] && $scoreH == $scoreA) {
+            $pkt = 1;
+        }
+        if ($typ['GoldenGame'] == 1) { $pkt *= 2; }
+        $typyModel->update($typ['Id'], ['pkt' => $pkt]);
+    }
+
+    // Aktualizuj JSON meczu
+    $jsonPath = WRITEPATH . "mecze/{$daneMeczu['TurniejID']}/{$daneMeczu['ApiID']}.json";
+    if (file_exists($jsonPath)) {
+        $json = json_decode(file_get_contents($jsonPath), true) ?? [];
+        $json['status']             = 'Zakonczony';
+        $json['home_team']['score'] = (int)$scoreH;
+        $json['away_team']['score'] = (int)$scoreA;
+        $json['liczbaTypow']        = count($typy);
+        file_put_contents($jsonPath, json_encode($json, JSON_PRETTY_PRINT));
+    }
+
+    // Usuń cache typów
+    $typyCache = WRITEPATH . "typy/{$meczId}.json";
+    if (file_exists($typyCache)) { unlink($typyCache); }
+
+    session()->setFlashdata('success', "Wynik {$scoreH}:{$scoreA} zapisany, punkty przeliczone.");
+    return redirect()->to('/hell/mecze');
+}
+
+
+
 
 }
 
