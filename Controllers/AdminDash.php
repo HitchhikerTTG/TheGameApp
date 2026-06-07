@@ -587,7 +587,7 @@ public function mecze()
 
 foreach ([&$terminarz, &$wszystkie] as &$lista) {
     foreach ($lista as &$m) {
-        $path = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
+        $path = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$m['ApiID']}.json";
         if (file_exists($path)) {
             $d = json_decode(file_get_contents($path), true) ?? [];
             $m['plHomeName']  = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
