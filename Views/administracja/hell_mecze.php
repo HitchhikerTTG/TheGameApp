@@ -17,31 +17,28 @@
           <td class="ps-3"><?= esc($m['plHomeName'] ?? $m['HomeName']) ?> – <?= esc($m['plAwayName'] ?? $m['AwayName']) ?></td>
           <td class="small text-muted"><?= esc(substr($m['Date'],0,10)) ?> <?= esc(substr($m['naszCzas'] ?? $m['Time'],0,5)) ?></td>
           <td>
-            <form method="post" action="<?= site_url('Serwisant/przelicz') ?>" class="d-flex gap-1 align-items-center">
-              <?= csrf_field() ?>
-              <input type="hidden" name="meczId" value="<?= (int)$m['Id'] ?>">
-              <input type="number" name="scoreH" value="<?= (int)$m['ScoreHome'] ?>" min="0" class="form-control form-control-sm" style="width:56px">
-              <span>:</span>
-              <input type="number" name="scoreA" value="<?= (int)$m['ScoreAway'] ?>" min="0" class="form-control form-control-sm" style="width:56px">
-              <button class="btn btn-sm btn-primary">Zapisz</button>
-            </form>
-          </td>
-          <td><?php if ($m['apiScoreH'] !== null): ?>
-  <span class="text-muted small ms-2">
-    API: <?= (int)$m['apiScoreH'] ?>:<?= (int)$m['apiScoreA'] ?>
-    <?php if ($m['apiStatus'] === 'Zakonczony'): ?>
-      <span class="badge bg-success">FT</span>
-    <?php elseif ($m['apiStatus'] === 'Live'): ?>
-      <span class="badge bg-danger">Live</span>
+  <form method="post" action="<?= site_url('serwisant/zapiszWynikMeczu') ?>"
+        class="d-flex gap-1 align-items-center">
+    <?= csrf_field() ?>
+    <input type="hidden" name="meczId" value="<?= (int)$m['Id'] ?>">
+    <input type="number" name="scoreH" value="<?= $m['apiScoreH'] ?? (int)$m['ScoreHome'] ?>"
+           min="0" class="form-control form-control-sm" style="width:56px">
+    <span>:</span>
+    <input type="number" name="scoreA" value="<?= $m['apiScoreA'] ?? (int)$m['ScoreAway'] ?>"
+           min="0" class="form-control form-control-sm" style="width:56px">
+    <?php if ($m['apiScoreH'] !== null): ?>
+      <span class="text-muted small">
+        (API: <?= (int)$m['apiScoreH'] ?>:<?= (int)$m['apiScoreA'] ?>)
+      </span>
     <?php endif ?>
-  </span>
-  <button type="button" class="btn btn-sm btn-outline-success ms-1"
-          onclick="this.closest('form').querySelector('[name=scoreH]').value=<?= (int)$m['apiScoreH'] ?>;
-                   this.closest('form').querySelector('[name=scoreA]').value=<?= (int)$m['apiScoreA'] ?>">
-    Użyj
-  </button>
-<?php endif ?></td>
-          <td><a href="<?= site_url('Serwisant/przeliczMecz/' . (int)$m['Id']) ?>" class="btn btn-sm btn-outline-secondary">Przelicz pkt</a></td>
+    <button class="btn btn-sm btn-primary">Zapisz</button>
+  </form>
+</td>
+<td>
+  <a href="<?= site_url('przeliczMecz/' . (int)$m['Id']) ?>"
+     class="btn btn-sm btn-outline-secondary">Przelicz pkt</a>
+</td>
+
         </tr>
         <?php endforeach ?>
       </tbody>
