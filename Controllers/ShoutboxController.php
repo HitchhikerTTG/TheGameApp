@@ -15,26 +15,27 @@ class ShoutboxController extends BaseController
                .view('ukladanka/sg/chat');
     }
 
-    public function getMessages()
-    {
-        $clubHash = session()->get('club_hash');
-        $model = new ShoutboxModel();
-        $messages = $model->getMessages($clubHash);
-
-        // Decode HTML entities
-        foreach ($messages as &$message) {
-            $message['message'] = html_entity_decode($message['message']);
-        }
-
-        return $this->response->setJSON($messages);
+public function getMessages()
+{
+    $clubHash = session()->get('club_hash');
+    if (!$clubHash) {
+        return $this->response->setJSON([]);
     }
+    $model    = new ShoutboxModel();
+    $messages = $model->getMessages($clubHash);
+    foreach ($messages as &$message) {
+        $message['message'] = html_entity_decode($message['message']);
+    }
+    return $this->response->setJSON($messages);
+}
+
 
     public function postMessage()
     {
         $forbiddenWords = include APPPATH . 'Config/forbidden_words.php';
         $emojis = ['🍔', '🍟', '🍕', '🌭', '🍿', '🥗', '🍣', '🍱', '🍩', '🍪', '🍫', '🍬', '🍰', '🎂', '🍎', '🍉', '🍇', '🍒', '🍓', '🥑', '🥥', '🍷', '🥂', '😍', '😂'];
 
-        $userId = session()->get('user_id');
+        $userId = session()->get('loggedInUser');
         $username = session()->get('username');
         $clubHash = session()->get('club_hash');
         $message = $this->request->getPost('message');
@@ -58,7 +59,7 @@ class ShoutboxController extends BaseController
         //$message = htmlentities($message);
 
         $data = [
-            'user_id' => $userId,
+            'uniID' => $userId,
             'username' => $username,
             'message' => $message,
             'club_hash' => $clubHash
