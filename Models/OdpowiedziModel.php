@@ -55,13 +55,15 @@ public function saveAnswer($data)
 }
 
 	// Funkcja do pobierania odpowiedzi na pytanie
-        public function pobierzOdpowiedziNaPytanie($pytanieID)
+    public function pobierzOdpowiedziNaPytanie($pytanieID)
     {
-        return $this->select('odpowiedzi.odp, uzytkownicy.nick')
+        return $this->select('<odpowiedzi.id>, odpowiedzi.odp, odpowiedzi.pkt, uzytkownicy.nick')
                     ->join('uzytkownicy', 'uzytkownicy.uniID = odpowiedzi.uniidOdp')
                     ->where('odpowiedzi.idPyt', $pytanieID)
+                    ->orderBy('uzytkownicy.nick', 'ASC')
                     ->findAll();
     }
+
 
 public function liczbaOdpowiedzi($userUniID) {
     return $this->where('uniidOdp', $userUniID)

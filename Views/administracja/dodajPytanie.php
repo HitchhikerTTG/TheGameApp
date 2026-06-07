@@ -19,8 +19,14 @@ $validation = \Config\Services::validation();
     <input type="text" id="tresc" name="tresc" required value="<?= old('tresc') ?>">
     <?php if ($validation->hasError('tresc')): ?>
         <div class="alert alert-danger"><?= $validation->getError('tresc') ?></div>
-    <?php endif; ?>
+    <?php endif; ?> 
     <br>
+
+    <div class="mb-3">
+      <label class="form-label">Prawidłowa odpowiedź (opcjonalnie)</label>
+      <input type="text" name="odpowiedz" class="form-control" maxlength="255"
+             placeholder="Dla Twojej referencji -- pojawi się obok pytania w panelu">
+    </div>
 
     <label for="pkt">Punkty:</label>
     <input type="number" id="pkt" name="pkt" required value="<?= old('pkt') ?>">

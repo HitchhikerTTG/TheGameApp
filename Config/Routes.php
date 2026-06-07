@@ -147,7 +147,17 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     
     // notatki
     $routes->post('AdminDash/dodajNotatke',      'AdminDash::dodajNotatke');
-$routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
+    $routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
+    
+    // porządki administracyjne
+    $routes->get('hell/mecze',                          'AdminDash::mecze');
+    $routes->get('hell/pytania',                        'AdminDash::pytania');
+    $routes->get('hell/pytania/odpowiedzi/(:num)',       'AdminDash::odpowiedziNaPytanie/$1');
+    $routes->post('hell/pytania/zapiszPunkty',          'AdminDash::zapiszPunktyOdpowiedzi');
+    $routes->get('hell/gracze',                         'AdminDash::gracze');
+    $routes->get('hell/turnieje',                       'AdminDash::turnieje');
+    $routes->match(['GET','POST'], 'wyniki',            'Serwisant::wyniki');
+
 
 
 

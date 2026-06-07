@@ -36,25 +36,6 @@ protected $_key;
         
     }
 
-    public function sendEmail()
-    {
-        $email = \Config\Services::email();
-
-        $email->setFrom('typuj@jakiwynik.com');
-        $email->setTo('nirski@re-medium.pl');
-        $email->setSubject('Mail prosto ode mnie');
-        $email->setMessage('O bardzo ważnej treści');
-
-        if ($email->send()) 
-        {
-            echo 'E-mail został wysłany pomyślnie.';
-        } 
-        else 
-        {
-            $data = $email->printDebugger(['headers']);
-            print_r($data);
-        }
-    }
     // 
     // FUNKCJE ZWIAZANE Z TURNIEJAMI
     //
@@ -598,66 +579,128 @@ public function ukryjNotatke(int $id)
         ]);
     }
 
-    public function index() {
-        // Wczytanie z pliku konfiguracyjnego json:
-        $common = new Common();
-        $tournaments = $common->loadTournaments();
-        $kluby = $this->loadClubs();
+public function index() {
+    $config      = get_active_tournament_config();
+    $meczService = new MeczService();
+    $turniejID   = $config['activeTournamentId'] ?? 0;
 
-        $meczService = new MeczService;
-//        $configPath = WRITEPATH . 'ActiveTournament.json';
-//        $config = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [
-//            'activeTournamentId' => 'Brak danych',
-//            'activeCompetitionId' => 'Brak danych',
-//            'activeTournamentName' => 'Brak danych'
-//        ];
-        $config = get_active_tournament_config();
+    $mecze      = $turniejID ? $meczService->getRozegraneMeczeTurnieju($turniejID) : [];
+    $terminarz  = $turniejID ? model(TerminarzModel::class)->getRozpoczeteNieZakonczone($turniejID) : [];
+    $pytania    = $turniejID ? $this->getTourmanentQuestions($turniejID) : [];
+    $notatki    = $turniejID ? model(NotatkiModel::class)->getForAdmin($turniejID) : [];
+    $allKluby   = model(KlubyModel::class)->getAllClubs();
+
+    return view('administracja/hell_dashboard', [
+        'pageTitle'  => 'Hell Dashboard',
+        'config'     => $config,
+        'mecze'      => $mecze,
+        'terminarz'  => $terminarz,
+        'pytania'    => $pytania,
+        'notatki'    => $notatki,
+        'allKluby'   => $allKluby,
+    ]);
+}
 
 
-        $data = [
-            'pageTitle' => 'Twoje własne osobiste piekielko',
-            'message' => $config ? 'Well... here it all starts.' : 'Nie wybrano aktywnego turnieju.',
-            'turnieje' => $tournaments,
-            'kluby' => $kluby,
-            'config' => $config,
-            'pytania' => $this->getTourmanentQuestions($config['activeTournamentId']),
-            'notatki'  => model(NotatkiModel::class)->getForAdmin($config['activeTournamentId']), 
-            'allKluby' => model(KlubyModel::class)->getAllClubs(),
+public function mecze()
+{
+    $config      = get_active_tournament_config();
+    $meczService = new MeczService();
+    $terminarzModel = model(TerminarzModel::class);
 
-        ];
+    $mecze     = $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']);
+    $terminarz = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId']);
 
-        $mecze = isset($config['activeTournamentId']) && $config['activeTournamentId'] !== 'Brak danych' 
-                 ? $meczService->getRozegraneMeczeTurnieju($config['activeTournamentId']) 
-                 : [];
-
-               
-
-        return view('administracja/index', $data)
-               .view('administracja/listaTurniejow', $data)
-               .view('administracja/dodajTurniej', $data)
-               .view('administracja/dodajKlub', $data)
-               .view('administracja/listaKlubow', $data)
-               .view('administracja/listaMeczow', ['mecze' => $mecze])
-               .view('administracja/zarzadzajPytaniami', $data)
-               .view('administracja/dodajPytanie')
-               .view('administracja/dodajNotatke', $data);               
+    foreach ($terminarz as &$mecz) {
+        $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            $json = json_decode(file_get_contents($jsonPath), true);
+            $mecz['ScoreHome'] = $mecz['ScoreHome'] ?? ($json['home_team']['score'] ?? null);
+            $mecz['ScoreAway'] = $mecz['ScoreAway'] ?? ($json['away_team']['score'] ?? null);
+        }
     }
 
-    public function pokazMiAdresy($turniejID){
-        $userModel = model(UserModel::class);
-        
-        $file = WRITEPATH . 'logs/test_log.log';
-        // Zapisujemy URL do pliku logów
-        file_put_contents($file, "wywołałem funkcję do pobrania pliku \n\n", FILE_APPEND);
+    return view('administracja/hell_mecze', [
+        'pageTitle' => 'Mecze',
+        'config'    => $config,
+        'mecze'     => $mecze,
+        'terminarz' => $terminarz,
+    ]);
+}
 
-        $lista = $userModel->getActiveUsersInTournament($turniejID);
-        
-        echo('<pre>');
-        print_r($lista);
-        echo('</pre>');
-        
-        
+public function pytania()
+{
+    $config  = get_active_tournament_config();
+    $pytania = $this->getTourmanentQuestions($config['activeTournamentId']);
+
+    return view('administracja/hell_pytania', [
+        'pageTitle' => 'Pytania',
+        'config'    => $config,
+        'pytania'   => $pytania,
+    ]);
+}
+
+public function odpowiedziNaPytanie(int $pytanieID)
+{
+    $pytanie    = model(PytaniaModel::class)->getPytanieById($pytanieID);
+    $odpowiedzi = model(\App\Models\OdpowiedziModel::class)->pobierzOdpowiedziNaPytanie($pytanieID);
+
+    return view('administracja/hell_odpowiedzi', [
+        'pageTitle'  => 'Odpowiedzi na pytanie',
+        'pytanie'    => $pytanie,
+        'odpowiedzi' => $odpowiedzi,
+    ]);
+}
+
+public function zapiszPunktyOdpowiedzi()
+{
+    $odpowiedziModel = model(\App\Models\OdpowiedziModel::class);
+    $pytanieID       = (int)$this->request->getPost('pytanieID');
+    $pktArr          = $this->request->getPost('pkt') ?? [];
+
+    foreach ($pktArr as $odpId => $pkt) {
+        $odpowiedziModel->update((int)$odpId, ['pkt' => max(0, (int)$pkt)]);
     }
+
+    session()->setFlashdata('success', 'Punkty zapisane.');
+    return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
+}
+
+public function gracze()
+{
+    $userModel        = model(UserModel::class);
+    $klubyModel       = model(KlubyModel::class);
+    $clubMembersModel = model(ClubMembersModel::class);
+
+    $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
+    $usersInClubIds = array_column($usersInAnyClub, 'uniID');
+    $users          = $userModel->findAll();
+
+    return view('administracja/hell_gracze', [
+        'pageTitle'   => 'Gracze',
+        'users'       => $users,
+        'usersNoClub' => array_values(array_filter($users, fn($u) => !in_array($u['uniID'], $usersInClubIds))),
+        'clubs'       => $klubyModel->findAll(),
+        'clubMembers' => $clubMembersModel->getAllClubMembers(),
+        'validation'  => \Config\Services::validation(),
+    ]);
+}
+
+public function turnieje()
+{
+    $config   = get_active_tournament_config();
+    $notatki  = model(NotatkiModel::class)->getForAdmin($config['activeTournamentId']);
+    $allKluby = model(KlubyModel::class)->getAllClubs();
+
+    return view('administracja/hell_turnieje', [
+        'pageTitle' => 'Turnieje',
+        'config'    => $config,
+        'turnieje'  => $this->loadTournaments(),
+        'notatki'   => $notatki,
+        'allKluby'  => $allKluby,
+    ]);
+}
+
 
 
     public function kampanie()
