@@ -87,7 +87,9 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
     $userModel->where('uniID', $loggedInUserId)->set([
         'notify_bet_saved' => (int)($this->request->getPost('notify_bet_saved') === 'on'),
         'notify_reminder'  => (int)($this->request->getPost('notify_reminder') === 'on'),
+        'digest_optout'    => (int)($this->request->getPost('digest_optout') === 'on'),
     ])->update();
+
 
     session()->setFlashdata('success', 'Preferencje zapisane.');
     return redirect()->to('/profil');

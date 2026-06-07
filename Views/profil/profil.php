@@ -62,6 +62,14 @@ echo "</pre>";
               Przypomnij mi przed meczami gdy nie obstawiłem
             </label>
           </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="digest_optout" id="digest_optout"
+              <?= $userInfo['digest_optout'] ? 'checked' : '' ?>>
+            <label class="form-check-label" for="digest_optout">
+              Nie chcę otrzymywać porannego digestu
+            </label>
+          </div>
+
           <button type="submit" class="btn btn-primary">Zapisz</button>
         </form>
       </div>

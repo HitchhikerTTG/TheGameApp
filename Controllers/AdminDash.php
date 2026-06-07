@@ -642,38 +642,38 @@ public function zapiszPunktyOdpowiedzi()
 
 public function gracze()
 {
-    $userModel        = model(UserModel::class);
-    $klubyModel       = model(KlubyModel::class);
-    $clubMembersModel = model(ClubMembersModel::class);
+    $klubyModel        = model(\App\Models\KlubyModel::class);
+    $userModel         = model(\App\Models\UserModel::class);
+    $clubMembersModel  = model(\App\Models\ClubMembersModel::class);
 
-    $usersInAnyClub = $clubMembersModel->getUsersInAnyClub();
-    $usersInClubIds = array_column($usersInAnyClub, 'uniID');
-    $users          = $userModel->findAll();
-    $clubs          = $klubyModel->findAll();
-
-    // Buduj $kluby z listą memberów (nick + uniID)
-    $allUsers = $userModel->select('uniID, nick')->findAll();
+    $allUsers    = $userModel->select('uniID, nick')->findAll();
     $usersByUniId = array_column($allUsers, null, 'uniID');
+
+    $assignedUniIds = array_column($clubMembersModel->getUsersInAnyClub(), 'uniID');
 
     $kluby = $klubyModel->findAll();
     foreach ($kluby as &$k) {
-        $memberRows  = $clubMembersModel->listClubMembers($k['id']);
+        $memberRows   = $clubMembersModel->listClubMembers($k['id']);
         $k['members'] = array_values(array_map(
             fn($row) => $usersByUniId[$row['uniID']] ?? ['uniID' => $row['uniID'], 'nick' => '?'],
             $memberRows
         ));
     }
+    unset($k);
+
+    $usersNoClub = array_values(array_filter(
+        $allUsers,
+        fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
+    ));
 
     return view('administracja/hell_gracze', [
-        'pageTitle'   => 'Gracze',
-        'users'       => $users,
-        'usersNoClub' => array_values(array_filter($users, fn($u) => !in_array($u['uniID'], $usersInClubIds))),
-        'clubs'       => $clubs,
-        'clubMembers' => $clubMembersModel->getAllClubMembers(),
-        'kluby'       => $kluby,         // ← nowe
-        'validation'  => \Config\Services::validation(),
+        'kluby'      => $kluby,
+        'allKluby'   => $kluby,
+        'users'      => $allUsers,
+        'usersNoClub'=> $usersNoClub,
     ]);
 }
+
 
 
 public function turnieje()
@@ -733,6 +733,7 @@ public function digest()
         'config'      => $config,
         'activeCount' => model(\App\Models\UserModel::class)
                             ->where('PlaysTheActiveTournament', 1)
+                             ->where('digest_optout', 0)
                             ->countAllResults(),
     ]);
 }
@@ -747,6 +748,7 @@ public function wyslijDigest()
     $users = model(\App\Models\UserModel::class)
         ->select('uniID, nick, email')
         ->where('PlaysTheActiveTournament', 1)
+        ->where('digest_optout', 0)  
         ->findAll();
 
     if (empty($users)) {
