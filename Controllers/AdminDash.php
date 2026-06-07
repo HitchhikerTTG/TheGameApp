@@ -332,90 +332,71 @@ public function loadClubs(){
 
     }
 
-            public function dodajPytanie()
-    {
-        $pytanieModel = new PytaniaModel();
-
-        $validated = $this->validate([
-            'tresc' => [
-                'rules' => 'required|min_length[3]|max_length[255]',
-                'errors' => [
-                    'required' => 'Treść pytania jest wymagana',
-                    'min_length' => 'Treść pytania musi mieć co najmniej 3 znaki',
-                    'max_length' => 'Treść pytania nie może przekraczać 255 znaków',
-                ]
+public function dodajPytanie()
+{
+    $validated = $this->validate([
+        'tresc' => [
+            'rules'  => 'required|min_length[3]|max_length[255]',
+            'errors' => [
+                'required'   => 'Treść pytania jest wymagana',
+                'min_length' => 'Treść pytania musi mieć co najmniej 3 znaki',
             ],
-            'pkt' => [
-                'rules' => 'required|is_natural',
-                'errors' => [
-                    'required' => 'Liczba punktów jest wymagana',
-                    'is_natural' => 'Liczba punktów musi być liczbą naturalną',
-                ]
+        ],
+        'pkt' => [
+            'rules'  => 'required|is_natural',
+            'errors' => [
+                'required'   => 'Liczba punktów jest wymagana',
+                'is_natural' => 'Liczba punktów musi być liczbą naturalną',
             ],
-            'wazneDo' => [
-                'rules' => 'required|valid_date[Y-m-d H:i:s]',
-                'errors' => [
-                    'required' => 'Data ważności jest wymagana',
-                    'valid_date' => 'Data ważności musi mieć format YYYY-MM-DD HH:MM:SS',
-                ]
-            ],
-            'TurniejID' => [
-                'rules' => 'required|is_natural',
-                'errors' => [
-                    'required' => 'ID turnieju jest wymagane',
-                    'is_natural' => 'ID turnieju musi być liczbą naturalną',
-                ]
-            ],
-        ]);
+        ],
+        'wazneDo' => [
+            'rules'  => 'required',
+            'errors' => ['required' => 'Data ważności jest wymagana'],
+        ],
+    ]);
 
-        if (!$validated) {
-            return view('administracja/dodajPytanie', ['validation' => $this->validator]);
-        } else {
-            $data = [
-                'tresc' => $this->request->getPost('tresc'),
-                'pkt' => $this->request->getPost('pkt'),
-                'wazneDo' => $this->request->getPost('wazneDo'),
-                'utworzone' => date('Y-m-d H:i:s'),
-                'zamkniete' => 0,
-                'TurniejID' => $this->request->getPost('TurniejID'),
-            ];
-
-            log_message('debug', 'Data to be inserted: ' . json_encode($data));
-
-            if ($pytanieModel->addQuestion($data)) {
-                session()->setFlashdata('success', 'Dodane poprawnie. <br> Czujesz moc? Chcesz dodać kolejne?');
-                return redirect()->to('/hell');
-            } else {
-                session()->setFlashdata('error', 'Wystąpił błąd podczas dodawania pytania.');
-            }
-        }
-
-        return redirect()->to('/hell');
+    if (!$validated) {
+        session()->setFlashdata('fail', $this->validator->listErrors());
+        return redirect()->to('/hell/pytania');
     }
+
+    $wazneDo = str_replace('T', ' ', $this->request->getPost('wazneDo'));
+    if (strlen($wazneDo) === 16) { $wazneDo .= ':00'; }
+
+    $config = get_active_tournament_config();
+    $data = [
+        'tresc'     => $this->request->getPost('tresc'),
+        'odpowiedz' => strip_tags($this->request->getPost('odpowiedz') ?? ''),
+        'pkt'       => $this->request->getPost('pkt'),
+        'wazneDo'   => $wazneDo,
+        'utworzone' => date('Y-m-d H:i:s'),
+        'zamkniete' => 0,
+        'TurniejID' => (int)$config['activeTournamentId'],
+    ];
+
+    if (model(PytaniaModel::class)->addQuestion($data)) {
+        session()->setFlashdata('success', 'Pytanie dodane.');
+    } else {
+        session()->setFlashdata('fail', 'Wystąpił błąd podczas dodawania pytania.');
+    }
+    return redirect()->to('/hell/pytania');
+}
+
 
         public function getTourmanentQuestions($turniejID){
         $pytaniaModel = new PytaniaModel();
         return $pytaniaModel->getPytanieByTurniejID($turniejID);
     }
 
-        public function updateQuestionStatus()
-    {
-        $pytaniaModel = new PytaniaModel();
-        $activeQuestions = $this->request->getPost('aktywne');
+public function updateQuestionStatus()
+{
+    $id   = (int)$this->request->getPost('question_id');
+    $nowy = (int)$this->request->getPost('aktywne');
+    model(PytaniaModel::class)->update($id, ['aktywne' => $nowy]);
+    session()->setFlashdata('success', 'Status pytania zaktualizowany.');
+    return redirect()->to('/hell/pytania');
+}
 
-        // Reset all questions to inactive
-        $pytaniaModel->resetAllQuestionStatuses();
-
-        // Update selected questions to active
-        if (!empty($activeQuestions)) {
-            foreach ($activeQuestions as $id) {
-                $pytaniaModel->updateQuestionStatus($id, 1);
-            }
-        }
-
-        session()->setFlashdata('success', 'Statusy pytań zostały zaktualizowane.');
-        return redirect()->to('/hell');
-    }
 
     public function dodajNotatke()
 {

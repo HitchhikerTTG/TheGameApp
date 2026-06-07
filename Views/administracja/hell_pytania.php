@@ -54,8 +54,9 @@
           <td><?= (int)$p['pkt'] ?></td>
           <td class="small"><?= esc(substr($p['wazneDo'],0,16)) ?></td>
           <td>
-            <form method="post" action="<?= site_url('AdminDash/updateQuestionStatus/'.(int)$p['id']) ?>">
+            <form method="post" action="<?= site_url('AdminDash/updateQuestionStatus') ?>">
               <?= csrf_field() ?>
+              <input type="hidden" name="question_id" value="<?= (int)$p['id'] ?>">
               <input type="hidden" name="aktywne" value="<?= $p['aktywne'] ? 0 : 1 ?>">
               <button class="btn btn-sm <?= $p['aktywne'] ? 'btn-success' : 'btn-outline-secondary' ?>">
                 <?= $p['aktywne'] ? '✓' : '–' ?>
