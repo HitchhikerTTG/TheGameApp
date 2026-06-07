@@ -149,6 +149,15 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->post('AdminDash/dodajNotatke',      'AdminDash::dodajNotatke');
     $routes->post('AdminDash/ukryjNotatke/(:num)', 'AdminDash::ukryjNotatke/$1');
 
+    // hell sub-pages
+    $routes->get('hell/mecze',                     'AdminDash::mecze');
+    $routes->get('hell/pytania',                   'AdminDash::pytania');
+    $routes->get('hell/pytania/odpowiedzi/(:num)', 'AdminDash::odpowiedziNaPytanie/$1');
+    $routes->post('hell/pytania/zapiszPunkty',     'AdminDash::zapiszPunktyOdpowiedzi');
+    $routes->get('hell/gracze',                    'AdminDash::gracze');
+    $routes->get('hell/turnieje',                  'AdminDash::turnieje');
+    $routes->match(['GET','POST'], 'wyniki',       'Serwisant::wyniki');
+
     // live poll AJAX
     $routes->get('livepoll', 'TheGame::livePoll');
 

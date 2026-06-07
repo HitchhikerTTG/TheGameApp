@@ -475,6 +475,39 @@ protected $_key;
 
     }
 
+    public function wyniki()
+    {
+        $configPath = WRITEPATH . 'ActiveTournament.json';
+        $config     = file_exists($configPath) ? json_decode(file_get_contents($configPath), true) : [];
+        $terminarzModel = model(TerminarzModel::class);
+        $terminarz  = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId'] ?? 0);
+
+        foreach ($terminarz as &$mecz) {
+            $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
+            if (file_exists($jsonPath)) {
+                $json = json_decode(file_get_contents($jsonPath), true);
+                $mecz['ScoreHome'] = $mecz['ScoreHome'] ?? ($json['home_team']['score'] ?? null);
+                $mecz['ScoreAway'] = $mecz['ScoreAway'] ?? ($json['away_team']['score'] ?? null);
+            }
+        }
+
+        if ($this->request->getMethod() === 'POST') {
+            if (!$this->validate(['H' => 'required|is_natural', 'A' => 'required|is_natural'])) {
+                session()->setFlashdata('error', $this->validator->listErrors());
+                return redirect()->back()->withInput();
+            }
+            $ktoryMecz = (int)$this->request->getPost('meczID');
+            $terminarzModel->update($ktoryMecz, [
+                'ScoreHome'  => (int)$this->request->getPost('H'),
+                'ScoreAway'  => (int)$this->request->getPost('A'),
+                'zakonczony' => 1,
+            ]);
+            return redirect()->to('/przeliczMecz/' . $ktoryMecz);
+        }
+
+        return view('wyniki/index', ['terminarz' => $terminarz]);
+    }
+
     public function policzPunktyDlaMeczu(int $mecz=1){
 
         //Co ta funkcja ma zrobić? Ma pobrać wynik meczu wskazanego w parametrze, sprawdzić, czy jest zakończony, jeśli tak, to a następnie sprawdzić, jakie punkty przypisać do typu każdego gracza, który obstawiał. 
