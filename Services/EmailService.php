@@ -218,7 +218,7 @@ public function sendCampaign(string $templateFile, string $subject, string $targ
     return $sent;
 }
 
-public function sendDigest(array $users, int $turniejID, string $adminKomentarz): int
+public function sendDigest(array $users, int $turniejID, string $adminKomentarz, string $subjectTemplate = 'Dzień dobry, {nick}! Co w trawce piszczy?'): int
 {
     $digestService = new \App\Services\DigestService();
     $url  = base_url('typowanie');
@@ -227,7 +227,7 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz)
     foreach ($users as $user) {
         $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz);
         $html    = $this->buildDigestHtml($data, $url);
-        $subject = 'Dzień dobry, ' . ($user['nick'] ?? '') . '! Co w trawce piszczy?';
+        $subject = str_replace('{nick}', $user['nick'] ?? '', $subjectTemplate);
 
         if ($this->postmark->sendEmail(
             'Typer <digest@jakiwynik.com>',
@@ -244,7 +244,7 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz)
 
     $this->db->table('email_campaigns')->insert([
         'template_file'    => 'digest',
-        'subject'          => 'Poranny digest ' . date('d.m.Y'),
+        'subject'          => $subjectTemplate,
         'target_group'     => 'active',
         'sent_at'          => date('Y-m-d H:i:s'),
         'recipients_count' => $sent,
@@ -252,6 +252,7 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz)
 
     return $sent;
 }
+
 
 private function buildDigestHtml(array $data, string $url): string
 {

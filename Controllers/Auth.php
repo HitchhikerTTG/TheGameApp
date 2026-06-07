@@ -583,7 +583,15 @@ class Auth extends BaseController
 
             // Ustaw ciasteczko
             $response = service('response');
-            $response->setCookie('remember_me', $token, 604800); // Ważność ciasteczka (604800 sekund = 1 tydzień)
+//            $response->setCookie('remember_me', $token, 604800); // Ważność ciasteczka (604800 sekund = 1 tydzień)
+            $response->setCookie([
+    'name'     => 'remember_me',
+    'value'    => $token,
+    'expire'   => 604800,
+    'httponly' => true,
+    'secure'   => true,   // tylko jeśli masz HTTPS (staging/prod = tak)
+    'samesite' => 'Lax',
+]);
             return $response;
             }
 
