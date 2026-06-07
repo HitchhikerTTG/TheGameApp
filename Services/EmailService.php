@@ -243,17 +243,29 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz,
     }
 
     // aktualizacja po błędzie
-    $this->db->table('email_campaigns')->updateOrInsert(
-        [
-            'template_file' => 'digest',
-            'target_group'  => 'active',
-        ],
-        [
+    $existing = $this->db->table('email_campaigns')
+        ->where('template_file', 'digest')
+        ->where('target_group', 'active')
+        ->get()->getRow();
+
+    if ($existing) {
+        $this->db->table('email_campaigns')
+            ->where('template_file', 'digest')
+            ->where('target_group', 'active')
+            ->update([
+                'subject'          => $subjectTemplate,
+                'sent_at'          => date('Y-m-d H:i:s'),
+                'recipients_count' => $sent,
+            ]);
+    } else {
+        $this->db->table('email_campaigns')->insert([
+            'template_file'    => 'digest',
             'subject'          => $subjectTemplate,
+            'target_group'     => 'active',
             'sent_at'          => date('Y-m-d H:i:s'),
             'recipients_count' => $sent,
-        ]
-    );
+        ]);
+    }
 
 
 
