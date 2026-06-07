@@ -247,8 +247,8 @@ class Auth extends BaseController
             'Nowa rejestracja: ' . $nick,
             'Zarejestrował się nowy użytkownik: <strong>' . esc($nick) . '</strong><br>'
             . 'Email: ' . esc($email) . '<br><br>'
-            . '<a href="<https://jakiwynik.com/hell/gracze>">Przypisz do klubu →</a>',
-            'Nowy użytkownik: ' . $nick . ' (' . $email . '). Przypisz do klubu: <https://jakiwynik.com/hell/gracze'>
+            . '<a href="https://jakiwynik.com/hell/gracze">Przypisz do klubu →</a>',
+            'Nowy użytkownik: ' . $nick . ' (' . $email . '). Przypisz do klubu:'
         );
             
             session()->setFlashdata('success', 'Nowy użytkownik został zarejestrowany, a ja uczę się wysyłaś maila z potwierdzeniem. Jak klikniesz w link, możesz się tu potem zalogować.');
