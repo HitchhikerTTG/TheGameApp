@@ -355,9 +355,9 @@ private function buildDigestHtml(array $data, string $url): string
          . $dzisiajHtml
          . $pytanieHtml
          . '<hr style="border:none;border-top:1px solid #f3f4f6;margin:24px 0;">'
-         . '<p style="font-size:12px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
-         . '<p style="font-size:11px;color:#d1d5db;margin:8px 0 0;">PS. Podoba Ci się jakiwynik.com? Postaw mi kawę ☕ → '
-         . '<a href="https://buymeacoffee.com/jakiwynik" style="color:#d1d5db;">buymeacoffee.com/jakiwynik</a></p>'
+         . '<p style="font-size:14px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
+         . '<p style="font-size:13px;color:#d1d5db;margin:8px 0 0;">PS. Jeśli dobrze się bawisz w typerze i doceniasz jak to wszystko dzoała, to będzie mi cholernie miło, jeśli postawisz mi kawę ☕ → '
+         . '<a href="https://buycoffe.to/wit" style="color:#d1d5db;">buycoffe.to/wit</a></p>'
          . '</div></body></html>';
 }
     

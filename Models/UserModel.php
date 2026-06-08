@@ -17,7 +17,7 @@ class UserModel extends Model{
         'PlaysTheActiveTournament',
     'notify_bet_saved',   // ← dodaj
     'notify_reminder',    // ← dodakj
-    'digest_optout',
+    'digest_optin',
 
     ];
 
@@ -67,7 +67,7 @@ public function setActiveTournamentFlagForUsers($userIds)
 
     public function getGameUserData($userUniId) {
         // Określenie, które pola mają zostać pobrane
-        return $this->select('id, nick, activated, PlaysTheActiveTournament, uniID, notify_bet_saved, notify_reminder, digest_optout')
+        return $this->select('id, nick, activated, PlaysTheActiveTournament, uniID, notify_bet_saved, notify_reminder, digest_optin')
 
                     ->where('uniID', $userUniId)
                     ->first();

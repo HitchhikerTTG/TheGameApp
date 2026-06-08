@@ -796,7 +796,7 @@ public function digest()
         'config'      => $config,
         'activeCount' => model(\App\Models\UserModel::class)
                             ->where('PlaysTheActiveTournament', 1)
-                             ->where('digest_optout', 0)
+                             ->where('digest_optin', 1)
                             ->countAllResults(),
     ]);
 }
@@ -811,7 +811,7 @@ public function wyslijDigest()
     $users = model(\App\Models\UserModel::class)
         ->select('uniID, nick, email')
         ->where('PlaysTheActiveTournament', 1)
-        ->where('digest_optout', 0)  
+        ->where('digest_optin', 1)  
         ->findAll();
 
     if (empty($users)) {

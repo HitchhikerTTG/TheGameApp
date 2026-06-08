@@ -63,12 +63,13 @@ echo "</pre>";
             </label>
           </div>
           <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" name="digest_optout" id="digest_optout"
-              <?= $userInfo['digest_optout'] ? 'checked' : '' ?>>
-            <label class="form-check-label" for="digest_optout">
-              Nie chcę otrzymywać porannego digestu
+            <input class="form-check-input" type="checkbox" name="digest_optin" id="digest_optin"
+              <?= $userInfo['digest_optin'] ? 'checked' : '' ?>>
+            <label class="form-check-label" for="digest_optin">
+              Chcę otrzymywać poranny digest
             </label>
           </div>
+
 
           <button type="submit" class="btn btn-primary">Zapisz</button>
         </form>
