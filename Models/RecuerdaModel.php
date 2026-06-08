@@ -23,6 +23,7 @@ class RecuerdaModel extends Model{
         if ($existingToken) {
             // Aktualizuj istniejący token
             $data = [
+                'token' => $token,
                 'expires_at' => $expiresAt,
                 'last_used' => date('Y-m-d H:i:s')
             ];
