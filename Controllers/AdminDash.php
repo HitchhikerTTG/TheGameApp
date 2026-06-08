@@ -710,7 +710,7 @@ public function zapiszPunktyOdpowiedzi()
         ->przeliczTabeleGraczy((int)($config['activeTournamentId'] ?? 0));
 
     session()->setFlashdata('success', 'Punkty zostały przeliczone.');
-    return redirect()->to('/hell/pytania/' . $pytanieID . '/odpowiedzi');
+    return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
 }
 
 
