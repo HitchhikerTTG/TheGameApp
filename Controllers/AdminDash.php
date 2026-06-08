@@ -684,22 +684,35 @@ public function odpowiedziNaPytanie(int $pytanieID)
 
 public function zapiszPunktyOdpowiedzi()
 {
-    $odpId     = (int)$this->request->getPost('odpId');
-    $correct   = (int)$this->request->getPost('correct');  // 1 lub 0
     $pytanieID = (int)$this->request->getPost('pytanieID');
+    $oceny     = $this->request->getPost('oceny') ?? [];
+
+    if ($pytanieID <= 0) {
+        session()->setFlashdata('fail', 'Nieprawidłowe ID pytania.');
+        return redirect()->back();
+    }
 
     $pytanie = model(\App\Models\PytaniaModel::class)->find($pytanieID);
-    $pkt     = $correct ? (int)$pytanie['pkt'] : 0;
+    if (!$pytanie) {
+        session()->setFlashdata('fail', 'Nie znaleziono pytania.');
+        return redirect()->back();
+    }
 
-    model(\App\Models\OdpowiedziModel::class)->update($odpId, ['pkt' => $pkt]);
+    foreach ($oceny as $odpId => $correct) {
+        $odpId = (int)$odpId;
+        if ($odpId <= 0) continue;
+        $pkt = (int)$correct ? (int)$pytanie['pkt'] : 0;
+        model(\App\Models\OdpowiedziModel::class)->update($odpId, ['pkt' => $pkt]);
+    }
 
     $config = get_active_tournament_config();
     model(\App\Models\TabelaModel::class)
         ->przeliczTabeleGraczy((int)($config['activeTournamentId'] ?? 0));
 
-    // AJAX-friendly: zwróć JSON (fetch z widoku)
-    return $this->response->setJSON(['ok' => true, 'pkt' => $pkt]);
+    session()->setFlashdata('success', 'Punkty zostały przeliczone.');
+    return redirect()->to('/hell/pytania/' . $pytanieID . '/odpowiedzi');
 }
+
 
 
 public function gracze()

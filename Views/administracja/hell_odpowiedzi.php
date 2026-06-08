@@ -48,12 +48,23 @@
   <td><?= esc($odp['nick']) ?></td>
   <td><?= esc($odp['odp']) ?></td>
   <td>
-    <button class="btn btn-sm btn-ocena <?= $odp['pkt'] > 0 ? 'btn-success' : 'btn-outline-secondary' ?>"
-            data-correct="1">✓</button>
-    <button class="btn btn-sm btn-ocena <?= $odp['pkt'] == 0 && $odp['pkt'] !== null ? 'btn-danger' : 'btn-outline-secondary' ?>"
-            data-correct="0">✗</button>
-    <span class="ms-2 small text-muted pkt-label"><?= $odp['pkt'] !== null ? $odp['pkt'].' pkt' : '--' ?></span>
-  </td>
+  <input type="hidden"
+         name="oceny[<?= (int)$odp['id'] ?>]"
+         value="<?= $odp['pkt'] > 0 ? 1 : 0 ?>">
+
+  <button type="button"
+          class="btn btn-sm btn-ocena <?= $odp['pkt'] > 0 ? 'btn-success' : 'btn-outline-secondary' ?>"
+          data-correct="1">✓</button>
+
+  <button type="button"
+          class="btn btn-sm btn-ocena <?= ($odp['pkt'] !== null && $odp['pkt'] == 0) ? 'btn-danger' : 'btn-outline-secondary' ?>"
+          data-correct="0">✗</button>
+
+  <span class="ms-2 small text-muted pkt-label">
+    <?= $odp['pkt'] !== null ? $odp['pkt'] . ' pkt' : '--' ?>
+  </span>
+</td>
+
 </tr>
 
           <?php endforeach ?>
@@ -71,53 +82,36 @@
 <?= $this->endSection() ?>
 <?= $this->section('scripts') ?>
 <script>
-function setAll(val) {
-  document.querySelectorAll('.pkt-input').forEach(i => i.value = val);
+function setAll(correct) {
+    document.querySelectorAll('tr[data-odp-id]').forEach(function (tr) {
+        applyOcena(tr, correct);
+    });
+}
+
+function applyOcena(tr, correct) {
+    // Aktualizuj hidden input
+    const input = tr.querySelector('input[type="hidden"][name^="oceny"]');
+    if (input) input.value = correct;
+
+    // Aktualizuj style przycisków
+    tr.querySelectorAll('.btn-ocena').forEach(function (b) {
+        const isThis = parseInt(b.dataset.correct, 10) === correct;
+        b.classList.toggle('btn-success',          isThis && correct === 1);
+        b.classList.toggle('btn-danger',           isThis && correct === 0);
+        b.classList.toggle('btn-outline-secondary', !isThis);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const pytanieID = <?= (int)$pytanie['id'] ?>;
-
     document.querySelectorAll('.btn-ocena').forEach(function (btn) {
         btn.addEventListener('click', function () {
-            const tr      = btn.closest('tr');
-            const odpId   = parseInt(tr.dataset.odpId, 10);
+            const tr      = btn.closest('tr[data-odp-id]');
             const correct = parseInt(btn.dataset.correct, 10);
-
-            const body = new URLSearchParams({
-                odpId:     odpId,
-                correct:   correct,
-                pytanieID: pytanieID,
-                [document.querySelector('meta[name="csrf-token-name"]').content]:
-                    document.querySelector('meta[name="csrf-hash"]').content
-            });
-
-            fetch('/hell/pytania/zapiszPunkty', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body.toString()
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.ok) {
-                    const label = tr.querySelector('.pkt-label');
-                    if (label) label.textContent = data.pkt + ' pkt';
-
-                    // Aktualizacja stylu przycisków
-                    tr.querySelectorAll('.btn-ocena').forEach(b => {
-                        b.classList.remove('btn-success', 'btn-danger', 'btn-outline-secondary');
-                        if (parseInt(b.dataset.correct, 10) === correct) {
-                            b.classList.add(correct ? 'btn-success' : 'btn-danger');
-                        } else {
-                            b.classList.add('btn-outline-secondary');
-                        }
-                    });
-                }
-            })
-            .catch(() => alert('Błąd zapisu'));
+            applyOcena(tr, correct);
         });
     });
 });
+
 
 </script>
 <?= $this->endSection() ?>
