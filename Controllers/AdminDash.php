@@ -634,8 +634,7 @@ public function mecze()
 private function _pobierzHistoryIndex(array $mecze, string $compID): array
 {
     if (empty($mecze) || empty($compID)) return [];
-    // Zbierz unikalne daty meczów
-    $daty = array_unique(array_column($mecze, 'Date'));
+    $daty  = array_unique(array_map(fn($d) => substr($d, 0, 10), array_column($mecze, 'Date')));
     $index = [];
     $liveScore = new \App\Controllers\LiveScore();
     foreach ($daty as $data) {
@@ -646,6 +645,7 @@ private function _pobierzHistoryIndex(array $mecze, string $compID): array
                 'to'   => $data,
             ]);
             foreach ($wyniki as $w) {
+                if (!isset($w['home'], $w['away'])) continue;
                 $key = $w['home']['id'] . '_' . $w['away']['id'];
                 $index[$key] = $w;
             }
@@ -655,6 +655,7 @@ private function _pobierzHistoryIndex(array $mecze, string $compID): array
     }
     return $index;
 }
+
 
 
 
@@ -723,14 +724,16 @@ public function gracze()
     unset($k);
 
     return view('administracja/hell_gracze', [
-        'kluby'       => $kluby,
-        'allKluby'    => $kluby,
-        'users'       => $allUsers,
-        'usersNoClub' => array_values(array_filter(
-            $allUsers,
-            fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
-        )),
-    ]);
+    'kluby'       => $kluby,
+    'allKluby'    => $kluby,
+    'users'       => $allUsers,
+    'clubMembers' => $clubMembersModel->getAllClubMembers(),
+    'usersNoClub' => array_values(array_filter(
+        $allUsers,
+        fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
+    )),
+]);
+
 }
 
 
