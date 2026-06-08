@@ -157,7 +157,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('hell/gracze',                         'AdminDash::gracze');
     $routes->get('hell/turnieje',                       'AdminDash::turnieje');
     $routes->match(['GET','POST'], 'wyniki',            'Serwisant::wyniki');
-
+    $routes->post('hell/mecze/zapisz',               'AdminDash::zapiszIPrezelicz');
 
     // aktualizacja
     

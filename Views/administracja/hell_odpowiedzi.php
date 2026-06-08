@@ -44,15 +44,18 @@
         </thead>
         <tbody>
           <?php foreach ($odpowiedzi as $odp): ?>
-          <tr>
-            <td class="ps-3 fw-semibold"><?= esc($odp['nick']) ?></td>
-            <td><?= esc($odp['odp']) ?></td>
-            <td>
-              <input type="number" name="pkt[<?= (int)$odp['id'] ?>]"
-                     value="<?= (int)$odp['pkt'] ?>" min="0" max="<?= (int)$pytanie['pkt'] ?>"
-                     class="form-control form-control-sm pkt-input">
-            </td>
-          </tr>
+          <tr data-odp-id="<?= $odp['id'] ?>">
+  <td><?= esc($odp['nick']) ?></td>
+  <td><?= esc($odp['odp']) ?></td>
+  <td>
+    <button class="btn btn-sm btn-ocena <?= $odp['pkt'] > 0 ? 'btn-success' : 'btn-outline-secondary' ?>"
+            data-correct="1">✓</button>
+    <button class="btn btn-sm btn-ocena <?= $odp['pkt'] == 0 && $odp['pkt'] !== null ? 'btn-danger' : 'btn-outline-secondary' ?>"
+            data-correct="0">✗</button>
+    <span class="ms-2 small text-muted pkt-label"><?= $odp['pkt'] !== null ? $odp['pkt'].' pkt' : '--' ?></span>
+  </td>
+</tr>
+
           <?php endforeach ?>
         </tbody>
       </table>

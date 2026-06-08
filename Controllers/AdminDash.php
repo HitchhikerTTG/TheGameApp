@@ -383,6 +383,7 @@ public function dodajPytanie()
 }
 
 
+
         public function getTourmanentQuestions($turniejID){
         $pytaniaModel = new PytaniaModel();
         return $pytaniaModel->getPytanieByTurniejID($turniejID);
@@ -396,6 +397,7 @@ public function updateQuestionStatus()
     session()->setFlashdata('success', 'Status pytania zaktualizowany.');
     return redirect()->to('/hell/pytania');
 }
+
 
 
     public function dodajNotatke()
@@ -502,7 +504,7 @@ public function ukryjNotatke(int $id)
             session()->setFlashdata('error', 'Nie udało się przypisać użytkownika do klubu.');
         }
 
-        return redirect()->to('/AdminDash/assignUserToClubView');
+        return redirect()->to('/hell/gracze');
     }
 
     public function assignUserToClubView() {
@@ -552,7 +554,7 @@ public function ukryjNotatke(int $id)
             } else {
                 session()->setFlashData('fail', 'Nie znaleziono użytkownika w tym klubie.');
             }
-            return redirect()->to('/AdminDash/removeUserFromClub');
+            return redirect()->to('/hell/gracze');
         }
 
         return view('administracja/removeUserFromClub', [
@@ -580,8 +582,9 @@ public function mecze()
 {
     $config    = get_active_tournament_config();
     $turniejID = (int)($config['activeTournamentId'] ?? 0);
+    $compID    = $config['activeCompetitionId'] ?? '';
 
-    $terminarz    = [];
+    $terminarz      = [];
     $wszystkieMecze = [];
 
     if ($turniejID > 0) {
@@ -590,17 +593,32 @@ public function mecze()
         $wszystkieMecze = (new \App\Services\MeczService())
                             ->getRozegraneMeczeTurnieju($turniejID) ?? [];
 
+        // Enrich z JSON + fallback do History API dla meczów bez wyniku
+        $historyIndex = $this->_pobierzHistoryIndex($terminarz, $compID);
+
         foreach ([&$terminarz, &$wszystkieMecze] as &$lista) {
             foreach ($lista as &$m) {
                 $path = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
-                if (file_exists($path)) {
-                    $d = json_decode(file_get_contents($path), true) ?? [];
-                    $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
-                    $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
-                    $m['naszCzas']   = $d['naszCzas'] ?? null;
-                    $m['apiScoreH']  = $d['home_team']['score'] ?? null;
-                    $m['apiScoreA']  = $d['away_team']['score'] ?? null;
-                    $m['apiStatus']  = $d['status'] ?? null;
+                $d = file_exists($path)
+                    ? (json_decode(file_get_contents($path), true) ?? [])
+                    : [];
+
+                $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
+                $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
+                $m['naszCzas']   = $d['naszCzas'] ?? null;
+                $m['apiScoreH']  = $d['home_team']['score'] ?? null;
+                $m['apiScoreA']  = $d['away_team']['score'] ?? null;
+                $m['apiStatus']  = $d['status'] ?? null;
+
+                // Fallback: History API
+                if ($m['apiScoreH'] === null) {
+                    $key = $m['HomeID'] . '_' . $m['AwayID'];
+                    if (isset($historyIndex[$key])) {
+                        $parts = explode(' - ', $historyIndex[$key]['scores']['ft_score'] ?? '');
+                        $m['apiScoreH'] = (int)trim($parts[0] ?? '0');
+                        $m['apiScoreA'] = (int)trim($parts[1] ?? '0');
+                        $m['apiStatus'] = 'Zakonczony';
+                    }
                 }
             }
         }
@@ -613,81 +631,108 @@ public function mecze()
     ]);
 }
 
+private function _pobierzHistoryIndex(array $mecze, string $compID): array
+{
+    if (empty($mecze) || empty($compID)) return [];
+    // Zbierz unikalne daty meczów
+    $daty = array_unique(array_column($mecze, 'Date'));
+    $index = [];
+    $liveScore = new \App\Controllers\LiveScore();
+    foreach ($daty as $data) {
+        try {
+            $wyniki = $liveScore->getHistory([
+                'competition_id' => $compID,
+                'from' => $data,
+                'to'   => $data,
+            ]);
+            foreach ($wyniki as $w) {
+                $key = $w['home']['id'] . '_' . $w['away']['id'];
+                $index[$key] = $w;
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'History API error: ' . $e->getMessage());
+        }
+    }
+    return $index;
+}
+
+
 
 public function pytania()
 {
-    $config  = get_active_tournament_config();
-    $pytania = $this->getTourmanentQuestions($config['activeTournamentId']);
-
+    $config    = get_active_tournament_config();
+    $turniejID = (int)($config['activeTournamentId'] ?? 0);
     return view('administracja/hell_pytania', [
-        'pageTitle' => 'Pytania',
-        'config'    => $config,
-        'pytania'   => $pytania,
+        'pytania' => $turniejID
+            ? model(\App\Models\PytaniaModel::class)
+                ->where('TurniejID', $turniejID)->orderBy('id', 'DESC')->findAll()
+            : [],
     ]);
 }
+
 
 public function odpowiedziNaPytanie(int $pytanieID)
 {
-    $pytanie    = model(PytaniaModel::class)->getPytanieById($pytanieID);
-    $odpowiedzi = model(\App\Models\OdpowiedziModel::class)->pobierzOdpowiedziNaPytanie($pytanieID);
-
     return view('administracja/hell_odpowiedzi', [
-        'pageTitle'  => 'Odpowiedzi na pytanie',
-        'pytanie'    => $pytanie,
-        'odpowiedzi' => $odpowiedzi,
+        'pytanie'    => model(\App\Models\PytaniaModel::class)->find($pytanieID),
+        'odpowiedzi' => model(\App\Models\OdpowiedziModel::class)
+                            ->pobierzOdpowiedziNaPytanie($pytanieID),
     ]);
 }
 
+
 public function zapiszPunktyOdpowiedzi()
 {
-    $odpowiedziModel = model(\App\Models\OdpowiedziModel::class);
-    $pytanieID       = (int)$this->request->getPost('pytanieID');
-    $pktArr          = $this->request->getPost('pkt') ?? [];
+    $odpId     = (int)$this->request->getPost('odpId');
+    $correct   = (int)$this->request->getPost('correct');  // 1 lub 0
+    $pytanieID = (int)$this->request->getPost('pytanieID');
 
-    foreach ($pktArr as $odpId => $pkt) {
-        $odpowiedziModel->update((int)$odpId, ['pkt' => max(0, (int)$pkt)]);
-    }
+    $pytanie = model(\App\Models\PytaniaModel::class)->find($pytanieID);
+    $pkt     = $correct ? (int)$pytanie['pkt'] : 0;
 
-    session()->setFlashdata('success', 'Punkty zapisane.');
-    return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
+    model(\App\Models\OdpowiedziModel::class)->update($odpId, ['pkt' => $pkt]);
+
+    $config = get_active_tournament_config();
+    model(\App\Models\TabelaModel::class)
+        ->przeliczTabeleGraczy((int)($config['activeTournamentId'] ?? 0));
+
+    // AJAX-friendly: zwróć JSON (fetch z widoku)
+    return $this->response->setJSON(['ok' => true, 'pkt' => $pkt]);
 }
+
 
 public function gracze()
 {
-    $klubyModel        = model(\App\Models\KlubyModel::class);
-    $userModel         = model(\App\Models\UserModel::class);
-    $clubMembersModel  = model(\App\Models\ClubMembersModel::class);
+    $klubyModel       = model(\App\Models\KlubyModel::class);
+    $userModel        = model(\App\Models\UserModel::class);
+    $clubMembersModel = model(\App\Models\ClubMembersModel::class);
 
-    $allUsers    = $userModel->select('uniID, nick')->findAll();
+    $allUsers     = $userModel->select('uniID, nick')->findAll();
     $usersByUniId = array_column($allUsers, null, 'uniID');
 
     $assignedUniIds = array_column($clubMembersModel->getUsersInAnyClub(), 'uniID');
 
     $kluby = $klubyModel->findAll();
     foreach ($kluby as &$k) {
-        $memberRows   = $clubMembersModel->listClubMembers($k['id']);
+        $rows = $clubMembersModel->listClubMembers($k['id']);
         $k['members'] = array_values(array_map(
-            fn($row) => $usersByUniId[$row['uniID']] ?? ['uniID' => $row['uniID'], 'nick' => '?'],
-            $memberRows
+            fn($r) => $usersByUniId[$r['uniID']] ?? ['uniID' => $r['uniID'], 'nick' => '?'],
+            $rows
         ));
     }
     unset($k);
 
-    $usersNoClub = array_values(array_filter(
-        $allUsers,
-        fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
-    ));
-    
-    $clubMembers = $clubMembersModel->getAllClubMembers();
-
     return view('administracja/hell_gracze', [
-        'kluby'      => $kluby,
-        'allKluby'   => $kluby,
-        'users'      => $allUsers,
-        'usersNoClub'=> $usersNoClub,
-        'clubMembers' => $clubMembers,
+        'kluby'       => $kluby,
+        'allKluby'    => $kluby,
+        'users'       => $allUsers,
+        'usersNoClub' => array_values(array_filter(
+            $allUsers,
+            fn($u) => !in_array($u['uniID'], $assignedUniIds, true)
+        )),
     ]);
 }
+
 
 
 
@@ -809,9 +854,6 @@ public function wyslijKampanie()
 public function zapiszIPrezelicz()
 {
     $meczId = (int)$this->request->getPost('meczId');
-    $scoreH = $this->request->getPost('scoreH');
-    $scoreA = $this->request->getPost('scoreA');
-
     if (!$this->validate([
         'scoreH' => 'required|is_natural',
         'scoreA' => 'required|is_natural',
@@ -825,26 +867,22 @@ public function zapiszIPrezelicz()
     $typyModel      = model(\App\Models\TypyModel::class);
 
     $terminarzModel->update($meczId, [
-        'ScoreHome' => (int)$scoreH,
-        'ScoreAway' => (int)$scoreA,
+        'ScoreHome'  => (int)$this->request->getPost('scoreH'),
+        'ScoreAway'  => (int)$this->request->getPost('scoreA'),
         'zakonczony' => 1,
     ]);
 
-    // Przelicz punkty
     $daneMeczu = $terminarzModel->getMeczById($meczId);
+    $scoreH    = (int)$daneMeczu['ScoreHome'];
+    $scoreA    = (int)$daneMeczu['ScoreAway'];
     $typy      = $typyModel->getTypyByMeczId($meczId);
 
     foreach ($typy as $typ) {
         $pkt = 0;
-        if ($typ['HomeTyp'] == $scoreH && $typ['AwayTyp'] == $scoreA) {
-            $pkt = 3;
-        } elseif ($typ['HomeTyp'] > $typ['AwayTyp'] && $scoreH > $scoreA) {
-            $pkt = 1;
-        } elseif ($typ['HomeTyp'] < $typ['AwayTyp'] && $scoreH < $scoreA) {
-            $pkt = 1;
-        } elseif ($typ['HomeTyp'] == $typ['AwayTyp'] && $scoreH == $scoreA) {
-            $pkt = 1;
-        }
+        if ($typ['HomeTyp'] == $scoreH && $typ['AwayTyp'] == $scoreA)      { $pkt = 3; }
+        elseif ($typ['HomeTyp'] > $typ['AwayTyp'] && $scoreH > $scoreA)    { $pkt = 1; }
+        elseif ($typ['HomeTyp'] < $typ['AwayTyp'] && $scoreH < $scoreA)    { $pkt = 1; }
+        elseif ($typ['HomeTyp'] == $typ['AwayTyp'] && $scoreH == $scoreA)  { $pkt = 1; }
         if ($typ['GoldenGame'] == 1) { $pkt *= 2; }
         $typyModel->update($typ['Id'], ['pkt' => $pkt]);
     }
@@ -853,20 +891,24 @@ public function zapiszIPrezelicz()
     $jsonPath = WRITEPATH . "mecze/{$daneMeczu['TurniejID']}/{$daneMeczu['ApiID']}.json";
     if (file_exists($jsonPath)) {
         $json = json_decode(file_get_contents($jsonPath), true) ?? [];
-        $json['status']             = 'Zakonczony';
-        $json['home_team']['score'] = (int)$scoreH;
-        $json['away_team']['score'] = (int)$scoreA;
-        $json['liczbaTypow']        = count($typy);
+        $json['status'] = 'Zakonczony';
+        $json['home_team']['score'] = $scoreH;
+        $json['away_team']['score'] = $scoreA;
+        $json['liczbaTypow'] = count($typy);
         file_put_contents($jsonPath, json_encode($json, JSON_PRETTY_PRINT));
     }
 
     // Usuń cache typów
-    $typyCache = WRITEPATH . "typy/{$meczId}.json";
-    if (file_exists($typyCache)) { unlink($typyCache); }
+    $cache = WRITEPATH . "typy/{$meczId}.json";
+    if (file_exists($cache)) { unlink($cache); }
 
-    session()->setFlashdata('success', "Wynik {$scoreH}:{$scoreA} zapisany, punkty przeliczone.");
+    // Przelicz tabelę
+    model(\App\Models\TabelaModel::class)->przeliczTabeleGraczy($daneMeczu['TurniejID']);
+
+    session()->setFlashdata('success', "Wynik {$scoreH}:{$scoreA} zapisany. Punkty i tabela przeliczone.");
     return redirect()->to('/hell/mecze');
 }
+
 
 
 
