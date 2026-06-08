@@ -612,14 +612,14 @@ public function mecze()
 
                 // Fallback: History API
                 if ($m['apiScoreH'] === null) {
-                    $key = $m['HomeID'] . '_' . $m['AwayID'];
-                    if (isset($historyIndex[$key])) {
-                        $parts = explode(' - ', $historyIndex[$key]['scores']['ft_score'] ?? '');
+                    if (isset($historyIndex[(int)$m['ApiID']])) {
+                        $parts = explode(' - ', $historyIndex[(int)$m['ApiID']]['scores']['ft_score'] ?? '');
                         $m['apiScoreH'] = (int)trim($parts[0] ?? '0');
                         $m['apiScoreA'] = (int)trim($parts[1] ?? '0');
                         $m['apiStatus'] = 'Zakonczony';
                     }
                 }
+
             }
         }
         unset($lista, $m);
@@ -645,9 +645,8 @@ private function _pobierzHistoryIndex(array $mecze, string $compID): array
                 'to'   => $data,
             ]);
             foreach ($wyniki as $w) {
-                if (!isset($w['home'], $w['away'])) continue;
-                $key = $w['home']['id'] . '_' . $w['away']['id'];
-                $index[$key] = $w;
+                if (empty($w['fixture_id'])) continue;
+                $index[(int)$w['fixture_id']] = $w;
             }
         } catch (\Exception $e) {
             log_message('error', 'History API error: ' . $e->getMessage());
@@ -655,6 +654,7 @@ private function _pobierzHistoryIndex(array $mecze, string $compID): array
     }
     return $index;
 }
+
 
 
 
