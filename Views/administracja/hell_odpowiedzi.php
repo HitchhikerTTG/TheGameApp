@@ -74,5 +74,50 @@
 function setAll(val) {
   document.querySelectorAll('.pkt-input').forEach(i => i.value = val);
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const pytanieID = <?= (int)$pytanie['id'] ?>;
+
+    document.querySelectorAll('.btn-ocena').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const tr      = btn.closest('tr');
+            const odpId   = parseInt(tr.dataset.odpId, 10);
+            const correct = parseInt(btn.dataset.correct, 10);
+
+            const body = new URLSearchParams({
+                odpId:     odpId,
+                correct:   correct,
+                pytanieID: pytanieID,
+                [document.querySelector('meta[name="csrf-token-name"]').content]:
+                    document.querySelector('meta[name="csrf-hash"]').content
+            });
+
+            fetch('/hell/pytania/zapiszPunkty', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString()
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    const label = tr.querySelector('.pkt-label');
+                    if (label) label.textContent = data.pkt + ' pkt';
+
+                    // Aktualizacja stylu przycisków
+                    tr.querySelectorAll('.btn-ocena').forEach(b => {
+                        b.classList.remove('btn-success', 'btn-danger', 'btn-outline-secondary');
+                        if (parseInt(b.dataset.correct, 10) === correct) {
+                            b.classList.add(correct ? 'btn-success' : 'btn-danger');
+                        } else {
+                            b.classList.add('btn-outline-secondary');
+                        }
+                    });
+                }
+            })
+            .catch(() => alert('Błąd zapisu'));
+        });
+    });
+});
+
 </script>
 <?= $this->endSection() ?>
