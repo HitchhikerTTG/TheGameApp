@@ -61,7 +61,7 @@
           data-correct="0">✗</button>
 
   <span class="ms-2 small text-muted pkt-label">
-    <?= $odp['pkt'] !== null ? $odp['pkt'] . ' pkt' : '--' ?>
+    <?= $odp['pkt'] !== null ? $odp['pkt'] . ' pkt' : '-' ?>
   </span>
 </td>
 

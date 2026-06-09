@@ -682,8 +682,7 @@ public function odpowiedziNaPytanie(int $pytanieID)
 }
 
 
-public function zapiszPunktyOdpowiedzi()
-{
+public function zapiszPunktyOdpowiedzi(){
     $pytanieID = (int)$this->request->getPost('pytanieID');
     $oceny     = $this->request->getPost('oceny') ?? [];
 
@@ -705,13 +704,18 @@ public function zapiszPunktyOdpowiedzi()
         model(\App\Models\OdpowiedziModel::class)->update($odpId, ['pkt' => $pkt]);
     }
 
+    // Oznacz pytanie jako zamknięte
+    model(\App\Models\PytaniaModel::class)->update($pytanieID, ['zamkniete' => 1]);
+
+    // Przelicz tabelę graczy (uwzględnia punkty za pytania przez OdpowiedziModel::punktyZaPytania)
     $config = get_active_tournament_config();
     model(\App\Models\TabelaModel::class)
         ->przeliczTabeleGraczy((int)($config['activeTournamentId'] ?? 0));
 
-    session()->setFlashdata('success', 'Punkty zostały przeliczone.');
+    session()->setFlashdata('success', 'Punkty przeliczone, pytanie zamknięte.');
     return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
 }
+
 
 
 

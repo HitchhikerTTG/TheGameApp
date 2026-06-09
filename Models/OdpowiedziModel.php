@@ -25,28 +25,31 @@ class OdpowiedziModel extends Model{
 
 	}
 	
-public function saveAnswer($data)
-    {
-        $pytanieModel = new \App\Models\PytaniaModel();
-        $pytanie = $pytanieModel->find($data['idPyt']);
-        
-        // Sprawdzenie, czy aktualny czas nie przekracza daty „ważneDo"
-        if (strtotime($pytanie['wazneDo']) < time()) {
-            session()->setFlashData('error', 'Za późno na zmianę odpowiedzi.');
-            return false; // Nie można zapisać odpowiedzi po upływie czasu ważności pytania
-        }
+public function saveAnswer($data) {
+    $pytanieModel = new \App\Models\PytaniaModel();
+    $pytanie = $pytanieModel->find($data['idPyt']);
 
-        $existingAnswer = $this->where([
-            'idPyt' => $data['idPyt'],
-            'uniidOdp' => $data['uniidOdp']
-        ])->first();
-
-        if ($existingAnswer) {
-            $data['id'] = $existingAnswer['id'];
-        }
-
-        return $this->save($data);
+    if (strtotime($pytanie['wazneDo']) < time()) {
+        session()->setFlashData('error', 'Za późno na zmianę odpowiedzi.');
+        return false;
     }
+
+    if (empty($data['TurniejID'])) {
+        $data['TurniejID'] = $pytanie['TurniejID'];
+    }
+
+    $existingAnswer = $this->where([
+        'idPyt'    => $data['idPyt'],
+        'uniidOdp' => $data['uniidOdp'],
+    ])->first();
+
+    if ($existingAnswer) {
+        $data['id'] = $existingAnswer['id'];
+    }
+
+    return $this->save($data);
+}
+
     
     public function liczbaOdpowiedziNaPytanie($pytanieID) {
     $builder = $this->builder();
