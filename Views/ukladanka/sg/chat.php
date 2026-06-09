@@ -80,8 +80,8 @@ $(document).ready(function() {
       }
 
       var newest = data[0];
-      if (lastMessageId !== <newest.id>) {
-        lastMessageId = <newest.id>;
+      if (lastMessageId !== newest.id) {
+        lastMessageId = newest.id;
         var truncated = newest.message.length > 45
           ? newest.message.substring(0, 45) + '…'
           : newest.message;
