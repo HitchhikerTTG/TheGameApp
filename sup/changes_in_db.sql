@@ -60,4 +60,4 @@ CREATE TABLE notatki (
 -- ----------------------------------------
 
 ALTER TABLE uzytkownicy
-  ADD COLUMN digest_optout TINYINT(1) NOT NULL DEFAULT 0 AFTER notify_reminder;
+  ADD COLUMN digest_optin TINYINT(1) NOT NULL DEFAULT 1 AFTER notify_reminder;
