@@ -342,7 +342,7 @@ private function buildDigestHtml(array $data, string $url): string
             $komentarzPytanieHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
                                    . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz2']) . '</p>';
         }
-            $komentarzClosingeHtml = '';
+            $komentarzClosingHtml = '';
         if (!empty($data['adminKomentarz3'])) {
             $komentarzClosingHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
                                    . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz3']) . '</p>';
