@@ -303,9 +303,9 @@ private function buildDigestHtml(array $data, string $url): string
                      . '</tr>';
         }
         $sumPkt      = (int)$data['wczorajPkt'];
-        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Mecze rozegrane w ostatnich 24h</h3>'
-                    . '<p style="font-size:14px;color:#4f46e5;font-weight:700;margin-top:6px;">'
-                     . 'Twoja zdobycz punktowa za te mecze to' . $sumPkt . ' pkt</p>'
+        $wczorajHtml ='<p style="font-size:14px;color:#4f46e5;font-weight:700;margin-top:6px;">'
+                    . 'Twoja zdobycz punktowa za ostatnie mecze to ' . $sumPkt . ' pkt</p>'
+                    . '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki z ostatnich 24h</h3>'
                      . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
                      . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
                      . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
@@ -354,7 +354,7 @@ private function buildDigestHtml(array $data, string $url): string
         $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
                      . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;margin:0;">'
                      . esc($data['pytanie']['tresc']) . '</p>'
-                     . '<p style="text-align-right"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">Możesz wciaż udzielić lub zmienić swoją odpowiedź</a></p>';
+                     . '<p style="text-align:right; font-size:12px; text-transform:uppercase"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">zapisz lub edytuj odpowiedź</a></p>';
     }
 
     return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
