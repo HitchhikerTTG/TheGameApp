@@ -159,10 +159,12 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->match(['GET','POST'], 'wyniki',            'Serwisant::wyniki');
     $routes->post('hell/mecze/zapisz',               'AdminDash::zapiszIPrezelicz');
 
+
     // aktualizacja
     
     $routes->post('hell/mecze/zapisz', 'AdminDash::zapiszIPrezelicz');
 
+    $routes->post('hell/turniej/okno24h', 'AdminDash::ustawOkno24h');
 
 
 

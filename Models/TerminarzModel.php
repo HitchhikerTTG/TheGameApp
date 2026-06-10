@@ -222,6 +222,22 @@ public function czyRozpoczety($gameID) {
         ->findAll();
 }
 
+public function getMecze24h(int $turniejId, bool $onlyIds = false): array
+{
+    $query = $this->where('TurniejID', $turniejId)
+                  ->where('zakonczony', 0)
+                  ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s', strtotime('-6 hours')))
+                  ->where("CONCAT(Date, ' ', Time) <=", date('Y-m-d H:i:s', strtotime('+24 hours')))
+                  ->orderBy('Date', 'ASC')
+                  ->orderBy('Time', 'ASC');
+
+    if ($onlyIds) {
+        $query->select('Id, ApiID, HomeID, AwayID, zakonczony');
+    }
+
+    return $query->findAll();
+}
+
 	
 
 }

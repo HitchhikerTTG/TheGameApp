@@ -68,6 +68,9 @@ class MeczService {
             case "najblizsze":
                 $lista_meczow=$this->getMeczeDnia($turniejID, true);
                 break;
+            case "najblizsze_24h":
+                $lista_meczow = $this->terminarzModel->getMecze24h($turniejID, true);
+                break;
             case "do_rozegrania":
                 $lista_meczow =$this->getMeczeTurniejuDoRozegrania($turniejID, true);
                 break;

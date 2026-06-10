@@ -10,7 +10,8 @@ class TurniejeModel extends Model{
 			'id', // lokalny 
 			'CompetitionID', //api
 			'CompetitionName',
-			'Active'
+			'Active',
+			'okno_24h'
     ];
 
 	public function znajdzLokalnyIdTurnieju($competitionId) {

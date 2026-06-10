@@ -23,6 +23,17 @@
 <p>Numer aktywnego turnieju: <?= esc($config['activeCompetitionId'] ?? 'Brak danych') ?></p>
 <p>Nazwa aktywnego turnieju: <?= esc($config['activeTournamentName'] ?? 'Brak danych') ?></p>
 
+<form method="post" action="/hell/turniej/okno24h" class="d-inline">
+    <?= csrf_field() ?>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" name="okno_24h"
+               value="1" onchange="this.form.submit()"
+               <?= $config['okno24h'] ? 'checked' : '' ?>>
+        <label class="form-check-label small">Okienko 24h zamiast „dzisiaj"</label>
+    </div>
+</form>
+
+
 <?
 ?>
 

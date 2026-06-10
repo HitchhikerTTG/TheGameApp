@@ -933,6 +933,18 @@ public function zapiszIPrezelicz()
 }
 
 
+public function ustawOkno24h()
+{
+    $okno = (int)(bool)$this->request->getPost('okno_24h');
+    $config = get_active_tournament_config();
+    model(\App\Models\TurniejeModel::class)
+        ->where('id', $config['activeTournamentId'])
+        ->set(['okno_24h' => $okno])
+        ->update();
+
+    session()->setFlashdata('success', 'Ustawienie widoku meczów zapisane.');
+    return redirect()->to('/hell/turnieje');
+}
 
 
 

@@ -61,3 +61,7 @@ CREATE TABLE notatki (
 
 ALTER TABLE uzytkownicy
   ADD COLUMN digest_optin TINYINT(1) NOT NULL DEFAULT 1 AFTER notify_reminder;
+
+ALTER TABLE turnieje
+  ADD COLUMN okno_24h TINYINT(1) NOT NULL DEFAULT 0;
+
