@@ -825,7 +825,7 @@ public function wyslijDigest()
     $turniejID = (int)$config['activeTournamentId'];
     $komentarz = trim(strip_tags($this->request->getPost('komentarz') ?? ''));
     $komentarzPytanie = trim(strip_tags($this->request->getPost('komentarzPytanie') ?? ''));
-    $komentarzPytanie =trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
+    $komentarzClosing =trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
     $subject   = trim(strip_tags($this->request->getPost('subject') ?? 'Dzień dobry, {nick}! Co w trawce piszczy?'));
 
     $users = model(\App\Models\UserModel::class)
