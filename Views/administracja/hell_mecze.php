@@ -54,7 +54,7 @@
             </form>
           </td>
           <td class="text-end pe-3 small text-muted">
-            <?= count($terminarz) ?> typujących
+            <?= (int)($m['liczbaTypow'] ?? 0) ?> typujących
           </td>
         </tr>
         <?php endforeach ?>

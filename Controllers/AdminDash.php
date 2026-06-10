@@ -609,6 +609,7 @@ public function mecze()
                 $m['apiScoreH']  = $d['home_team']['score'] ?? null;
                 $m['apiScoreA']  = $d['away_team']['score'] ?? null;
                 $m['apiStatus']  = $d['status'] ?? null;
+                $m['liczbaTypow'] = model(\App\Models\TypyModel::class)->liczbaTypowDlaMeczu((int)$m['Id']);
 
                 // Fallback: History API
                 if ($m['apiScoreH'] === null) {
