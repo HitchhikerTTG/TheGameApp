@@ -218,19 +218,19 @@ public function sendCampaign(string $templateFile, string $subject, string $targ
     return $sent;
 }
 
-public function sendDigest(array $users, int $turniejID, string $adminKomentarz, string $subjectTemplate = 'Dzień dobry, {nick}! Co w trawce piszczy?'): int
+public function sendDigest(array $users, int $turniejID, string $adminKomentarz,string $adminKomentarz2,string $adminKomentarz3, string $subjectTemplate = 'Dzień dobry, {nick}! Co w trawce piszczy?'): int
 {
     $digestService = new \App\Services\DigestService();
     $url  = base_url('typowanie');
     $sent = 0;
 
     foreach ($users as $user) {
-        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz);
+        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, string $adminKomentarz2,string $adminKomentarz3);
         $html    = $this->buildDigestHtml($data, $url);
         $subject = str_replace('{nick}', $user['nick'] ?? '', $subjectTemplate);
 
         if ($this->postmark->sendEmail(
-            'Typer <digest@jakiwynik.com>',
+            'Poranny niezbędnik typera <digest@jakiwynik.com>',
             $user['email'],
             'wit@jakiwynik.com',
             $subject,
@@ -337,6 +337,16 @@ private function buildDigestHtml(array $data, string $url): string
                      . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
                      . '</tr></thead><tbody>' . $rows . '</tbody></table>';
     }
+        $komentarzPytanieHtml = '';
+        if (!empty($data['adminKomentarz2'])) {
+            $komentarzPytanieHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
+                                   . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz2']) . '</p>';
+        }
+            $komentarzClosingeHtml = '';
+        if (!empty($data['adminKomentarz3'])) {
+            $komentarzClosingHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
+                                   . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz3']) . '</p>';
+        }
 
     // ── Pytanie dnia ──
     $pytanieHtml = '';
@@ -353,7 +363,9 @@ private function buildDigestHtml(array $data, string $url): string
          . $komentarzHtml
          . $wczorajHtml
          . $dzisiajHtml
+         . $komentarzPytanieHtml
          . $pytanieHtml
+         . $komentarzClosingHtml
          . '<hr style="border:none;border-top:1px solid #f3f4f6;margin:24px 0;">'
          . '<p style="font-size:14px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
          . '<p style="font-size:13px;color:#d1d5db;margin:8px 0 0;">PS. Jeśli dobrze się bawisz w typerze i doceniasz jak to wszystko dzoała, to będzie mi cholernie miło, jeśli postawisz mi kawę ☕ → '

@@ -824,6 +824,8 @@ public function wyslijDigest()
     $config    = get_active_tournament_config();
     $turniejID = (int)$config['activeTournamentId'];
     $komentarz = trim(strip_tags($this->request->getPost('komentarz') ?? ''));
+    $komentarzPytanie = trim(strip_tags($this->request->getPost('komentarzPytanie') ?? ''));
+    $komentarzPytanie =trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
     $subject   = trim(strip_tags($this->request->getPost('subject') ?? 'Dzień dobry, {nick}! Co w trawce piszczy?'));
 
     $users = model(\App\Models\UserModel::class)
@@ -837,7 +839,7 @@ public function wyslijDigest()
         return redirect()->to('/hell/digest');
     }
 
-    $sent = (new \App\Services\EmailService())->sendDigest($users, $turniejID, $komentarz, $subject);
+    $sent = (new \App\Services\EmailService())->sendDigest($users, $turniejID, $komentarz,$komentarzPytanie, $komentarzClosing,     $subject);
     session()->setFlashdata('success', "Wysłano digest do {$sent} graczy.");
     return redirect()->to('/hell/digest');
 }

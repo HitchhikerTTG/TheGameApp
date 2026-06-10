@@ -39,6 +39,24 @@
                        placeholder="np. Wieczór pełen emocji! Dziś mecz Polska–Niemcy…">
                 <div class="form-text">Pojawi się jako wyróżniony akapit na początku emaila.</div>
             </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    Komentarz admina
+                    <span class="text-muted fw-normal">(opcjonalny, maks. 200 znaków)</span>
+                </label>
+                <input type="text" name="komentarzPytanie" class="form-control" maxlength="200"
+                       placeholder="A tu coś o pytaniy">
+                <div class="form-text">Pojawi się jako dodatek przed pytaniem.</div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold">
+                    Komentarz admina
+                    <span class="text-muted fw-normal">(opcjonalny, maks. 200 znaków)</span>
+                </label>
+                <input type="text" name="komentarzClosing" class="form-control" maxlength="200"
+                       placeholder="czyli co podkreślisz?">
+                <div class="form-text">Co masz do powiedzenia na zakoczenie?</div>
+            </div>
 
             <div class="bg-light rounded p-3 small mb-4">
                 <div class="row mb-1">
