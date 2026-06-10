@@ -18,7 +18,7 @@ class DigestService
         $this->pytaniaModel   = model(PytaniaModel::class);
     }
 
-    public function buildForUser(array $user, int $turniejID, string $adminKomentarz): array
+    public function buildForUser(array $user, int $turniejID, string $adminKomentarz, string $adminKomentarz2, string $adminKomentarz3 ): array
     {
         $wczorajMecze = $this->getWczorajszeMecze($user, $turniejID);
         $dzisiajMecze = $this->getDzisiajszeMecze($user, $turniejID);
@@ -31,6 +31,8 @@ class DigestService
             'dzisiajMecze'  => $dzisiajMecze,
             'pytanie'       => $pytanie,
             'adminKomentarz'=> $adminKomentarz,
+            'adminKomentarz2'=> $adminKomentarz2,
+            'adminKomentarz3'=> $adminKomentarz3,
         ];
     }
 
