@@ -53,6 +53,11 @@ function initials(name) {
   return (name || '?').split(' ').map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0,2) || '??';
 }
 
+// ← ZMIANA: zastąpiono własny regex jQuery idiomem (jQuery jest załadowany w layoucie)
+function escHtml(s) {
+  return $('<div>').text(String(s)).html();
+}
+
 function typerToggleShout() {
   var feed     = document.getElementById('shoutbox-feed');
   var btn      = document.getElementById('shout-expand-btn');
@@ -65,12 +70,6 @@ function typerToggleShout() {
   if (preview)  preview.classList.toggle('d-none', isOpen);
   if (inputRow) inputRow.classList.toggle('d-none', !isOpen);
 }
-
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'"'/g,'&quot;');
-}
-
 
 $(document).ready(function() {
   var lastMessageId = null;
@@ -101,11 +100,18 @@ $(document).ready(function() {
 
       var html = '';
       data.slice().reverse().forEach(function(msg) {
+        // ← ZMIANA: dodany wewnętrzny <div> dla nicka+msg (przywrócona oryginalna struktura flex)
+        // ← ZMIANA: nick = escHtml(msg.username) zamiast displayNick (emoji tylko w avatarze)
+        // ← ZMIANA: usunięty nadmiarowy </div> na końcu
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
-          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:1.75rem;line-height:1;"' : '') + '>' + (msg.emoji ? escHtml(msg.emoji) : initials(msg.username)) + '</div>'
-          + '<div class="shout-nick">' + displayNick(msg.emoji, msg.username) + '</div>'
-          + '<div class="shout-msg">' + _emojiReplace(msg.message) + '</div>'
-          + '</div></div>';
+          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:1.75rem;line-height:1;"' : '') + '>'
+          +   (msg.emoji ? escHtml(msg.emoji) : initials(msg.username))
+          + '</div>'
+          + '<div>'
+          +   '<div class="shout-nick">' + escHtml(msg.username) + '</div>'
+          +   '<div class="shout-msg">' + _emojiReplace(msg.message) + '</div>'
+          + '</div>'
+          + '</div>';
       });
       $('#shoutbox-feed').html(html);
       var feed = document.getElementById('shoutbox-feed');
