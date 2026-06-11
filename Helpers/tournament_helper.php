@@ -41,6 +41,6 @@ function get_active_tournament_config(): array
         'activeTournamentId'   => $defaults->activeTournamentId,
         'activeTournamentName' => $defaults->activeTournamentNAME,
         'activeCompetitionId'  => null,
-        'okno24h'              => (bool)($row['okno_24h'] ?? false),  // ← nowe
+        'okno24h'              => false,  // ← nowe
     ];
 }

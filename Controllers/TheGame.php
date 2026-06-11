@@ -135,7 +135,7 @@ class TheGame extends BaseController
          . view('typowanie/footer');
     }
 
-    $filtr = !empty($config['okno24h']) ? 'najblizsze_24h' : 'najblizsze'; // bo chodzi o to, żeby było wiadomo ile meczów pokazać
+    $filtr = !empty($this->config['okno24h']) ? 'najblizsze_24h' : 'najblizsze'; // bo chodzi o to, żeby było wiadomo ile meczów pokazać
     
     $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, $filtr);
 
