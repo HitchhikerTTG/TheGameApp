@@ -98,11 +98,8 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
 
     public function zapiszEmoji()
     {
-        $loggedInUserId = session()->get('logged_in_user_uniID');
-        if (!$loggedInUserId) {
-            return redirect()->to('/auth');
-        }
-
+    $loggedInUserId = session()->get('loggedInUser');
+ 
         $emoji = mb_substr(trim($this->request->getPost('emoji') ?? ''), 0, 2);
 
         model(\App\Models\UserModel::class)
