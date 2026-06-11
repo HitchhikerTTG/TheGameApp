@@ -25,12 +25,23 @@
   var filtr        = 'punkty';
   var skrocony     = true;
 
+  // ← NOWE: escHtml przez natywny DOM, displayNick z separatorem niełamliwym
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+  function displayNick(emoji, nick) {
+    return (emoji ? escHtml(emoji) + '\u00a0' : '') + escHtml(nick);
+  }
+
   function ustalPozycje(dane, f) {
     var sorted = dane.slice().sort(function(a, b) { return b[f] - a[f]; });
     var pos = 1;
     return sorted.map(function(g, i) {
       if (i > 0 && g[f] !== sorted[i-1][f]) pos = i + 1;
-      return { uid: g.uid, nick: g.nick, punkty: g[f], pozycja: pos };
+      // ← NOWE: emoji przekazywane dalej, inaczej displayNick zawsze dostaje undefined
+      return { uid: g.uid, nick: g.nick, emoji: g.emoji || '', punkty: g[f], pozycja: pos };
     });
   }
 
@@ -50,7 +61,6 @@
         + '<div class="ff-bebas lb-pos ' + medalClass(g.pozycja) + '">' + g.pozycja + '</div>'
         + '<div class="lb-nick' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
         + displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</div>'
-        
         + '<div class="ff-bebas lb-pts' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
         + g.punkty + '</div></div>';
     });
