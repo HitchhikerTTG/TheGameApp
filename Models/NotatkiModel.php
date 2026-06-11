@@ -8,7 +8,7 @@ class NotatkiModel extends Model
     protected $table      = 'notatki';
     protected $primaryKey = 'id';
     protected $useTimestamps  = false;
-    protected $allowedFields  = ['tresc', 'opublikowana', 'TurniejID', 'KlubID'];
+    protected $allowedFields  = ['tresc', 'opublikowana', 'TurniejID', 'KlubID', 'wyklucz_KlubID'];
 
     public function getLatestPublished(int $turniejID, ?int $klubID, int $limit = 10): array
     {
@@ -19,6 +19,11 @@ class NotatkiModel extends Model
                             ->orWhere('KlubID', $klubID)
                         ->groupEnd()
                         ->orderBy('created_at', 'DESC');
+                        
+        if ($klubID !== null) {
+            $builder->where('(wyklucz_KlubID IS NULL OR wyklucz_KlubID != ' . (int)$klubID . ')');
+}
+ 
 
         return $builder->findAll($limit);
     }

@@ -422,11 +422,13 @@ public function updateQuestionStatus()
     }
 
     $klubIDRaw = $this->request->getPost('KlubID');
+    $wyklucz = $this->request->getPost('wyklucz_KlubID');
     $data = [
         'tresc'        => $this->request->getPost('tresc'),
         'opublikowana' => (int)($this->request->getPost('opublikowana') ?? 0),
         'TurniejID'    => (int)$config['activeTournamentId'],
         'KlubID'       => ($klubIDRaw !== '' && $klubIDRaw !== null) ? (int)$klubIDRaw : null,
+        'wyklucz_KlubID'=>!empty($wyklucz) ? (int)$wyklucz : null,
     ];
 
     if ($notatkiModel->addNotatka($data)) {

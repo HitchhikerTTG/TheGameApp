@@ -32,7 +32,18 @@ $activeConfig = get_active_tournament_config();
           <?php endforeach; ?>
         </select>
       </div>
-
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Wyklucz klub
+            <span class="text-muted fw-normal small">(opcjonalne)</span>
+        </label>
+        <select name="wyklucz_KlubID" class="form-select">
+            <option value="">Brak wykluczeń</option>
+            <?php foreach ($allKluby as $k): ?>
+                <option value="<?= (int)$k['id'] ?>"><?= esc($k['Nazwa']) ?></option>
+            <?php endforeach ?>
+        </select>
+     </div>
+  
       <div class="mb-3 form-check">
         <input type="checkbox" class="form-check-input" id="notatka-pub"
                name="opublikowana" value="1" checked>

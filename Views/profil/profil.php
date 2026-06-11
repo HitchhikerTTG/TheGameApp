@@ -52,21 +52,21 @@ echo "</pre>";
             <input class="form-check-input" type="checkbox" name="notify_bet_saved" id="notify_bet_saved"
               <?= $userInfo['notify_bet_saved'] ? 'checked' : '' ?>>
             <label class="form-check-label" for="notify_bet_saved">
-              Powiadom mnie gdy mój typ zostanie zapisany
+              Powiadom mnie, gdy mój typ zostanie zapisany
             </label>
           </div>
           <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" name="notify_reminder" id="notify_reminder"
               <?= $userInfo['notify_reminder'] ? 'checked' : '' ?>>
             <label class="form-check-label" for="notify_reminder">
-              Przypomnij mi przed meczami gdy nie obstawiłem
+              Przypomnij mi przed meczami, gdy nie obstawiłem wyniku (codziennie o godzinie 17)
             </label>
           </div>
           <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" name="digest_optin" id="digest_optin"
               <?= $userInfo['digest_optin'] ? 'checked' : '' ?>>
             <label class="form-check-label" for="digest_optin">
-              Chcę otrzymywać poranny digest
+              Chcę otrzymywać poranny niezbędnik typera (wysyłany codziennie rano)
             </label>
           </div>
 
