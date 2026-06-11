@@ -104,7 +104,7 @@ $(document).ready(function() {
         // ← ZMIANA: nick = escHtml(msg.username) zamiast displayNick (emoji tylko w avatarze)
         // ← ZMIANA: usunięty nadmiarowy </div> na końcu
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
-          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:1.75rem;line-height:1;"' : '') + '>'
+          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:2rem;line-height:1;"' : '') + '>'
           +   (msg.emoji ? escHtml(msg.emoji) : initials(msg.username))
           + '</div>'
           + '<div>'
