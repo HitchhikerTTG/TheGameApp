@@ -91,6 +91,7 @@ $(document).ready(function() {
           ? newest.message.substring(0, 45) + '…'
           : newest.message;
         $('#shout-preview-avatar').text(newest.emoji || initials(newest.username));
+        $('#shout-preview-avatar').text(newest.emoji || initials(newest.username)).css(newest.emoji ? { 'font-size': '2.25rem', 'line-height': '1' } : { 'font-size': '','line-height': ''});
         $('#shout-preview-nick').text(newest.username);
         $('#shout-preview-msg').html(_emojiReplace(truncated));
         if (newest.created_at) {
@@ -104,7 +105,7 @@ $(document).ready(function() {
         // ← ZMIANA: nick = escHtml(msg.username) zamiast displayNick (emoji tylko w avatarze)
         // ← ZMIANA: usunięty nadmiarowy </div> na końcu
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
-          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:2rem;line-height:1;"' : '') + '>'
+          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:2.25rem;line-height:1;"' : '') + '>'
           +   (msg.emoji ? escHtml(msg.emoji) : initials(msg.username))
           + '</div>'
           + '<div>'
