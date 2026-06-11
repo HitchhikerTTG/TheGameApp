@@ -37,7 +37,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-js/3.7.0/emoji.min.js"></script>
 <script>
-/* ── bezpieczna emoji – działa nawet bez biblioteki ── */
 var _emoji = null;
 try {
   _emoji = new EmojiConvertor();
@@ -53,7 +52,6 @@ function initials(name) {
   return (name || '?').split(' ').map(function(w){ return w[0] || ''; }).join('').toUpperCase().slice(0,2) || '??';
 }
 
-// ← ZMIANA: zastąpiono własny regex jQuery idiomem (jQuery jest załadowany w layoucie)
 function escHtml(s) {
   return $('<div>').text(String(s)).html();
 }
@@ -72,6 +70,9 @@ function typerToggleShout() {
 }
 
 $(document).ready(function() {
+  if (window._shoutboxReady) return;
+  window._shoutboxReady = true;
+
   var lastMessageId = null;
 
   function loadMessages() {
@@ -90,8 +91,12 @@ $(document).ready(function() {
         var truncated = newest.message.length > 45
           ? newest.message.substring(0, 45) + '…'
           : newest.message;
-        $('#shout-preview-avatar').text(newest.emoji || initials(newest.username));
-        $('#shout-preview-avatar').text(newest.emoji || initials(newest.username)).css(newest.emoji ? { 'font-size': '2.25rem', 'line-height': '1' } : { 'font-size': '','line-height': ''});
+        $('#shout-preview-avatar')
+          .text(newest.emoji || initials(newest.username))
+          .css(newest.emoji
+            ? { 'font-size': '1.75rem', 'line-height': '1' }
+            : { 'font-size': '',        'line-height': ''   }
+          );
         $('#shout-preview-nick').text(newest.username);
         $('#shout-preview-msg').html(_emojiReplace(truncated));
         if (newest.created_at) {
@@ -101,11 +106,8 @@ $(document).ready(function() {
 
       var html = '';
       data.slice().reverse().forEach(function(msg) {
-        // ← ZMIANA: dodany wewnętrzny <div> dla nicka+msg (przywrócona oryginalna struktura flex)
-        // ← ZMIANA: nick = escHtml(msg.username) zamiast displayNick (emoji tylko w avatarze)
-        // ← ZMIANA: usunięty nadmiarowy </div> na końcu
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
-          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:2.25rem;line-height:1;"' : '') + '>'
+          + '<div class="shout-avatar"' + (msg.emoji ? ' style="font-size:1.75rem;line-height:1;"' : '') + '>'
           +   (msg.emoji ? escHtml(msg.emoji) : initials(msg.username))
           + '</div>'
           + '<div>'
