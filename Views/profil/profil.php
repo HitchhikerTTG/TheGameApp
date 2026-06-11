@@ -69,7 +69,13 @@ echo "</pre>";
               Chcę otrzymywać poranny niezbędnik typera (wysyłany codziennie rano)
             </label>
           </div>
-
+          <div class="mb-3">
+              <label class="form-label fw-semibold">Twoje emoji
+                  <span class="text-muted fw-normal small">(jedno -- wybierz z klawiatury)</span>
+              </label>
+              <input type="text" name="emoji" class="form-control" maxlength="2"
+                     placeholder="np. 🦊" value="<?= esc($user['emoji'] ?? '') ?>">
+          </div>
 
           <button type="submit" class="btn btn-primary">Zapisz</button>
         </form>

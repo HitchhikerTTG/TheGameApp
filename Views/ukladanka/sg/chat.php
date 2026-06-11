@@ -66,6 +66,14 @@ function typerToggleShout() {
   if (inputRow) inputRow.classList.toggle('d-none', !isOpen);
 }
 
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function displayNick(emoji, nick) {
+  return (emoji ? escHtml(emoji) + ' ' : '') + escHtml(nick);
+}
+
+
 $(document).ready(function() {
   var lastMessageId = null;
 
@@ -85,8 +93,8 @@ $(document).ready(function() {
         var truncated = newest.message.length > 45
           ? newest.message.substring(0, 45) + '…'
           : newest.message;
-        $('#shout-preview-avatar').text(initials(newest.username));
-        $('#shout-preview-nick').text(newest.username);
+        $('#shout-preview-avatar').text(newest.emoji || initials(newest.username));
+        $('#shout-preview-nick').text((newest.emoji ? newest.emoji + ' ' : '') + newest.username);
         $('#shout-preview-msg').html(_emojiReplace(truncated));
         if (newest.created_at) {
           $('#shout-preview-time').text(newest.created_at.split(' ')[1].slice(0,5));
@@ -96,8 +104,8 @@ $(document).ready(function() {
       var html = '';
       data.slice().reverse().forEach(function(msg) {
         html += '<div class="d-flex gap-2 px-3 py-2" style="border-bottom:1px solid var(--bs-border-color);">'
-          + '<div class="shout-avatar">' + initials(msg.username) + '</div>'
-          + '<div><div class="shout-nick">' + msg.username + '</div>'
+          + '<div class="shout-avatar">' + (msg.emoji ? escHtml(msg.emoji) : initials(msg.username)) + '</div>'
+          + '<div class="shout-nick">' + displayNick(msg.emoji, msg.username) + '</div>'
           + '<div class="shout-msg">' + _emojiReplace(msg.message) + '</div>'
           + '</div></div>';
       });

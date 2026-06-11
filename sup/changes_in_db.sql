@@ -68,4 +68,11 @@ ALTER TABLE turnieje
 ALTER TABLE notatki
   ADD COLUMN wyklucz_KlubID INT UNSIGNED NULL DEFAULT NULL;
 
+-- Dodaj kolumnę emoji (utf8mb4 -- wymagane dla 4-bajtowych znaków)
+ALTER TABLE uzytkownicy
+    ADD COLUMN emoji VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
+
+-- Ujednolicenie charset całej tabeli (naprawia też kolumnę latin2)
+ALTER TABLE uzytkownicy
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

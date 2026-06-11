@@ -9,10 +9,14 @@ class ShoutboxModel extends Model
 
     public function getMessages($clubHash)
     {
-        return $this->where('club_hash', $clubHash)
-                    ->orderBy('created_at', 'DESC')
-                    ->findAll();
+        return $this->db->table('shoutbox_messages')
+                    ->select('shoutbox_messages.*, uzytkownicy.emoji')
+                    ->join('uzytkownicy', 'shoutbox_messages.uniID = uzytkownicy.uniID', 'left')
+                    ->where('shoutbox_messages.club_hash', $clubHash)
+                    ->orderBy('shoutbox_messages.created_at', 'DESC')
+                    ->get()->getResultArray();
     }
+
 
     public function addMessage($data)
     {

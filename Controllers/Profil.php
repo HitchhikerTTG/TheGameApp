@@ -88,6 +88,8 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
         'notify_bet_saved' => (int)($this->request->getPost('notify_bet_saved') === 'on'),
         'notify_reminder'  => (int)($this->request->getPost('notify_reminder') === 'on'),
         'digest_optin' => (int)($this->request->getPost('digest_optin') === 'on'),
+        $emoji = mb_substr(trim($this->request->getPost('emoji') ?? ''), 0, 2), // brak dodatkowej walidacji -- mb_substr + VARCHAR(10) utf8mb4 wystarczą
+
     ])->update();
 
 

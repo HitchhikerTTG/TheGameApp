@@ -66,13 +66,15 @@ class TabelaModel extends Model
             $liczbapkt = $liczbaPktZaTypy + $liczbaPktZaPytania;
 
             $wyniki[] = [
-                    'uid' => $uzytkownik['id'],
-                    'nick' => $uzytkownik['nick'], // zakładam, że username to właściwe pole
-                    'punkty' => $liczbapkt,
-                    'punktyZaMecze' => $liczbaPktZaTypy,
-                    'punktyZaPytania' => $liczbaPktZaPytania,
-                    'dokladneTrafienia' => $dokladneTrafienia,
-                ];
+                'uid'              => $uzytkownik['id'],
+                'nick'             => $uzytkownik['nick'],
+                'emoji'            => $uzytkownik['emoji'] ?? '',   // ← dodać
+                'punkty'           => $liczbapkt,
+                'punktyZaMecze'    => $liczbaPktZaTypy,
+                'punktyZaPytania'  => $liczbaPktZaPytania,
+                'dokladneTrafienia'=> $dokladneTrafienia,
+            ];
+
             }
 
         // Przekształcenie wyników do formatu JSON

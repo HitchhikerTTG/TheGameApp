@@ -49,7 +49,8 @@
       html += '<div class="lb-row' + (isMe ? ' me' : '') + '">'
         + '<div class="ff-bebas lb-pos ' + medalClass(g.pozycja) + '">' + g.pozycja + '</div>'
         + '<div class="lb-nick' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
-        + g.nick + (isMe ? ' ← Ty' : '') + '</div>'
+        + displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</div>'
+        
         + '<div class="ff-bebas lb-pts' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
         + g.punkty + '</div></div>';
     });
@@ -58,7 +59,7 @@
       var g = pozycje[userPos];
       html += '<div class="lb-row" style="border-top:2px dashed var(--bs-border-color);">'
         + '<div class="ff-bebas lb-pos" style="color:var(--ty-accent);">' + g.pozycja + '</div>'
-        + '<div class="lb-nick" style="color:var(--ty-accent);">' + g.nick + ' ← Ty</div>'
+        + '<div class="lb-nick" style="color:var(--ty-accent);">' + displayNick(g.emoji, g.nick) + ' ← Ty</div>'
         + '<div class="ff-bebas lb-pts" style="color:var(--ty-accent);">' + g.punkty + '</div></div>';
     }
 

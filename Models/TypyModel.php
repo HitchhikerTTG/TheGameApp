@@ -125,7 +125,7 @@ public function usedGoldenBall($userUniId, $turniejId = null) {
 
     public function ktoTypujeTenMeczLimited($meczId) {
         $builder = $this->db->table($this->table);
-        $builder->select('typy.GameID, typy.HomeTyp, typy.AwayTyp, typy.GoldenGame, typy.pkt, uzytkownicy.nick AS username');
+        $builder->select('typy.GameID, typy.HomeTyp, typy.AwayTyp, typy.GoldenGame, typy.pkt, uzytkownicy.nick AS username, uzytkownicy.emoji');
         $builder->join('uzytkownicy', 'typy.uniID = uzytkownicy.uniID');
         $builder->where('typy.GameID', $meczId);
         return $builder->get()->getResultArray();

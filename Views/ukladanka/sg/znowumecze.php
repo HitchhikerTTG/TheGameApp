@@ -193,7 +193,7 @@
             $isMe = ($typ['username'] === session()->get('username')); ?>
         <div class="results-row">
           <div class="res-pos"><?= $pos++ ?></div>
-          <div class="res-nick <?= $isMe ? 'res-me' : '' ?>"><?= esc($typ['username']) ?><?= $isMe ? ' ← Ty' : '' ?></div>
+          <div class="res-nick <?= $isMe ? 'res-me' : '' ?>"><?= !empty($typ['emoji']) ? esc($typ['emoji']) . ' ' : '' ?><?= esc($typ['username']) ?><?= $isMe ? ' ← Ty' : '' ?></div>
           <div class="res-type"><?= (int)$typ['HomeTyp'] ?>:<?= (int)$typ['AwayTyp'] ?><?= $typ['GoldenGame'] == 1 ? ' ⚽' : '' ?></div>
           <div class="res-pts ff-bebas"><?= isset($typ['pkt']) ? $typ['pkt'] : '--' ?></div>
         </div>
