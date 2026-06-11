@@ -567,6 +567,11 @@ class Auth extends BaseController
             $mail->send();
             */    
             session()->setFlashdata('success', 'Twoje hasło zostało zaktualizowane, możesz się już zalogować, z _nowym_hasłem_.');
+            (new \App\Services\EmailService())->sendPasswordChanged(
+                $ktoryToUser[0]['email'],
+                $ktoryToUser[0]['nick']
+            );
+
             return redirect()->to('auth');
         }
         
