@@ -166,6 +166,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
 
     $routes->post('hell/turniej/okno24h', 'AdminDash::ustawOkno24h');
 
+    $routes->post('profil/zapiszEmoji', 'Profil::zapiszEmoji');
 
 
 

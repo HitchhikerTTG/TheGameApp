@@ -19,6 +19,34 @@ echo "</pre>";
 
 
 <div class="containter gy-2">
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h5 class="card-title">Twoje emoji</h5>
+        <p class="text-muted small">Będzie widoczne przy nicku w tabeli, przy meczach i w avatarze chatu.</p>
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <div id="emoji-preview" style="font-size:3rem;line-height:1;min-width:3rem;text-align:center;">
+                <?= esc($userInfo['emoji'] ?? '') ?: '🙂' ?>
+            </div>
+            <div class="flex-grow-1">
+                <form method="post" action="<?= base_url('profil/zapiszEmoji') ?>">
+                    <?= csrf_field() ?>
+                    <div class="input-group">
+                        <input type="text" name="emoji" id="emoji-input" class="form-control form-control-lg"
+                               maxlength="2" placeholder="np. 🦊"
+                               value="<?= esc($userInfo['emoji'] ?? '') ?>"
+                               oninput="document.getElementById('emoji-preview').textContent = this.value || '🙂'">
+                        <button type="submit" class="btn btn-primary">Zapisz</button>
+                    </div>
+                    <div class="form-text">Wpisz jedno emoji z klawiatury (telefon lub Ctrl+. na Windows).</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class ="row">
     <div class = "col">
         <h3> Turnieje, w których biorę udział</h3>
@@ -69,14 +97,6 @@ echo "</pre>";
               Chcę otrzymywać poranny niezbędnik typera (wysyłany codziennie rano)
             </label>
           </div>
-          <div class="mb-3">
-              <label class="form-label fw-semibold">Twoje emoji
-                  <span class="text-muted fw-normal small">(jedno -- wybierz z klawiatury)</span>
-              </label>
-              <input type="text" name="emoji" class="form-control" maxlength="2"
-                     placeholder="np. 🦊" value="<?= esc($user['emoji'] ?? '') ?>">
-          </div>
-
           <button type="submit" class="btn btn-primary">Zapisz</button>
         </form>
       </div>

@@ -66,11 +66,9 @@ function typerToggleShout() {
   if (inputRow) inputRow.classList.toggle('d-none', !isOpen);
 }
 
+
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function displayNick(emoji, nick) {
-  return (emoji ? escHtml(emoji) + ' ' : '') + escHtml(nick);
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'"'/g,'&quot;');
 }
 
 
@@ -94,7 +92,7 @@ $(document).ready(function() {
           ? newest.message.substring(0, 45) + '…'
           : newest.message;
         $('#shout-preview-avatar').text(newest.emoji || initials(newest.username));
-        $('#shout-preview-nick').text((newest.emoji ? newest.emoji + ' ' : '') + newest.username);
+        $('#shout-preview-nick').text(newest.username);
         $('#shout-preview-msg').html(_emojiReplace(truncated));
         if (newest.created_at) {
           $('#shout-preview-time').text(newest.created_at.split(' ')[1].slice(0,5));
