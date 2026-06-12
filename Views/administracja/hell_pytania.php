@@ -19,9 +19,22 @@
           <label class="form-label">Treść pytania</label>
           <input type="text" name="tresc" class="form-control" required value="<?= old('tresc') ?>">
         </div>
+
         <div class="col-md-4">
           <label class="form-label">Punkty</label>
           <input type="number" name="pkt" class="form-control" value="<?= old('pkt', 3) ?>" min="1">
+        </div>
+        // PO polu "tresc" (przed "Prawidłowa odpowiedź"), wstawić:
+        <div class="mb-3">
+            <label class="form-label">Opis (opcjonalnie)</label>
+            <textarea name="opis" class="form-control" rows="2"
+                      placeholder="Krótkie wyjaśnienie lub kontekst pytania"><?= old('opis') ?></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Źródło prawdy (opcjonalnie)</label>
+            <input type="text" name="zrodlo" class="form-control" maxlength="255"
+                   placeholder="np. FIFA.com" value="<?= old('zrodlo') ?>">
         </div>
         <div class="col-md-6">
           <label class="form-label">Prawidłowa odpowiedź <span class="text-muted">(opcjonalna)</span></label>

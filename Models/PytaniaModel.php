@@ -13,7 +13,9 @@ class PytaniaModel extends Model{
         'odpowiedz',
         'zamkniete',
         'TurniejID',
-        'aktywne'
+        'aktywne',
+        'opis',
+        'zrodlo'
     ];
 
     public function getPytanieById(int $id)

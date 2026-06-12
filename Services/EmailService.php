@@ -376,10 +376,19 @@ private function buildDigestHtml(array $data, string $url): string
     // ── Pytanie dnia ──
     $pytanieHtml = '';
     if (!empty($data['pytanie'])) {
+        $opisHtml   = !empty($data['pytanie']['opis'])
+            ? '<p style="font-size:13px;color:#6b7280;margin:6px 0 0;">' . esc($data['pytanie']['opis']) . '</p>'
+            : '';
+        $zrodloHtml = !empty($data['pytanie']['zrodlo'])
+            ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Źródło: ' . esc($data['pytanie']['zrodlo']) . '</p>'
+            : '';
+
         $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
                      . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;margin:0;">'
                      . esc($data['pytanie']['tresc']) . '</p>'
-                     . '<p style="text-align:right; font-size:12px; text-transform:uppercase"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">zapisz lub edytuj odpowiedź</a></p>';
+                     . $opisHtml
+                     . $zrodloHtml
+                     . '<p style="text-align:right;font-size:12px;text-transform:uppercase"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">zapisz lub edytuj odpowiedź</a></p>';
     }
 
     return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
