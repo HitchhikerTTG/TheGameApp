@@ -438,7 +438,7 @@ function processMatchesData($matchesData) {
             'competition' => $match['competition']['name'],
             'date' => $match['date'],
             'time' => $match['time'],
-            'naszCzas' => $dt->$dt->format('H:i:s'),
+            'naszCzas' => $dt->format('H:i:s'),
             'naszaData' => $dt->format('Y-m-d'), // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
