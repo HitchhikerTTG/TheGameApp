@@ -3,7 +3,8 @@
 <?php foreach ($mecze as $match):
     if (!isset($match['details'])) continue;
 
-    $matchDate    = date('Y-m-d', strtotime($match['details']['date']));
+//  $matchDate    = date('Y-m-d', strtotime($match['details']['date']));
+    $matchDate = $match['details']['naszaData'] ?? date('Y-m-d', strtotime($match['details']['date']));
     $naszCzas     = date('H:i',   strtotime($match['details']['naszCzas']));
     $homeTeamName = $match['details']['home_team']['plName'] ?? $match['details']['home_team']['name'] ?? '?';
     $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';    

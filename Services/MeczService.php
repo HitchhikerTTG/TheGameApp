@@ -415,6 +415,11 @@ function processMatchesData($matchesData) {
         // Konwersja czasu meczu z UTC na lokalny czas
         $localTime = $this->convertToTimezone($match['date'] . ' ' . $match['time'], $userTimezone);
 
+        $dt = new \DateTime($match['date'] . ' ' . $match['time'], new \DateTimeZone('UTC'));
+        $dt->setTimezone(new \DateTimeZone($userTimezone));
+
+
+
         // Wybieranie tylko niezbędnych pól
         $processedMatch = [
             'match_id' => $match['id'],
@@ -433,7 +438,8 @@ function processMatchesData($matchesData) {
             'competition' => $match['competition']['name'],
             'date' => $match['date'],
             'time' => $match['time'],
-            'naszCzas' => $localTime, // Zapisanie lokalnego czasu
+            'naszCzas' => $dt->$dt->format('H:i:s'),
+            'naszaData' => $dt->format('Y-m-d') // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
             'additional_info' => 'Any additional info here' // Przykład dodawania nowych pól

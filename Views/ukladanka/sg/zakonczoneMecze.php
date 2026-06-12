@@ -23,7 +23,7 @@
       $lastDate = null;
       foreach ($mecze as $match):
           if (!isset($match['details'])) continue;
-          $matchDate = date('Y-m-d', strtotime($match['details']['date'])); 
+          $matchDate = $match['details']['naszaData'] ?? date('Y-m-d', strtotime($match['details']['date']));
 
                 $matchTime = date('H:i', strtotime($match['details']['time']));
                 $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
