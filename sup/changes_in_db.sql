@@ -74,5 +74,8 @@ ALTER TABLE uzytkownicy
 
 -- Ujednolicenie charset całej tabeli (naprawia też kolumnę latin2)
 ALTER TABLE uzytkownicy
-    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;  
 
+ALTER TABLE pytania
+    ADD COLUMN opis    TEXT NULL AFTER tresc,
+    ADD COLUMN zrodlo  VARCHAR(255) NULL AFTER opis;

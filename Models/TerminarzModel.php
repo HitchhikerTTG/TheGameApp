@@ -211,7 +211,7 @@ public function czyRozpoczety($gameID) {
 	
 	public function getMeczeNaReminder(int $turniejID): array
 {
-    return $this->select('Id, Date, Time, HomeName, AwayName')
+    return $this->select('Id, ApiID, Date, Time, HomeName, AwayName')
         ->where('TurniejID', $turniejID)
         ->where('zakonczony', 0)
         ->where('Rozpoczety', 0)

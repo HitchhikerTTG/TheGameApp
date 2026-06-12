@@ -40,8 +40,25 @@ class EmailService
         $terminarzModel = model(\App\Models\TerminarzModel::class);
         $mecz = $terminarzModel->getMeczById($gameID);
 
-        $dataMeczu   = $mecz ? date('d.m.Y', strtotime($mecz['Date'])) . ' ' . substr($mecz['Time'], 0, 5) : "mecz #{$gameID}";
-        $nazwyDruzyn = $mecz ? "{$mecz['HomeName']} - {$mecz['AwayName']}" : '';
+        //$dataMeczu   = $mecz ? date('d.m.Y', strtotime($mecz['Date'])) . ' ' . substr($mecz['Time'], 0, 5) : "mecz #{$gameID}";
+        //$nazwyDruzyn = $mecz ? "{$mecz['HomeName']} - {$mecz['AwayName']}" : '';
+        
+        if ($mecz) {
+           $dt = new \DateTime($mecz['Date'] . ' ' . $mecz['Time'], new \DateTimeZone('UTC'));
+            $dt->setTimezone(new \DateTimeZone('Europe/Warsaw'));
+            $lokalnyczas = $dt->format('d.m.Y H:i');
+
+            $jsonPath = WRITEPATH . "mecze/{$mecz['TurniejID']}/{$mecz['ApiID']}.json";
+            $details  = file_exists($jsonPath) ? (json_decode(file_get_contents($jsonPath), true) ?? []) : [];
+            $homeName = $details['home_team']['plName'] ?? $details['home_team']['name'] ?? $mecz['HomeName'];
+            $awayName = $details['away_team']['plName'] ?? $details['away_team']['name'] ?? $mecz['AwayName'];
+
+            $dataMeczu   = $lokalnyczas;
+            $nazwyDruzyn = "{$homeName} - {$awayName}";
+        } else {
+            $dataMeczu   = "mecz #{$gameID}";
+            $nazwyDruzyn = '';
+        }
 
         $sendAfter = date('Y-m-d H:i:s', strtotime('+3 minutes'));
 
@@ -162,8 +179,16 @@ class EmailService
 
         $pozycje = '';
         foreach ($unbet as $match) {
-            $data     = date('d.m.Y', strtotime($match['Date'])) . ' ' . substr($match['Time'], 0, 5);
-            $pozycje .= "<li>{$data} -- {$match['HomeName']} vs {$match['AwayName']}</li>";
+            $dt = new \DateTime($match['Date'] . ' ' . $match['Time'], new \DateTimeZone('UTC'));
+            $dt->setTimezone(new \DateTimeZone('Europe/Warsaw'));
+            $lokalnyczas = $dt->format('d.m.Y H:i');
+
+            $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$match['ApiID']}.json";
+            $details  = file_exists($jsonPath) ? (json_decode(file_get_contents($jsonPath), true) ?? []) : [];
+            $homeName = $details['home_team']['plName'] ?? $details['home_team']['name'] ?? $match['HomeName'];
+            $awayName = $details['away_team']['plName'] ?? $details['away_team']['name'] ?? $match['AwayName'];
+
+            $pozycje .= "<li>{$lokalnyczas} -- {$homeName} vs {$awayName}</li>";
         }
 
         $url  = base_url('typowanie');
