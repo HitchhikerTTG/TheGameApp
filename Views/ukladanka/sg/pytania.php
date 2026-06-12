@@ -19,7 +19,7 @@
     <?php endif; ?>
 
     <?php if (!empty($pytanie['zrodlo'])): ?>
-        <p style="font-size:12px;color:var(--bs-tertiary-color);" class="mb-0">
+        <p style="font-size:12px;color:var(--bs-tertiary-color);" class="mb-0 ms-auto">
             Weryfikujemy na podstawie: <?= esc($pytanie['zrodlo']) ?>
         </p>
     </div> 
