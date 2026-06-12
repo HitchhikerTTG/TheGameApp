@@ -439,7 +439,7 @@ function processMatchesData($matchesData) {
             'date' => $match['date'],
             'time' => $match['time'],
             'naszCzas' => $dt->$dt->format('H:i:s'),
-            'naszaData' => $dt->format('Y-m-d') // Zapisanie lokalnego czasu
+            'naszaData' => $dt->format('Y-m-d'), // Zapisanie lokalnego czasu
             'location' => $match['location'] ?? 'Unknown', // Dodanie wartości domyślnej, jeśli lokalizacja nie istnieje
             'odds' => $match['odds']['pre'], // Przykładowe przetworzenie zakładów
             'additional_info' => 'Any additional info here' // Przykład dodawania nowych pól
