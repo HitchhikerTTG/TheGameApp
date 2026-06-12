@@ -43,8 +43,8 @@ class DigestService
             ->table('terminarz')
             ->where('TurniejID', $turniejID)
             ->where('zakonczony', 1)
-            ->where('Date >=', date('Y-m-d', strtotime('-1 day')))
-            ->where('Date <=', date('Y-m-d'))
+            ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s', strtotime('-1 day')))
+            ->where("CONCAT(Date, ' ', Time) <",  date('Y-m-d H:i:s'))
             ->orderBy('Date', 'ASC')
             ->orderBy('Time', 'ASC')
             ->get()->getResultArray();

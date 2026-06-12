@@ -466,10 +466,13 @@ foreach ($meczeArchiwalne as &$mecz) {
         // Fallback: buduj details z danych DB gdy brakuje cache
         $dbMecz = model(TerminarzModel::class)->getMeczById($mecz['Id']);
         if ($dbMecz) {
+            $dtFb = new \DateTime($dbMecz['Date'] . ' ' . $dbMecz['Time'], new \DateTimeZone('UTC'));
+            $dtFb->setTimezone(new \DateTimeZone('Europe/Warsaw'));
             $mecz['details'] = [
                 'date'        => $dbMecz['Date'],
                 'time'        => $dbMecz['Time'],
-                'naszCzas'    => $dbMecz['Time'],
+                'naszCzas'  => $dtFb->format('H:i:s'),
+                'naszaData' => $dtFb->format('Y-m-d'),
                 'home_team'   => [
                     'name'  => $dbMecz['HomeName'],
                     'score' => $dbMecz['ScoreHome'],

@@ -413,7 +413,7 @@ function processMatchesData($matchesData) {
 
     foreach ($matchesData as $match) {
         // Konwersja czasu meczu z UTC na lokalny czas
-        $localTime = $this->convertToTimezone($match['date'] . ' ' . $match['time'], $userTimezone);
+        //$localTime = $this->convertToTimezone($match['date'] . ' ' . $match['time'], $userTimezone);
 
         $dt = new \DateTime($match['date'] . ' ' . $match['time'], new \DateTimeZone('UTC'));
         $dt->setTimezone(new \DateTimeZone($userTimezone));

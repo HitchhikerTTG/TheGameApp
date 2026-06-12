@@ -610,6 +610,7 @@ public function mecze()
                 $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
                 $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
                 $m['naszCzas']   = $d['naszCzas'] ?? null;
+                $m['naszaData']  = $d['naszaData'] ?? null;
                 $m['apiScoreH']  = $d['home_team']['score'] ?? null;
                 $m['apiScoreA']  = $d['away_team']['score'] ?? null;
                 $m['apiStatus']  = $d['status'] ?? null;
