@@ -367,6 +367,8 @@ public function dodajPytanie()
     $data = [
         'tresc'     => $this->request->getPost('tresc'),
         'odpowiedz' => strip_tags($this->request->getPost('odpowiedz') ?? ''),
+        'opis'      => strip_tags($this->request->getPost('opis') ?? ''),
+        'zrodlo'    => strip_tags($this->request->getPost('zrodlo') ?? ''),
         'pkt'       => $this->request->getPost('pkt'),
         'wazneDo'   => $wazneDo,
         'utworzone' => date('Y-m-d H:i:s'),

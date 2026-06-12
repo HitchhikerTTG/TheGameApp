@@ -24,7 +24,6 @@
           <label class="form-label">Punkty</label>
           <input type="number" name="pkt" class="form-control" value="<?= old('pkt', 3) ?>" min="1">
         </div>
-        // PO polu "tresc" (przed "Prawidłowa odpowiedź"), wstawić:
         <div class="mb-3">
             <label class="form-label">Opis (opcjonalnie)</label>
             <textarea name="opis" class="form-control" rows="2"

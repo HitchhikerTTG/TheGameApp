@@ -11,16 +11,18 @@
   <div class="card-body px-3 py-3">
     <div class="question-badge mb-3">⚡ <?= (int)$pytanie['pkt'] ?> pkt</div>
     <p style="font-size:16px;font-weight:500;line-height:1.4;" class="mb-3"><?= esc($pytanie['tresc']) ?></p>
+    <div class="d-flex gap-2 align-items-baseline mb-3">
     <?php if (!empty($pytanie['opis'])): ?>
-        <p style="font-size:13px;color:var(--bs-secondary-color);line-height:1.4;" class="mb-2">
+        <p style="font-size:13px;color:var(--bs-secondary-color);line-height:1.4;" class="mb-0">
             <?= esc($pytanie['opis']) ?>
         </p>
     <?php endif; ?>
 
     <?php if (!empty($pytanie['zrodlo'])): ?>
-        <p style="font-size:12px;color:var(--bs-tertiary-color);" class="mb-3">
-            Źródło: <?= esc($pytanie['zrodlo']) ?>
+        <p style="font-size:12px;color:var(--bs-tertiary-color);" class="mb-0">
+            Weryfikujemy na podstawie: <?= esc($pytanie['zrodlo']) ?>
         </p>
+    </div> 
     <?php endif; ?>
     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
       <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
