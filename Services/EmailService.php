@@ -380,7 +380,7 @@ private function buildDigestHtml(array $data, string $url): string
             ? '<p style="font-size:13px;color:#6b7280;margin:6px 0 0;">' . esc($data['pytanie']['opis']) . '</p>'
             : '';
         $zrodloHtml = !empty($data['pytanie']['zrodlo'])
-            ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Źródło: ' . esc($data['pytanie']['zrodlo']) . '</p>'
+            ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Skąd będę znał dobrą odpowiedź?: ' . esc($data['pytanie']['zrodlo']) . '</p>'
             : '';
 
         $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
