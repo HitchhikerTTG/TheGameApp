@@ -158,6 +158,9 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('hell/turnieje',                       'AdminDash::turnieje');
     $routes->match(['GET','POST'], 'wyniki',            'Serwisant::wyniki');
     $routes->post('hell/mecze/zapisz',               'AdminDash::zapiszIPrezelicz');
+    // porządki w terminarzu
+    $routes->get('hell/terminarz/porownaj',             'AdminDash::porownajTerminarz'); 
+    $routes->post('hell/terminarz/aktualizujMecz/(:num)', 'AdminDash::aktualizujMecz/$1');
 
 
     // aktualizacja
@@ -168,7 +171,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
 
     $routes->post('profil/zapiszEmoji', 'Profil::zapiszEmoji');
 
-
+    
 
 });
 

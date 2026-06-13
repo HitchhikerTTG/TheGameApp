@@ -17,6 +17,7 @@ $a = fn(string $p): string => str_starts_with($uri, $p) ? ' active' : '';
            href="/hell/kampanie">Maile</a>
       </li>
       <li class="nav-item"><a class="nav-link<?= $a('/hell/turnieje') ?>" href="/hell/turnieje">Turnieje</a></li>
+      <li class="nav-item"><a class="nav-link<?= $a('/hell/terminarz/porownaj') ?>" href="/hell/terminarz/porownaj">Terminarz</a></li>
     </ul>
     <a href="/wyniki" class="btn btn-sm btn-outline-warning" target="_blank">Wyniki ↗</a>
   </div>

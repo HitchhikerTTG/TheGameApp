@@ -952,6 +952,79 @@ public function ustawOkno24h()
 }
 
 
+public function porownajTerminarz()
+{
+    $config       = get_active_tournament_config();
+    $turniejID    = (int)$config['activeTournamentId'];
+    $compID       = $config['activeCompetitionId'];
+
+    // Mecze z bazy – tylko nierozegrane
+    $terminarzModel = model(\App\Models\TerminarzModel::class);
+    $dbMecze = $terminarzModel
+        ->where('TurniejID', $turniejID)
+        ->where('zakonczony', 0)
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+
+    // Mecze z API (wszystkie strony)
+    $common = new \App\Libraries\Common();
+    $apiMecze = [];
+    $page = 1;
+    do {
+        $resp = $common->getFixtures(['competition_id' => $compID, 'page' => $page]);
+        foreach ($resp['data']['fixtures'] ?? [] as $f) {
+            $apiMecze[$f['id']] = $f;  // klucz: ApiID
+        }
+        $hasNext = !empty($resp['data']['next_page']);
+        $page++;
+    } while ($hasNext);
+
+    // Połącz i zaznacz różnice
+    $porownanie = [];
+    foreach ($dbMecze as $db) {
+        $api = $apiMecze[$db['ApiID']] ?? null;
+        $roznice = [];
+
+        if ($api) {
+            if ($db['Date'] !== $api['date'])           $roznice[] = 'Date';
+            if (substr($db['Time'], 0, 5) !== substr($api['time'], 0, 5)) $roznice[] = 'Time';
+            if ($db['Round'] !== (string)$api['round']) $roznice[] = 'Round';
+        }
+
+        $porownanie[] = [
+            'db'      => $db,
+            'api'     => $api,
+            'roznice' => $roznice,
+        ];
+    }
+
+    return view('layouts/hell', [])  // przez extend w widoku
+        . view('administracja/hell_terminarz', [
+            'porownanie' => $porownanie,
+            'turniejID'  => $turniejID,
+        ]);
+}
+
+public function aktualizujMecz(int $meczId)
+{
+    $terminarzModel = model(\App\Models\TerminarzModel::class);
+    $data = array_filter([
+        'Date'  => $this->request->getPost('Date'),
+        'Time'  => $this->request->getPost('Time'),
+        'Round' => $this->request->getPost('Round'),
+    ]);
+
+    if (!empty($data)) {
+        $terminarzModel->update($meczId, $data);
+    }
+
+    session()->setFlashdata('success', 'Mecz #' . $meczId . ' zaktualizowany.');
+    return redirect()->to('/hell/terminarz/porownaj');
+}
+
+
+
 
 }
 
