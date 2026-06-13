@@ -990,6 +990,11 @@ public function porownajTerminarz()
             if ($db['Date'] !== $api['date'])           $roznice[] = 'Date';
             if (substr($db['Time'], 0, 5) !== substr($api['time'], 0, 5)) $roznice[] = 'Time';
             if ($db['Round'] !== (string)$api['round']) $roznice[] = 'Round';
+            // porównujemy także nazwy drużyn
+            if ($db['HomeName'] !== $api['home_name']) $roznice[] = 'HomeName';
+            if ($db['AwayName'] !== $api['away_name']) $roznice[] = 'AwayName';
+            if ((string)$db['HomeID'] !== (string)$api['home_id']) $roznice[] = 'HomeID';
+            if ((string)$db['AwayID'] !== (string)$api['away_id']) $roznice[] = 'AwayID';
         }
 
         $porownanie[] = [
@@ -1010,9 +1015,13 @@ public function aktualizujMecz(int $meczId)
 {
     $terminarzModel = model(\App\Models\TerminarzModel::class);
     $data = array_filter([
-        'Date'  => $this->request->getPost('Date'),
-        'Time'  => $this->request->getPost('Time'),
-        'Round' => $this->request->getPost('Round'),
+        'Date'     => $this->request->getPost('Date'),
+        'Time'     => $this->request->getPost('Time'),
+        'Round'    => $this->request->getPost('Round'),
+        'HomeName' => $this->request->getPost('HomeName'),
+        'AwayName' => $this->request->getPost('AwayName'),
+        'HomeID'   => $this->request->getPost('HomeID'),
+        'AwayID'   => $this->request->getPost('AwayID'),
     ]);
 
     if (!empty($data)) {

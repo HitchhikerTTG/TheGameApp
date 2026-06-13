@@ -49,7 +49,7 @@
       <?= csrf_field() ?>
 
       <div class="row g-3 align-items-end">
-
+        
         <!-- Data -->
         <div class="col-md-3">
           <label class="form-label small fw-semibold mb-1">Data</label>
@@ -59,7 +59,7 @@
               <span class="badge bg-danger mb-1">API: <?= esc($api['date']) ?> (<?= $dtApi->format('d.m') ?>)</span>
             <?php endif ?>
             <input type="date" name="Date" class="form-control form-control-sm <?= $diffDate ? 'border-warning' : '' ?>"
-                   value="<?= esc($db['Date']) ?>">
+                   value="<?= $diffDate ? esc($api['date']) : esc($db['Date']) ?>"> 
             <span class="text-muted" style="font-size:11px;">W bazie: <?= $dtDb->format('d.m.Y') ?></span>
           </div>
         </div>
@@ -73,10 +73,43 @@
               <span class="badge bg-danger mb-1">API: <?= esc(substr($api['time'], 0, 5)) ?> UTC = <?= $dtApi->format('H:i') ?> WAW</span>
             <?php endif ?>
             <input type="time" name="Time" class="form-control form-control-sm <?= $diffTime ? 'border-warning' : '' ?>"
-                   value="<?= esc(substr($db['Time'], 0, 5)) ?>">
+                   value="<?= $diffTime ? esc(substr($api['time'], 0, 5)) : esc(substr($db['Time'], 0, 5)) ?>">
             <span class="text-muted" style="font-size:11px;">W bazie: <?= $dtDb->format('H:i') ?> WAW</span>
           </div>
         </div>
+
+                <!-- Gospodarze -->
+<div class="col-md-3">
+  <label class="form-label small fw-semibold mb-1">Gospodarz</label>
+  <?php $diffHome = in_array('HomeName', $roznice); ?>
+  <div class="d-flex flex-column gap-1">
+    <?php if ($api && $diffHome): ?>
+      <span class="badge bg-danger mb-1">API: <?= esc($api['home_name']) ?> (ID: <?= esc($api['home_id']) ?>)</span>
+    <?php endif ?>
+    <input type="text" name="HomeName" class="form-control form-control-sm <?= $diffHome ? 'border-warning' : '' ?>"
+           value="<?= $diffHome ? esc($api['home_name']) : esc($db['HomeName']) ?>">
+    <input type="hidden" name="HomeID"
+           value="<?= $diffHome ? esc($api['home_id']) : esc($db['HomeID']) ?>">
+    <span class="text-muted" style="font-size:11px;">W bazie: <?= esc($db['HomeName']) ?></span>
+  </div>
+</div>
+
+<!-- Gość -->
+<div class="col-md-3">
+  <label class="form-label small fw-semibold mb-1">Gość</label>
+  <?php $diffAway = in_array('AwayName', $roznice); ?>
+  <div class="d-flex flex-column gap-1">
+    <?php if ($api && $diffAway): ?>
+      <span class="badge bg-danger mb-1">API: <?= esc($api['away_name']) ?> (ID: <?= esc($api['away_id']) ?>)</span>
+    <?php endif ?>
+    <input type="text" name="AwayName" class="form-control form-control-sm <?= $diffAway ? 'border-warning' : '' ?>"
+           value="<?= $diffAway ? esc($api['away_name']) : esc($db['AwayName']) ?>">
+    <input type="hidden" name="AwayID"
+           value="<?= $diffAway ? esc($api['away_id']) : esc($db['AwayID']) ?>">
+    <span class="text-muted" style="font-size:11px;">W bazie: <?= esc($db['AwayName']) ?></span>
+  </div>
+</div>
+
 
         <!-- Runda -->
         <div class="col-md-2">
