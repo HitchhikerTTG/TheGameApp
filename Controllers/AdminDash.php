@@ -1027,6 +1027,12 @@ public function aktualizujMecz(int $meczId)
     if (!empty($data)) {
         $terminarzModel->update($meczId, $data);
     }
+    
+    $mecz    = $terminarzModel->getMeczById($meczId);
+        $jsonPath = WRITEPATH . "mecze/{$mecz['TurniejID']}/{$mecz['ApiID']}.json";
+        if (file_exists($jsonPath)) {
+            unlink($jsonPath);
+        }
 
     session()->setFlashdata('success', 'Mecz #' . $meczId . ' zaktualizowany.');
     return redirect()->to('/hell/terminarz/porownaj');

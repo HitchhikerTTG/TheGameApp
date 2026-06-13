@@ -50,31 +50,45 @@
 
       <div class="row g-3 align-items-end">
         
-        <!-- Data -->
-        <div class="col-md-3">
-          <label class="form-label small fw-semibold mb-1">Data</label>
-          <?php $diffDate = in_array('Date', $roznice); ?>
+        <!-- Zamiast osobnych kolumn Date i Time – jedna sekcja "Kiedy" -->
+        <div class="col-md-5">
+          <label class="form-label small fw-semibold mb-1">Kiedy</label>
           <div class="d-flex flex-column gap-1">
-            <?php if ($api && $diffDate): ?>
-              <span class="badge bg-danger mb-1">API: <?= esc($api['date']) ?> (<?= $dtApi->format('d.m') ?>)</span>
-            <?php endif ?>
-            <input type="date" name="Date" class="form-control form-control-sm <?= $diffDate ? 'border-warning' : '' ?>"
-                   value="<?= $diffDate ? esc($api['date']) : esc($db['Date']) ?>"> 
-            <span class="text-muted" style="font-size:11px;">W bazie: <?= $dtDb->format('d.m.Y') ?></span>
-          </div>
-        </div>
 
-        <!-- Godzina -->
-        <div class="col-md-2">
-          <label class="form-label small fw-semibold mb-1">Godzina (UTC)</label>
-          <?php $diffTime = in_array('Time', $roznice); ?>
-          <div class="d-flex flex-column gap-1">
-            <?php if ($api && $diffTime): ?>
-              <span class="badge bg-danger mb-1">API: <?= esc(substr($api['time'], 0, 5)) ?> UTC = <?= $dtApi->format('H:i') ?> WAW</span>
+            <!-- Wiersz: baza -->
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted" style="font-size:11px;width:40px;">Baza:</span>
+              <span class="<?= $maRoznice ? 'text-danger' : '' ?>">
+                <?= esc($db['Date']) ?> <?= esc(substr($db['Time'], 0, 5)) ?> UTC
+              </span>
+              <span class="text-muted" style="font-size:11px;">
+                (= <?= $dtDb->format('d.m.Y H:i') ?> WAW)
+              </span>
+            </div>
+
+            <!-- Wiersz: API -->
+            <?php if ($api): ?>
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted" style="font-size:11px;width:40px;">API:</span>
+              <span class="<?= $maRoznice ? 'fw-semibold' : 'text-muted' ?>">
+                <?= esc($api['date']) ?> <?= esc(substr($api['time'], 0, 5)) ?> UTC
+              </span>
+              <span class="text-muted" style="font-size:11px;">
+                (= <?= $dtApi->format('d.m.Y H:i') ?> WAW)
+              </span>
+            </div>
             <?php endif ?>
-            <input type="time" name="Time" class="form-control form-control-sm <?= $diffTime ? 'border-warning' : '' ?>"
-                   value="<?= $diffTime ? esc(substr($api['time'], 0, 5)) : esc(substr($db['Time'], 0, 5)) ?>">
-            <span class="text-muted" style="font-size:11px;">W bazie: <?= $dtDb->format('H:i') ?> WAW</span>
+
+            <!-- Inputy – zawsze UTC, API jako sugerowana wartość gdy różnica -->
+            <div class="d-flex gap-2 mt-1">
+              <input type="date" name="Date"
+                     class="form-control form-control-sm <?= in_array('Date', $roznice) ? 'border-warning' : '' ?>"
+                     value="<?= in_array('Date', $roznice) ? esc($api['date']) : esc($db['Date']) ?>">
+              <input type="time" name="Time"
+                     class="form-control form-control-sm <?= in_array('Time', $roznice) ? 'border-warning' : '' ?>"
+                     value="<?= in_array('Time', $roznice) ? esc(substr($api['time'],0,5)) : esc(substr($db['Time'],0,5)) ?>">
+            </div>
+
           </div>
         </div>
 
