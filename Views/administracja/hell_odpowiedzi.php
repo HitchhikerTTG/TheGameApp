@@ -4,22 +4,77 @@
 
 <div class="mb-4">
   <a href="/hell/pytania" class="btn btn-sm btn-outline-secondary mb-3">← Pytania</a>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
-      <h5 class="mb-1"><?= esc($pytanie['tresc']) ?></h5>
-      <div class="d-flex gap-3 mt-2 small">
-        <span class="text-muted">Pkt: <strong><?= (int)$pytanie['pkt'] ?></strong></span>
-        <?php if (!empty($pytanie['odpowiedz'])): ?>
-          <span class="badge bg-success align-self-center">Prawidłowa: <?= esc($pytanie['odpowiedz']) ?></span>
-        <?php else: ?>
-          <span class="text-muted">Brak zdefiniowanej prawidłowej odpowiedzi</span>
-        <?php endif ?>
-        <span class="text-muted">Ważne do: <?= esc(substr($pytanie['wazneDo'],0,16)) ?></span>
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h5 class="mb-1"><?= esc($pytanie['tresc']) ?></h5>
+        <div class="d-flex gap-3 mt-2 small">
+          <span class="text-muted">Pkt: <strong><?= (int)$pytanie['pkt'] ?></strong></span>
+          <?php if (!empty($pytanie['odpowiedz'])): ?>
+            <span class="badge bg-success align-self-center">Prawidłowa: <?= esc($pytanie['odpowiedz']) ?></span>
+          <?php else: ?>
+            <span class="text-muted">Brak prawidłowej odpowiedzi</span>
+          <?php endif ?>
+          <span class="text-muted">Ważne do: <?= esc(substr($pytanie['wazneDo'],0,16)) ?></span>
+          <?php if (!empty($pytanie['aktywne'])): ?>
+            <span class="badge bg-primary">Aktywne</span>
+          <?php endif ?>
+        </div>
       </div>
+      <button class="btn btn-sm btn-outline-secondary" type="button"
+              data-bs-toggle="collapse" data-bs-target="#formEdycja">
+        ✏ Edytuj pytanie
+      </button>
+    </div>
+
+    <div class="collapse mt-3" id="formEdycja">
+      <hr>
+      <form method="post" action="<?= site_url('hell/pytania/edytuj/' . (int)$pytanie['id']) ?>">
+        <?= csrf_field() ?>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Treść pytania</label>
+            <input type="text" name="tresc" class="form-control" required
+                   value="<?= esc($pytanie['tresc']) ?>">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Opis <span class="text-muted">(opcjonalny)</span></label>
+            <textarea name="opis" class="form-control" rows="2"><?= esc($pytanie['opis'] ?? '') ?></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Źródło prawdy <span class="text-muted">(opcjonalne)</span></label>
+            <input type="text" name="zrodlo" class="form-control"
+                   value="<?= esc($pytanie['zrodlo'] ?? '') ?>" placeholder="np. FIFA.com">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Punkty</label>
+            <input type="number" name="pkt" class="form-control" min="1" required
+                   value="<?= (int)$pytanie['pkt'] ?>">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Ważne do</label>
+            <input type="datetime-local" name="wazneDo" class="form-control"
+                   value="<?= esc(str_replace(' ', 'T', substr($pytanie['wazneDo'], 0, 16))) ?>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Prawidłowa odpowiedź <span class="text-muted">(opcjonalna)</span></label>
+            <input type="text" name="odpowiedz" class="form-control"
+                   value="<?= esc($pytanie['odpowiedz'] ?? '') ?>" placeholder="np. Bayern Monachium">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="aktywne" value="1"
+                     id="aktywneSwitch" <?= !empty($pytanie['aktywne']) ? 'checked' : '' ?>>
+              <label class="form-check-label" for="aktywneSwitch">Aktywne</label>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Zapisz zmiany</button>
+      </form>
     </div>
   </div>
 </div>
-
 <?php if (empty($odpowiedzi)): ?>
   <div class="alert alert-info">Brak odpowiedzi na to pytanie.</div>
 <?php else: ?>

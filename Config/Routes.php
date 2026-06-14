@@ -161,7 +161,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     // porządki w terminarzu
     $routes->get('hell/terminarz/porownaj',             'AdminDash::porownajTerminarz'); 
     $routes->post('hell/terminarz/aktualizujMecz/(:num)', 'AdminDash::aktualizujMecz/$1');
-
+    $routes->post('hell/pytania/edytuj/(:num)', 'AdminDash::edytujPytanie/$1');
 
     // aktualizacja
     

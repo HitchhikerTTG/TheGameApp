@@ -1038,7 +1038,29 @@ public function aktualizujMecz(int $meczId)
     return redirect()->to('/hell/terminarz/porownaj');
 }
 
+public function edytujPytanie(int $pytanieID)
+{
+    $data = array_filter([
+        'tresc'     => $this->request->getPost('tresc'),
+        'opis'      => $this->request->getPost('opis') ?? '',
+        'zrodlo'    => $this->request->getPost('zrodlo') ?? '',
+        'odpowiedz' => $this->request->getPost('odpowiedz') ?? '',
+        'pkt'       => $this->request->getPost('pkt'),
+        'aktywne'   => $this->request->getPost('aktywne') ? 1 : 0,
+    ], fn($v) => $v !== null && $v !== false);
 
+    // wazneDo osobno – nie chcemy go wyrzucić przez array_filter gdy jest pusty string
+    $wazneDo = $this->request->getPost('wazneDo');
+    if ($wazneDo) {
+        $data['wazneDo'] = str_replace('T', ' ', $wazneDo);
+        if (strlen($data['wazneDo']) === 16) $data['wazneDo'] .= ':00';
+    }
+
+    model(\App\Models\PytaniaModel::class)->update($pytanieID, $data);
+
+    session()->setFlashdata('success', 'Pytanie zaktualizowane.');
+    return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
+}
 
 
 }

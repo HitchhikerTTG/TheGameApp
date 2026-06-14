@@ -101,6 +101,10 @@
 <?php endforeach; ?>
 <?php endif; ?>
 
+<div class="d-flex gap-2 mt-3">
+  <a href="/archiwalnePytania" class="btn btn-outline-secondary btn-sm flex-fill text-center">Wcześniejsze pytania &raquo;</a>
+</div>
+
 <script>
 $(document).on('click', '.edit-answer-btn', function() {
     var $form  = $(this).closest('form');
