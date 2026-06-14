@@ -1,4 +1,4 @@
-<?php if (empty($pytania)): ?>
+<?ph  p if (empty($pytania)): ?>
   <p class="text-secondary mt-4" style="font-size:14px;">Brak archiwalnych pytań.</p>
 <?php else: ?>
 
@@ -74,19 +74,20 @@
     <span>›</span>
   </div>
   <div style="display:none;">
-    <div class="px-3 pb-3">
-      <div class="results-row" style="font-size:11px;color:var(--bs-tertiary-color);font-weight:700;text-transform:uppercase;">
-        <div>Nick</div><div>Odpowiedź</div><div>Pkt</div>
-      </div>
-      <?php foreach ($odpowiedzi as $o):
-            $isMe = ($o['nick'] === session()->get('username')); ?>
-        <div class="results-row">
-          <div class="res-nick <?= $isMe ? 'res-me' : '' ?>"><?= esc($o['nick']) ?><?= $isMe ? ' ← Ty' : '' ?></div>
-          <div class="res-type"><?= esc($o['odp']) ?></div>
-          <div class="res-pts ff-bebas"><?= $o['pkt'] > 0 ? '+' . (int)$o['pkt'] : '–' ?></div>
-        </div>
-      <?php endforeach ?>
+<div class="px-3 pb-3">
+  <div class="results-row" style="font-size:11px;color:var(--bs-tertiary-color);font-weight:700;text-transform:uppercase;
+       grid-template-columns: minmax(80px,25%) 1fr 48px;">
+    <div>Nick</div><div>Odpowiedź</div><div>Pkt</div>
+  </div>
+  <?php foreach ($odpowiedzi as $o):
+        $isMe = ($o['nick'] === session()->get('username')); ?>
+    <div class="results-row" style="grid-template-columns: minmax(80px,25%) 1fr 48px;">
+      <div class="res-nick <?= $isMe ? 'res-me' : '' ?>"><?= esc($o['nick']) ?><?= $isMe ? ' ← Ty' : '' ?></div>
+      <div><?= esc($o['odp']) ?></div>
+      <div class="res-pts ff-bebas"><?= $o['pkt'] > 0 ? '+' . (int)$o['pkt'] : '–' ?></div>
     </div>
+  <?php endforeach ?>
+</div>
   </div>
   <?php endif ?>
 
