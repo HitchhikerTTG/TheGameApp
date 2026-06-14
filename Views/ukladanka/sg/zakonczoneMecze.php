@@ -1,162 +1,91 @@
-   <style>
-   .bg-platyna {
-       background-color: #e5e4e2;
-   }
+<?php $lastDate = null; ?>
 
-   .bg-zloto {
-       background-color: #ffd700;
-   }
+<?php foreach ($mecze as $match):
+    if (!isset($match['details'])) continue;
 
-   .bg-srebro {
-       background-color: #c0c0c0;
-   }
+    $matchDate    = $match['details']['naszaData'] ?? date('Y-m-d', strtotime($match['details']['date']));
+    $naszCzas     = date('H:i', strtotime($match['details']['naszCzas']));
+    $homeTeamName = $match['details']['home_team']['plName'] ?? $match['details']['home_team']['name'] ?? '?';
+    $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';
+    $homeScore    = $match['details']['home_team']['score'] ?? $match['ScoreHome'] ?? '?';
+    $awayScore    = $match['details']['away_team']['score'] ?? $match['ScoreAway'] ?? '?';
+    $userHome     = $match['typy']['HomeTyp'] ?? null;
+    $userAway     = $match['typy']['AwayTyp'] ?? null;
+    $userPkt      = $match['typy']['pkt'] ?? null;
+    $isGolden     = ($match['Id'] == $usedGoldenBall);
 
-   .bg-braz {
-       background-color: #cd7f32;
-   }
-   </style>
-   <div class="section my-3 pt-3">
-    <h4>Archiwum meczów</h4>
-    <div class="container mt-3 px-0 mx-0">
-        <div id="matchesAccordion" class="accordion">
-      <?php 
-      $lastDate = null;
-      foreach ($mecze as $match):
-          if (!isset($match['details'])) continue;
-          $matchDate = $match['details']['naszaData'] ?? date('Y-m-d', strtotime($match['details']['date']));
+    $isExact = $userHome !== null
+        && (string)$userHome === (string)$homeScore
+        && (string)$userAway === (string)$awayScore;
 
-                $matchTime = date('H:i', strtotime($match['details']['time']));
-                $naszCzas = date('H:i', strtotime($match['details']['naszCzas']));
-                if ($lastDate !== $matchDate): 
-                    if ($lastDate !== null): ?>
-                        </div> <!-- Close previous date group -->
-                    <?php endif; ?>
-                    <div class="row"><div class="col-12"><strong> Data meczu: <?= $matchDate; ?></strong></div></div>
-                    <div class="date-group">
-                <?php 
-                $lastDate = $matchDate;
-                endif; ?>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading<?= $match['ApiID']; ?>">
-                        <?php
-$homeTeamName = is_array($match['details']) && isset($match['details']['home_team']['plName']) 
-    ? $match['details']['home_team']['plName'] 
-    : (isset($match['details']['home_team']['name']) 
-        ? $match['details']['home_team']['name'] 
-        : 'szukam...');
-$awayTeamName = is_array($match['details']) && isset($match['details']['away_team']['plName']) 
-    ? $match['details']['away_team']['plName'] 
-    : (isset($match['details']['away_team']['name']) 
-        ? $match['details']['away_team']['name'] 
-        : 'szukam...');
-                        $homeTeamScore = is_array($match['details']) && isset($match['details']['home_team']['score']) ? $match['details']['home_team']['score'] : 'Unknown';
-                        $awayTeamScore = is_array($match['details']) && isset($match['details']['away_team']['score']) ? $match['details']['away_team']['score'] : 'Unknown';
-                        $pkt = isset($match['typy']['pkt']) ? $match['typy']['pkt'] : 'Unknown';
-                        ?>
-                        <button class="accordion-button collapsed px-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $match['ApiID']; ?>" aria-expanded="false" aria-controls="collapse<?= $match['ApiID']; ?>">
-                            <?= $homeTeamName; ?> vs <?= $awayTeamName; ?> <?= $homeTeamScore; ?> vs <?= $awayTeamScore; ?> | Twoje Pkt: <?= $pkt; ?>
-                        </button>
-                    </h2>
-                    <div id="collapse<?= $match['ApiID']; ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $match['ApiID']; ?>">
-                        <div class="accordion-body">
-                            <div class="row match form-row text-center">
-                                <div class="col">
-                                    <p>Twój typ: <?= $match['typy']['HomeTyp'] ?? '-'; ?> : <?= $match['typy']['AwayTyp'] ?? '-'; ?></p>
-                                    <?php
-                                        if ($usedGoldenBall == 0) {
-                                            $labelText = 'Nie chciałeś 2x więcej punktów za ten mecz';
-                                        } elseif ($usedGoldenBall == $match['Id']) {
-                                            $labelText = 'Za ten mecz chciałeś 2x wiecej punktów';
-                                        } else {
-                                            $labelText = 'Nie chciałeś 2x więcej punktów za ten mecz';
-                                        } 
-                                    ?>
-                                    <p><?= $labelText ?></p>
-                                    <p>Ten mecz wytypowało: <?= $match['liczbaTypow']; ?> osób </p>
-                                    <p>Zwycięstwo <?=$homeTeamName?> wytypowało: <?= $match['podsumowanieTypow']['countWin1']; ?> osób </p>
-                                       <p>Zwycięstwo <?=$awayTeamName?> wytypowało: <?= $match['podsumowanieTypow']['countWin2']; ?> osób </p>
-                                       <p>Remis obstawiło: <?= $match['podsumowanieTypow']['countDraw']; ?> osób </p>
-                                       <p>Najpopularniejszy typ: <?= $match['podsumowanieTypow']['mostPopularType']; ?>, wskazany <?=$match['podsumowanieTypow']['mostPopularTypeCount']?> razy </p>
-                                       <p>Złota piłka użyta: <?= $match['podsumowanieTypow']['goldenBallCount']; ?> raz(y) </p>
-                                       
-                                       <?php if($match['details']['status']=="Zakonczony"){?>
-                                       	<p>Punkty zdobyło: <?= $match['naKoniec']['playersWithPoints']; ?> graczy </p>
-                                       	<p>Dokładnie mecz wytypowało: <?= $match['naKoniec']['correctPredictions']; ?> graczy </p>
-                                       	<p>A z użycia złotej piłki ucieszyło się: <?= $match['naKoniec']['doublePointsPlayers']; ?> gracz(y) </p>'' 
-   	
-                                       <?php }?>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#typy<?= $match['Id']; ?>">
-                                        Jak typowali?
-                                    </button>
-                                    <div class="modal fade" id="typy<?= $match['Id']; ?>" tabindex="-1" aria-labelledby="typy<?= $match['Id']; ?>Label" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="typy<?= $match['Id']; ?>Label">Nasze typy na ten mecz:</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <?php if (isset($match['rozpoczety']) && $match['rozpoczety'] == 1): ?> 
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Nick</th>
-                                                                    <th>Typ</th>
-                                                                    <th>Złota piłka</th>
-                                                                </tr>
-                                                            </thead>
-<tbody>
-                                                                  <?php if (isset($match['typyGraczy'])): 
-       foreach ($match['typyGraczy'] as $typ): 
-           // Określenie klasy CSS na podstawie punktów
-           $class = '';
-           switch (intval($typ['pkt'])) {
-               case 6:
-                   $class = 'bg-platyna';
-                   break;
-               case 3:
-                   $class = 'bg-zloto';
-                   break;
-               case 2:
-                   $class = 'bg-srebro';
-                   break;
-               case 1:
-                   $class = 'bg-braz';
-                   break;
-               default:
-                   $class = '';
-           }
-           ?>
-           <tr class="<?= $class; ?>">
-               <td><?= htmlspecialchars($typ['username']); ?></td>
-               <td><?= htmlspecialchars($typ['HomeTyp']); ?>:<?= htmlspecialchars($typ['AwayTyp']); ?></td>
-               <td><?php if ($typ['GoldenGame'] == 1): ?>🙏<?php endif; ?></td>
-           </tr>
-       <?php endforeach; 
-   endif; ?>
-                                                               </tbody>
-                                                        </table>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="modal-footer"></div>
-                                            </div>
-                                        </div>
-                                    </div> <!-- Close modal fade -->
-                                </div> <!-- Close col -->
-                            </div> <!-- Close row match form-row text-center -->
-                        </div> <!-- Close accordion-body -->
-                    </div> <!-- Close accordion-collapse collapse -->
-                </div> <!-- Close accordion-item -->
-            <?php endforeach; ?>
-        </div> <!-- Close #matchesAccordion -->
-    </div> <!-- Close container -->
-</div> <!-- Close section -->
-<div class="container mt-3 px-0 mx-0">
-    <div class="row">
-        <div class="col">
-            <button type="button" class="btn btn-outline-secondary">
-                <a href="/wszystkieMecze">Twoje typy na wszystkie mecze &raquo;</a>
-            </button>
-        </div>
+    if ($lastDate !== $matchDate):
+        $lastDate = $matchDate;
+        $dayFormatted = (new DateTime($matchDate))->format('l, j F');
+?>
+  <p class="section-label mt-4 mb-1">Archiwum</p>
+  <div class="d-flex align-items-baseline gap-2 mb-3">
+    <span class="ff-bebas day-date"><?= $dayFormatted ?></span>
+    <span class="text-secondary" style="font-size:13px;"><?= esc($match['details']['competition'] ?? '') ?></span>
+  </div>
+<?php endif ?>
+
+<div class="card match-card mb-3">
+
+  <div class="match-head d-flex align-items-center justify-content-between px-3 py-2">
+    <span class="match-time"><?= $naszCzas ?> · Zakończony</span>
+    <span class="status-badge status-scored">
+      <?= $userPkt !== null ? '+' . $userPkt . ' pkt' : 'Przeliczony' ?>
+    </span>
+  </div>
+
+  <div class="card-body px-3 py-3">
+    <div class="d-grid mb-2" style="grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;">
+      <div class="text-center">
+        <div class="team-name mb-1"><?= esc($homeTeamName) ?></div>
+        <div class="ff-bebas score-display"><?= (int)$homeScore ?></div>
+      </div>
+      <div class="ff-bebas vs-div">:</div>
+      <div class="text-center">
+        <div class="team-name mb-1"><?= esc($awayTeamName) ?></div>
+        <div class="ff-bebas score-display"><?= (int)$awayScore ?></div>
+      </div>
     </div>
+
+    <?php if ($userHome !== null): ?>
+      <p class="text-center mb-0" style="font-size:13px;">
+        Twój typ: <strong><?= (int)$userHome ?> : <?= (int)$userAway ?></strong>
+        <?php if ($isGolden): ?>&nbsp;·&nbsp;<span class="chip-green">⚽ Złota</span><?php endif ?>
+        <?php if ($isExact): ?>&nbsp;·&nbsp;<span style="color:var(--ty-green);font-weight:600;">✓ Dokładnie!</span><?php endif ?>
+      </p>
+    <?php else: ?>
+      <p class="text-center mb-0 text-secondary" style="font-size:13px;">Brak typu</p>
+    <?php endif ?>
+  </div>
+
+  <?php if (!empty($match['typyGraczy'])): ?>
+    <div class="collapse-trigger" onclick="typerToggleResults(<?= $match['ApiID'] ?>)">
+      <span>Wyniki graczy</span>
+      <span id="arrow-<?= $match['ApiID'] ?>">›</span>
+    </div>
+    <div id="results-<?= $match['ApiID'] ?>" class="px-3 pb-3" style="display:none;">
+      <div class="results-row" style="font-size:11px;color:var(--bs-tertiary-color);font-weight:700;text-transform:uppercase;">
+        <div>#</div><div>Nick</div><div>Typ</div><div>Pkt</div>
+      </div>
+      <?php $pos = 1; foreach ($match['typyGraczy'] as $typ):
+            $isMe = ($typ['username'] === session()->get('username')); ?>
+        <div class="results-row">
+          <div class="res-pos"><?= $pos++ ?></div>
+          <div class="res-nick <?= $isMe ? 'res-me' : '' ?>"><?= !empty($typ['emoji']) ? esc($typ['emoji']) . ' ' : '' ?><?= esc($typ['username']) ?><?= $isMe ? ' ← Ty' : '' ?></div>
+          <div class="res-type"><?= (int)$typ['HomeTyp'] ?>:<?= (int)$typ['AwayTyp'] ?><?= $typ['GoldenGame'] == 1 ? ' ⚽' : '' ?></div>
+          <div class="res-pts ff-bebas"><?= isset($typ['pkt']) ? $typ['pkt'] : '--' ?></div>
+        </div>
+      <?php endforeach ?>
+    </div>
+  <?php endif ?>
+
+</div>
+<?php endforeach ?>
+
+<div class="d-flex gap-2 mt-3">
+  <a href="/typowanie" class="btn btn-outline-secondary btn-sm flex-fill text-center">← Wróć do typowania</a>
 </div>

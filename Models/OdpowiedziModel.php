@@ -63,6 +63,7 @@ public function pobierzOdpowiedziNaPytanie($pytanieID)
     return $this->select('odpowiedzi.id, odpowiedzi.odp, odpowiedzi.pkt, uzytkownicy.nick')
                 ->join('uzytkownicy', 'uzytkownicy.uniID = odpowiedzi.uniidOdp')
                 ->where('odpowiedzi.idPyt', $pytanieID)
+                ->orderBy('odpowiedzi.pkt', 'DESC')
                 ->orderBy('uzytkownicy.nick', 'ASC')
                 ->findAll();
 }
