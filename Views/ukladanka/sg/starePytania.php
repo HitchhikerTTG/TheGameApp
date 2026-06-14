@@ -1,4 +1,4 @@
-<?ph  p if (empty($pytania)): ?>
+<?php if (empty($pytania)): ?>
   <p class="text-secondary mt-4" style="font-size:14px;">Brak archiwalnych pytań.</p>
 <?php else: ?>
 
