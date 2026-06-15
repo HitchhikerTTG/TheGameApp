@@ -243,14 +243,15 @@ public function sendCampaign(string $templateFile, string $subject, string $targ
     return $sent;
 }
 
-public function sendDigest(array $users, int $turniejID, string $adminKomentarz,string $adminKomentarz2,string $adminKomentarz3, string $subjectTemplate = 'Dzień dobry, {nick}! Co w trawce piszczy?'): int
+public function sendDigest(array $users, int $turniejID, string $adminKomentarz,string $adminKomentarz2,string $adminKomentarz3, string $subjectTemplate = 'Dzień dobry, {nick}! Co w trawce piszczy?', array  $pytaniaWczorajIds = [],
+    array  $pytaniaDzisiajIds = [] ): int
 {
     $digestService = new \App\Services\DigestService();
     $url  = base_url('typowanie');
     $sent = 0;
 
     foreach ($users as $user) {
-        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3);
+        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3,$pytaniaWczorajIds, $pytaniaDzisiajIds);
         $html    = $this->buildDigestHtml($data, $url);
         $subject = str_replace('{nick}', $user['nick'] ?? '', $subjectTemplate);
 
@@ -304,10 +305,30 @@ private function buildDigestHtml(array $data, string $url): string
 {
     $nick = esc($data['nick']);
 
+    // ── Komentarz otwarcia ──
     $komentarzHtml = '';
     if (!empty($data['adminKomentarz'])) {
         $komentarzHtml = '<p style="background:#f0f4ff;border-left:3px solid #4f46e5;padding:10px 14px;'
                        . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz']) . '</p>';
+    }
+
+    // ── Blok punktów (WAŻNE -- na górze) ──
+    $pktHtml = '';
+    if (isset($data['wszystkiePkt'])) {
+        $pktHtml = '<div style="background:#f0f4ff;border-radius:8px;padding:16px 20px;margin:16px 0;display:flex;gap:24px;flex-wrap:wrap;">'
+            . '<div style="text-align:center;flex:1;">'
+            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Wszystkie punkty</div>'
+            .   '<div style="font-size:28px;font-weight:700;color:#4f46e5;">' . (int)$data['wszystkiePkt'] . '</div>'
+            . '</div>'
+            . '<div style="text-align:center;flex:1;">'
+            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Wczoraj zdobyte</div>'
+            .   '<div style="font-size:28px;font-weight:700;color:#059669;">' . (int)$data['wczorajPkt'] . '</div>'
+            . '</div>'
+            . '<div style="text-align:center;flex:1;">'
+            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Pozycja w rankingu</div>'
+            .   '<div style="font-size:28px;font-weight:700;color:#d97706;">' . (int)$data['rankingPozycja'] . '. miejsce</div>'
+            . '</div>'
+            . '</div>';
     }
 
     // ── Wczorajsze mecze ──
@@ -315,22 +336,19 @@ private function buildDigestHtml(array $data, string $url): string
     if (!empty($data['wczorajMecze'])) {
         $rows = '';
         foreach ($data['wczorajMecze'] as $m) {
-            $wynik   = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
-            $typTxt  = $m['userHome'] !== null
+            $wynik  = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
+            $typTxt = $m['userHome'] !== null
                 ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' ⚽' : '')
                 : '<em style="color:#6b7280;">brak</em>';
-            $pktTxt  = $m['pkt'] > 0 ? '+' . $m['pkt'] . ' pkt' : '0 pkt';
-            $rows   .= '<tr style="border-bottom:1px solid #f3f4f6;">'
-                     . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
-                     . '<td style="padding:6px 8px;text-align:center;font-weight:700;">' . $wynik . '</td>'
-                     . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
-                     . '<td style="padding:6px 8px;text-align:center;font-weight:700;color:#4f46e5;">' . $pktTxt . '</td>'
-                     . '</tr>';
+            $pktTxt = $m['pkt'] > 0 ? '+' . $m['pkt'] . ' pkt' : '0 pkt';
+            $rows  .= '<tr style="border-bottom:1px solid #f3f4f6;">'
+                    . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;font-weight:700;">' . $wynik . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
+                    . '<td style="padding:6px 8px;text-align:center;font-weight:700;color:#4f46e5;">' . $pktTxt . '</td>'
+                    . '</tr>';
         }
-        $sumPkt      = (int)$data['wczorajPkt'];
-        $wczorajHtml ='<p style="font-size:14px;color:#4f46e5;font-weight:700;margin-top:6px;">'
-                    . 'Twoja zdobycz punktowa za ostatnie mecze to ' . $sumPkt . ' pkt</p>'
-                    . '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki z ostatnich 24h</h3>'
+        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki z ostatnich 24h</h3>'
                      . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
                      . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
                      . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
@@ -340,7 +358,38 @@ private function buildDigestHtml(array $data, string $url): string
                      . '</tr></thead><tbody>' . $rows . '</tbody></table>';
     }
 
-    // ── Nadchodzące mecze (następne 24h) ──
+    // ── Wczorajsze pytanie(a) ──
+    $wczorajPytaniaHtml = '';
+    if (!empty($data['wczorajPytania'])) {
+        $komentarzPytanieHtml = '';
+        if (!empty($data['adminKomentarz2'])) {
+            $komentarzPytanieHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
+                                  . 'border-radius:4px;margin:16px 0 8px;">' . esc($data['adminKomentarz2']) . '</p>';
+        }
+        $wczorajPytaniaHtml .= $komentarzPytanieHtml;
+        $wczorajPytaniaHtml .= '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki za pytania</h3>';
+
+        foreach ($data['wczorajPytania'] as $p) {
+            $prawidlowaHtml = $p['odpowiedz']
+                ? '<span style="color:#059669;font-weight:700;">✓ ' . esc($p['odpowiedz']) . '</span>'
+                : '<em style="color:#9ca3af;">nie podano</em>';
+            $userOdpHtml = $p['userOdp']
+                ? esc($p['userOdp'])
+                : '<em style="color:#ef4444;">brak odpowiedzi</em>';
+            $pktColor = $p['pkt'] > 0 ? '#059669' : '#6b7280';
+
+            $wczorajPytaniaHtml .= '<div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px 14px;margin-bottom:10px;">'
+                . '<p style="margin:0 0 8px;font-size:14px;font-weight:500;">' . esc($p['tresc']) . '</p>'
+                . '<div style="display:flex;gap:16px;font-size:13px;flex-wrap:wrap;">'
+                . '<span><span style="color:#6b7280;">Prawidłowa:</span> ' . $prawidlowaHtml . '</span>'
+                . '<span><span style="color:#6b7280;">Twoja:</span> ' . $userOdpHtml . '</span>'
+                . '<span style="font-weight:700;color:' . $pktColor . ';">' . ($p['pkt'] > 0 ? '+' . $p['pkt'] : '0') . ' pkt</span>'
+                . '</div>'
+                . '</div>';
+        }
+    }
+
+    // ── Nadchodzące mecze ──
     $dzisiajHtml = '';
     if (!empty($data['dzisiajMecze'])) {
         $rows = '';
@@ -362,33 +411,32 @@ private function buildDigestHtml(array $data, string $url): string
                      . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
                      . '</tr></thead><tbody>' . $rows . '</tbody></table>';
     }
-        $komentarzPytanieHtml = '';
-        if (!empty($data['adminKomentarz2'])) {
-            $komentarzPytanieHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
-                                   . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz2']) . '</p>';
-        }
-            $komentarzClosingHtml = '';
-        if (!empty($data['adminKomentarz3'])) {
-            $komentarzClosingHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
-                                   . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz3']) . '</p>';
-        }
 
-    // ── Pytanie dnia ──
-    $pytanieHtml = '';
-    if (!empty($data['pytanie'])) {
-        $opisHtml   = !empty($data['pytanie']['opis'])
-            ? '<p style="font-size:13px;color:#6b7280;margin:6px 0 0;">' . esc($data['pytanie']['opis']) . '</p>'
-            : '';
-        $zrodloHtml = !empty($data['pytanie']['zrodlo'])
-            ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Skąd będę znał dobrą odpowiedź?: ' . esc($data['pytanie']['zrodlo']) . '</p>'
-            : '';
+    // ── Dzisiejsze pytanie(a) ──
+    $dzisiajPytaniaHtml = '';
+    if (!empty($data['dzisiajPytania'])) {
+        $dzisiajPytaniaHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>';
+        foreach ($data['dzisiajPytania'] as $p) {
+            $opisHtml   = !empty($p['opis'])   ? '<p style="font-size:13px;color:#6b7280;margin:6px 0 0;">' . esc($p['opis']) . '</p>'   : '';
+            $zrodloHtml = !empty($p['zrodlo']) ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Skąd będę wiedział: ' . esc($p['zrodlo']) . '</p>' : '';
+            $userOdpHtml = $p['hasOdp']
+                ? '<p style="font-size:13px;margin:8px 0 0;">Twoja odpowiedź: <strong>' . esc($p['userOdp']) . '</strong> <a href="' . $url . '" style="color:#4f46e5;font-size:12px;">zmień</a></p>'
+                : '<p style="text-align:right;font-size:12px;text-transform:uppercase;margin:8px 0 0;"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">Wpisz odpowiedź →</a></p>';
 
-        $pytanieHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>'
-                     . '<p style="background:#fffbeb;border:1px solid #fde68a;padding:10px 14px;border-radius:4px;margin:0;">'
-                     . esc($data['pytanie']['tresc']) . '</p>'
-                     . $opisHtml
-                     . $zrodloHtml
-                     . '<p style="text-align:right;font-size:12px;text-transform:uppercase"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">zapisz lub edytuj odpowiedź</a></p>';
+            $dzisiajPytaniaHtml .= '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:10px 14px;margin-bottom:10px;">'
+                . '<p style="margin:0;font-weight:500;">' . esc($p['tresc']) . '</p>'
+                . $opisHtml
+                . $zrodloHtml
+                . $userOdpHtml
+                . '</div>';
+        }
+    }
+
+    // ── Komentarz zamknięcia ──
+    $komentarzClosingHtml = '';
+    if (!empty($data['adminKomentarz3'])) {
+        $komentarzClosingHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
+                              . 'border-radius:4px;margin-top:16px;">' . esc($data['adminKomentarz3']) . '</p>';
     }
 
     return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
@@ -396,15 +444,14 @@ private function buildDigestHtml(array $data, string $url): string
          . '<div style="max-width:600px;margin:24px auto;background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.07);">'
          . '<p style="margin:0 0 16px;font-size:16px;">Hej <strong>' . $nick . '</strong>! 👋</p>'
          . $komentarzHtml
+         . $pktHtml               // ← punkty wysoko
          . $wczorajHtml
+         . $wczorajPytaniaHtml    // ← wyniki pytań pod meczami wczoraj
          . $dzisiajHtml
-         . $komentarzPytanieHtml
-         . $pytanieHtml
+         . $dzisiajPytaniaHtml    // ← aktywne pytania pod meczami dziś
          . $komentarzClosingHtml
          . '<hr style="border:none;border-top:1px solid #f3f4f6;margin:24px 0;">'
          . '<p style="font-size:14px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
-         . '<p style="font-size:13px;color:#d1d5db;margin:8px 0 0;">PS. Jeśli dobrze się bawisz w typerze i doceniasz jak to wszystko dzoała, to będzie mi cholernie miło, jeśli postawisz mi kawę ☕ → '
-         . '<a href="https://buycoffe.to/wit" style="color:#d1d5db;">buycoffe.to/wit</a></p>'
          . '</div></body></html>';
 }
     

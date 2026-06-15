@@ -39,6 +39,7 @@
                        placeholder="np. Wieczór pełen emocji! Dziś mecz Polska–Niemcy…">
                 <div class="form-text">Pojawi się jako wyróżniony akapit na początku emaila.</div>
             </div>
+            
             <div class="mb-4">
                 <label class="form-label fw-semibold">
                     Komentarz admina
@@ -48,6 +49,48 @@
                        placeholder="A tu coś o pytaniy">
                 <div class="form-text">Pojawi się jako dodatek przed pytaniem.</div>
             </div>
+            <?php if (!empty($pytaniaArchiwalne)): ?>
+<div class="mb-4">
+    <label class="form-label fw-semibold">
+        Wczorajsze pytanie(a)
+        <span class="text-muted fw-normal small">(opcjonalne -- wyniki zostaną pokazane pod meczami)</span>
+    </label>
+    <?php foreach ($pytaniaArchiwalne as $p): ?>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+               name="pytaniaWczoraj[]"
+               value="<?= (int)$p['id'] ?>"
+               id="pw<?= (int)$p['id'] ?>">
+        <label class="form-check-label small" for="pw<?= (int)$p['id'] ?>">
+            <?= esc($p['tresc']) ?>
+            <span class="text-muted">(<?= esc(substr($p['wazneDo'], 0, 10)) ?>, <?= (int)$p['pkt'] ?> pkt)</span>
+        </label>
+    </div>
+    <?php endforeach ?>
+</div>
+<?php endif ?>
+
+<?php if (!empty($pytaniaAktywne)): ?>
+<div class="mb-4">
+    <label class="form-label fw-semibold">
+        Dzisiejsze pytanie(a)
+        <span class="text-muted fw-normal small">(opcjonalne -- aktywne, gracze mogą jeszcze odpowiedzieć)</span>
+    </label>
+    <?php foreach ($pytaniaAktywne as $p): ?>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+               name="pytaniaDzisiaj[]"
+               value="<?= (int)$p['id'] ?>"
+               id="pd<?= (int)$p['id'] ?>"
+               <?= $p['aktywne'] ? 'checked' : '' ?>>
+        <label class="form-check-label small" for="pd<?= (int)$p['id'] ?>">
+            <?= esc($p['tresc']) ?>
+            <span class="text-muted">(ważne do <?= esc(substr($p['wazneDo'], 0, 10)) ?>, <?= (int)$p['pkt'] ?> pkt)</span>
+        </label>
+    </div>
+    <?php endforeach ?>
+</div>
+<?php endif ?>
             <div class="mb-4">
                 <label class="form-label fw-semibold">
                     Komentarz admina

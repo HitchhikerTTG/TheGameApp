@@ -813,14 +813,31 @@ public function testKampania()
 
 public function digest()
 {
-    $config = get_active_tournament_config();
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+    $now       = date('Y-m-d H:i:s');
+
+    $pytaniaArchiwalne = model(\App\Models\PytaniaModel::class)
+        ->where('TurniejID', $turniejID)
+        ->where('wazneDo <', $now)
+        ->orderBy('wazneDo', 'DESC')
+        ->findAll();
+
+    $pytaniaAktywne = model(\App\Models\PytaniaModel::class)
+        ->where('TurniejID', $turniejID)
+        ->where('wazneDo >=', $now)
+        ->orderBy('wazneDo', 'ASC')
+        ->findAll();
+
     return view('administracja/digest', [
-        'pageTitle'   => 'Poranny digest',
-        'config'      => $config,
-        'activeCount' => model(\App\Models\UserModel::class)
-                            ->where('PlaysTheActiveTournament', 1)
-                             ->where('digest_optin', 1)
-                            ->countAllResults(),
+        'pageTitle'         => 'Poranny digest',
+        'config'            => $config,
+        'activeCount'       => model(\App\Models\UserModel::class)
+                                ->where('PlaysTheActiveTournament', 1)
+                                ->where('digest_optin', 1)
+                                ->countAllResults(),
+        'pytaniaArchiwalne' => $pytaniaArchiwalne,
+        'pytaniaAktywne'    => $pytaniaAktywne,
     ]);
 }
 
@@ -828,15 +845,19 @@ public function wyslijDigest()
 {
     $config    = get_active_tournament_config();
     $turniejID = (int)$config['activeTournamentId'];
-    $komentarz = trim(strip_tags($this->request->getPost('komentarz') ?? ''));
+    $komentarz        = trim(strip_tags($this->request->getPost('komentarz') ?? ''));
     $komentarzPytanie = trim(strip_tags($this->request->getPost('komentarzPytanie') ?? ''));
-    $komentarzClosing =trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
-    $subject   = trim(strip_tags($this->request->getPost('subject') ?? 'Dzień dobry, {nick}! Co w trawce piszczy?'));
+    $komentarzClosing = trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
+    $subject          = trim(strip_tags($this->request->getPost('subject') ?? 'Dzień dobry, {nick}! Co w trawce piszczy?'));
+
+    // Pytania wybrane przez admina
+    $pytaniaWczoraj = array_map('intval', (array)($this->request->getPost('pytaniaWczoraj') ?? []));
+    $pytaniaDzisiaj = array_map('intval', (array)($this->request->getPost('pytaniaDzisiaj') ?? []));
 
     $users = model(\App\Models\UserModel::class)
         ->select('uniID, nick, email')
         ->where('PlaysTheActiveTournament', 1)
-        ->where('digest_optin', 1)  
+        ->where('digest_optin', 1)
         ->findAll();
 
     if (empty($users)) {
@@ -844,7 +865,12 @@ public function wyslijDigest()
         return redirect()->to('/hell/digest');
     }
 
-    $sent = (new \App\Services\EmailService())->sendDigest($users, $turniejID, $komentarz,$komentarzPytanie, $komentarzClosing,     $subject);
+    $sent = (new \App\Services\EmailService())->sendDigest(
+        $users, $turniejID,
+        $komentarz, $komentarzPytanie, $komentarzClosing,
+        $subject,
+        $pytaniaWczoraj, $pytaniaDzisiaj
+    );
     session()->setFlashdata('success', "Wysłano digest do {$sent} graczy.");
     return redirect()->to('/hell/digest');
 }

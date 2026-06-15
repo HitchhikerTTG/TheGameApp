@@ -160,7 +160,7 @@ class TheGame extends BaseController
     unset($mecz);
 
     $daneTurniejowe = [
-        'tabelaDanych' => $tabelaDanych,
+        'tabelaDanych' => $tabelaDanych,    
         'turniejID'    => $turniejID,
         'userID'       => $daneUzytkownika['id'],
     ];
