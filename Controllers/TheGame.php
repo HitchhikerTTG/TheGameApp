@@ -174,11 +174,11 @@ class TheGame extends BaseController
     // ZMIANA A: zamiast N zapytań COUNT -- jedno zapytanie grupujące
     $liczbyOdpowiedzi = [];
     if (!empty($pytanieIds)) {
-        $rows = $this->db->table('odpowiedzi')
-            ->select('idPyt, COUNT(*) AS cnt')
-            ->whereIn('idPyt', $pytanieIds)
-            ->groupBy('idPyt')
-            ->get()->getResultArray();
+        $rows = $this->odpowiedzModel->builder()
+                ->select('idPyt, COUNT(*) AS cnt')
+                ->whereIn('idPyt', $pytanieIds)
+                ->groupBy('idPyt')
+                ->get()->getResultArray();
         $liczbyOdpowiedzi = array_column($rows, 'cnt', 'idPyt');
     }
 
