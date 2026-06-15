@@ -14,6 +14,31 @@
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
   <link rel="stylesheet" type="text/css" href="/newStyle2026.css">
 
+<script>
+function initTheme() {
+  var saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-bs-theme', saved);
+  document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
+}
+function toggleTheme() {
+  var current = document.documentElement.getAttribute('data-bs-theme');
+  var next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-bs-theme', next);
+  localStorage.setItem('theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+initTheme();
+
+function typerToggleResults(apiId) {
+  var el    = document.getElementById('results-' + apiId);
+  var arrow = document.getElementById('arrow-' + apiId);
+  if (!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.textContent = open ? '›' : '‹';
+}
+</script>
+
 </head>
 
 <body>
@@ -47,21 +72,7 @@ if ($sukces): ?>
   <div class="alert alert-danger mx-3 mt-3 mb-0"><?= esc($fail) ?></div>
 <?php endif; ?>
 
-<script>
-function initTheme() {
-  var saved = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-bs-theme', saved);
-  document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
-}
-function toggleTheme() {
-  var current = document.documentElement.getAttribute('data-bs-theme');
-  var next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-bs-theme', next);
-  localStorage.setItem('theme', next);
-  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
-}
-initTheme();
-</script>
+
 
 <div class="px-3 pb-5">
  

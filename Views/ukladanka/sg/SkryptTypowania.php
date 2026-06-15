@@ -151,15 +151,6 @@ $(document).ready(function () {
       }
     });
   });
-
-  /* ── COLLAPSE WYNIKÓW ────────────────────────────────────────────── */
-  window.typerToggleResults = function (apiId) {
-    var $el    = $('#results-' + apiId);
-    var $arrow = $('#arrow-' + apiId);
-    var open   = $el.is(':visible');
-    $el.toggle(!open);
-    $arrow.text(open ? '›' : '‹');
-  };
   
     /* ── LIVE POLL (co 60s gdy jest mecz na żywo) ──────────────── */
   if ($('.status-live').length > 0) {
