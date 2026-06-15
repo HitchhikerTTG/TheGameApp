@@ -110,8 +110,8 @@ class TheGame extends BaseController
     public function testIndex($turniejID = null) {
 
     if ($turniejID === null) {
-        $turniejID = $this->config['activeTournamentId'];
-        $turniejName = $this->config['activeTournamentName'];
+        $turniejID            = $this->config['activeTournamentId'];
+        $turniejName          = $this->config['activeTournamentName'];
         $zewnetrzneIDTurnieju = $this->config['activeCompetitionId'];
     } else {
         $turniejName = "Wit musi zmienić sposób pobierania danych turnieju";
@@ -119,127 +119,126 @@ class TheGame extends BaseController
 
     $loggedInUserId = session()->get('loggedInUser');
 
-
-
-
-    //$model = model(TabelaModel::class);
+    // BEZ ZMIAN: odczyt JSON z dysku
     $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
 
-    //$userModel = model(UserModel::class);
+    // BEZ ZMIAN: 1 zapytanie do bazy
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
     $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
     if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
-    return view('typowanie/header', ['title' => $turniejName])
-         . view('ukladanka/sg/brakTurnieju')
-         . view('typowanie/footer');
+        return view('typowanie/header', ['title' => $turniejName])
+             . view('ukladanka/sg/brakTurnieju')
+             . view('typowanie/footer');
     }
 
-    $filtr = !empty($this->config['okno24h']) ? 'najblizsze_24h' : 'najblizsze'; // bo chodzi o to, żeby było wiadomo ile meczów pokazać
-    
-    $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju($loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, $filtr);
+    $filtr  = !empty($this->config['okno24h']) ? 'najblizsze_24h' : 'najblizsze';
+    $mecze4 = $this->meczService->meczeUzytkownikaWTurnieju(
+        $loggedInUserId, $turniejID, $zewnetrzneIDTurnieju, $filtr
+    );
 
-    // Fetch JSON data for each match
-foreach ($mecze4 as &$mecz) {
+    // BEZ ZMIAN: odczyt plików JSON dla meczów -- tu nie ma lepszej opcji
+    // bez zmiany architektury (te dane są już zcache'owane w plikach)
+    foreach ($mecze4 as &$mecz) {
         $jsonPath = WRITEPATH . "mecze/$turniejID/{$mecz['ApiID']}.json";
-        if (file_exists($jsonPath)) {
-            $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
-        } else {
-            $mecz['details'] = null;
-        }
-        if($mecz['rozpoczety']){
+        $mecz['details'] = file_exists($jsonPath)
+            ? json_decode(file_get_contents($jsonPath), true)
+            : null;
+
+        if ($mecz['rozpoczety']) {
             $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
             if (file_exists($jsonPath)) {
-            
-            
                 $data = json_decode(file_get_contents($jsonPath), true);
-                $mecz['typyGraczy'] = isset($data['types']) ? $data['types'] : [];
-                $mecz['podsumowanieTypow'] = isset($data['summary']) ? $data['summary'] : [];
-                //$mecz['naKoniec'] = isset($data['zakonczone']) ? $data['zakonczone'] : [];
-                }
-            else {
-                $mecz['typyGraczy'] = null;
+                $mecz['typyGraczy']        = $data['types']   ?? [];
+                $mecz['podsumowanieTypow'] = $data['summary'] ?? [];
+            } else {
+                $mecz['typyGraczy']        = null;
                 $mecz['podsumowanieTypow'] = null;
-                //$mecz['naKoniec'] = null;
             }
         }
     }
+    unset($mecz);
 
     $daneTurniejowe = [
         'tabelaDanych' => $tabelaDanych,
-        'turniejID' => $turniejID,
-        'userID' => $daneUzytkownika['id'],
+        'turniejID'    => $turniejID,
+        'userID'       => $daneUzytkownika['id'],
     ];
-    
-    $wstep = [
-        'title'=> $turniejName
-    ];
-    //$pytaniaModel= new PytaniaModel();
-    //$odpowiedzModel = new OdpowiedziModel();
-    $pytania = $this->pytaniaModel->getActiveQuestions($turniejID);
 
-foreach ($pytania as &$pytanie) {
+    $wstep = ['title' => $turniejName];
 
-    $pytanie['liczbaOdpowiedzi'] = $this->odpowiedzModel->liczbaOdpowiedziNaPytanie($pytanie['id']);
+    // BEZ ZMIAN: 1 zapytanie po aktywne pytania
+    $pytania    = $this->pytaniaModel->getActiveQuestions($turniejID);
+    $pytanieIds = array_column($pytania, 'id');
 
-    $odpowiedz = $this->odpowiedzModel->where('idPyt', $pytanie['id'])
-                                ->where('uniidOdp', $loggedInUserId)
-                                ->first();
-    if ($odpowiedz) {
-        $pytanie['dotychczasowa_odpowiedz'] = $odpowiedz['odp'];
-    }
-    
-    // Konwersja 'wazneDo' na czas lokalny
-    if (isset($pytanie['wazneDo'])) {
-        $utcDateTime = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
-        $localTimezone = new DateTimeZone('Europe/Warsaw'); // Zastąp 'Europe/Warsaw' swoją strefą czasową
-        $utcDateTime->setTimezone($localTimezone);
-        $pytanie['wazneDoLocal'] = $utcDateTime->format('Y-m-d H:i:s');
+    // ZMIANA A: zamiast N zapytań COUNT -- jedno zapytanie grupujące
+    $liczbyOdpowiedzi = [];
+    if (!empty($pytanieIds)) {
+        $rows = $this->db->table('odpowiedzi')
+            ->select('idPyt, COUNT(*) AS cnt')
+            ->whereIn('idPyt', $pytanieIds)
+            ->groupBy('idPyt')
+            ->get()->getResultArray();
+        $liczbyOdpowiedzi = array_column($rows, 'cnt', 'idPyt');
     }
 
-    // Sprawdzenie, czy czas wywołania funkcji jest po wartości 'wazneDo'
-    $currentDateTime = new DateTime('now', new DateTimeZone('UTC'));
-    if ($currentDateTime > $utcDateTime) {
-        // Ścieżka do pliku JSON
-        $jsonFilePath = WRITEPATH . "odpowiedzi/{$pytanie['id']}.json";
+    // ZMIANA B: zamiast N zapytań po odpowiedź gracza -- jedno zapytanie
+    $mojeOdpowiedzi = [];
+    if (!empty($pytanieIds)) {
+        $rows = $this->odpowiedzModel
+            ->whereIn('idPyt', $pytanieIds)
+            ->where('uniidOdp', $loggedInUserId)
+            ->findAll();
+        $mojeOdpowiedzi = array_column($rows, 'odp', 'idPyt');
+    }
 
-        if (file_exists($jsonFilePath)) {
-            // Pobierz dane z pliku JSON
-            $jsonData = file_get_contents($jsonFilePath);
-            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
-        } else {
-            // Wygeneruj dane i zapisz do pliku JSON
-            $this->wygenerujOdpowiedziNaPytanie($pytanie['id']);
-            $jsonData = file_get_contents($jsonFilePath);
-            $pytanie['odpowiedzi'] = json_decode($jsonData, true);
+    // Pętla tylko do formatowania i plików JSON -- bez zapytań do bazy
+    $utcNow = new DateTime('now', new DateTimeZone('UTC'));
+    foreach ($pytania as &$pytanie) {
+
+        $pytanie['liczbaOdpowiedzi']      = $liczbyOdpowiedzi[$pytanie['id']] ?? 0;
+        $pytanie['dotychczasowa_odpowiedz'] = $mojeOdpowiedzi[$pytanie['id']] ?? null;
+
+        // BEZ ZMIAN: konwersja czasu
+        if (isset($pytanie['wazneDo'])) {
+            $utcDateTime = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
+            $utcDateTime->setTimezone(new DateTimeZone('Europe/Warsaw'));
+            $pytanie['wazneDoLocal'] = $utcDateTime->format('Y-m-d H:i:s');
+
+            // BEZ ZMIAN: odczyt/generowanie pliku JSON po upływie terminu
+            $utcDeadline = new DateTime($pytanie['wazneDo'], new DateTimeZone('UTC'));
+            if ($utcNow > $utcDeadline) {
+                $jsonFilePath = WRITEPATH . "odpowiedzi/{$pytanie['id']}.json";
+                if (!file_exists($jsonFilePath)) {
+                    $this->wygenerujOdpowiedziNaPytanie($pytanie['id']);
+                }
+                $pytanie['odpowiedzi'] = json_decode(file_get_contents($jsonFilePath), true);
+            }
         }
     }
-}
-unset($pytanie); // Unset reference
+    unset($pytanie);
 
-
-
-
+    // BEZ ZMIAN: 2 zapytania
     $userClub = $this->clubMembersModel->getClubsByUser($loggedInUserId);
     $klubID   = $userClub ? (int)$userClub['klubID'] : null;
     $notatki  = $this->notatkiModel->getLatestPublished($turniejID, $klubID, 10);
 
-
     return view('typowanie/header', $wstep)
-           .view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
-           .view('ukladanka/sg/chat')
-           .view('ukladanka/sg/notatki', ['notatki' => $notatki]) 
-           .view('ukladanka/sg/znowumecze', [
-               'mecze' => $mecze4,
-               'turniejID' => $turniejID,
-               'userID' => $loggedInUserId,
-               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']
+           . view('ukladanka/sg/belkausera', ['daneUzytkownika' => $daneUzytkownika])
+           . view('ukladanka/sg/chat')
+           . view('ukladanka/sg/notatki', ['notatki' => $notatki])
+           . view('ukladanka/sg/znowumecze', [
+               'mecze'          => $mecze4,
+               'turniejID'      => $turniejID,
+               'userID'         => $loggedInUserId,
+               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall'],
            ])
-           .view('ukladanka/sg/pytania', ['pytania'=>$pytania])
-           .view('tabela/tabela', $daneTurniejowe)
-           .view('ukladanka/sg/SkryptTypowania')
-           .view('typowanie/footer');
+           . view('ukladanka/sg/pytania', ['pytania' => $pytania])
+           . view('tabela/tabela', $daneTurniejowe)
+           . view('ukladanka/sg/SkryptTypowania')
+           . view('typowanie/footer');
 }
+
 
 public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
     $configPath = WRITEPATH . 'ActiveTournament.json';
