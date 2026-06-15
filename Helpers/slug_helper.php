@@ -1,7 +1,7 @@
 <?php
 
 if (!function_exists('str_to_slug')) {
-    function str_to_slug(string $nick): string
+    function nickToSlug(string $nick): string
     {
         $map = [
             'ą'=>'a','ć'=>'c','ę'=>'e','ł'=>'l','ń'=>'n','ó'=>'o','ś'=>'s','ź'=>'z','ż'=>'z',
@@ -15,7 +15,7 @@ if (!function_exists('str_to_slug')) {
 }
 
 if (!function_exists('unique_slug')) {
-    function unique_slug(string $base, string $excludeUniID = ''): string
+    function uniqueSlug(string $base, string $excludeUniID = ''): string
     {
         $db        = \Config\Database::connect();
         $candidate = $base;
