@@ -293,9 +293,9 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td style="border-top:1px solid <?= $cBorder ?>;padding-top:20px;">
-            <p style="margin:0 0 6px;<?= $f ?>font-size:14px;color:<?= $cLabel ?>;font-style:italic;">may the odds be always in your <em>flavour</em></p>
-            <p style="margin:0 0 6px;<?= $f ?>font-size:14px;color:<?= $cLabel ?>">Jeśli widzisz w tym mailu coś, co się nie zgadza - daj mi proszę znać (choćby odpisując na tego maila). Postaram się to naprostować. Dziękuję. </em></p>
-            <p style="margin:0;<?= $f ?>font-size:14px;color:#cccccc;">
+            <p style="margin:0 0 6px;<?= $f ?>font-size:16px;color:<?= $cLabel ?>;font-style:italic;">may the odds be always in your <em>flavour</em></p>
+            <p style="margin:10 0 6px;<?= $f ?>font-size:16px;color:<?= $cLabel ?>">Jeśli widzisz w tym mailu coś, co się nie zgadza - daj mi proszę znać (choćby odpisując na tego maila). Postaram się to naprostować. Dziękuję. </em></p>
+            <p style="margin:10;<?= $f ?>font-size:16px;color:#cccccc;">
               A jeśli dobrze się bawisz, pamietaj że zawsze możesz mi postawić kaw&#x119; &#x2615; &rarr;
               <a href="https://buycoffee.to/wit" style="color:#cccccc;">buycoffee.to/wit</a>
             </p>
