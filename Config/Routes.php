@@ -171,7 +171,14 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
 
     $routes->post('profil/zapiszEmoji', 'Profil::zapiszEmoji');
 
+    // statystyki?
+    $routes->get('statystyki',          'Statystyki::turniej');
+    $routes->get('statystyki/przelicz', 'Statystyki::przelicz');
     
+    $routes->get('hell/generujSlug', 'AdminDash::generujSlugiBrakujace');
+    $routes->get('profil/(:segment)',       'Profil::pokaz/$1');        // publiczny profil gracza
+    $routes->get('wszechczasy',             'Statystyki::wszechczasy'); // tabela wszech czasów
+    $routes->post('hell/turnieje/toggleWszechczasy/(:num)', 'AdminDash::toggleWszechczasy/$1');
 
 });
 

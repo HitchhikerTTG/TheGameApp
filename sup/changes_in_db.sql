@@ -79,3 +79,8 @@ ALTER TABLE uzytkownicy
 ALTER TABLE pytania
     ADD COLUMN opis    TEXT NULL AFTER tresc,
     ADD COLUMN zrodlo  VARCHAR(255) NULL AFTER opis;
+    
+ALTER TABLE turnieje ADD COLUMN liczyDoWszechczasow TINYINT(1) NOT NULL DEFAULT 0;
+
+ALTER TABLE uzytkownicy ADD COLUMN slug VARCHAR(100) NULL UNIQUE; 
+ALTER TABLE uzytkownicy  ADD UNIQUE INDEX idx_slug (slug);

@@ -139,5 +139,123 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
             .view('profil/profil',$data);    
     }
 
+    public function pokaz(string $slug)
+{
+    helper('slug');
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    $userModel = model(\App\Models\UserModel::class);
+    $gracz     = $userModel->where('slug', $slug)->first();
+
+    if (!$gracz) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
+
+    $typyModel      = model(\App\Models\TypyModel::class);
+    $odpModel       = model(\App\Models\OdpowiedziModel::class);
+    $statModel      = model(\App\Models\StatystykiModel::class);
+
+    // ── Statystyki w aktywnym turnieju ──
+    $pktMecze   = $typyModel->punktyZaMecze($gracz['uniID'], $turniejID);
+    $pktPytania = $odpModel->punktyZaPytania($gracz['uniID'], $turniejID);
+    $dokladne   = $typyModel->dokladneTrafienia($gracz['uniID'], $turniejID);
+    $serie      = $statModel->obliczSerie($gracz['uniID'], $turniejID);
+
+    // Ulubiony wynik (najczęściej trafiony typ)
+    $db = \Config\Database::connect();
+    $ulubionyWynik = $db->query("
+        SELECT ty.HomeTyp, ty.AwayTyp, COUNT(*) AS liczba
+        FROM typy ty
+        JOIN terminarz t ON t.Id = ty.GameID
+        WHERE ty.uniID = ? AND t.TurniejID = ? AND ty.pkt > 0
+        GROUP BY ty.HomeTyp, ty.AwayTyp
+        ORDER BY liczba DESC LIMIT 1
+    ", [$gracz['uniID'], $turniejID])->getRow();
+
+    // Złota piłka: użyta / trafiona
+    $goldenUzyta   = (int)($db->query(
+        "SELECT COUNT(*) AS n FROM typy ty JOIN terminarz t ON t.Id=ty.GameID
+         WHERE ty.uniID=? AND t.TurniejID=? AND ty.GoldenGame=1 AND t.zakonczony=1",
+        [$gracz['uniID'], $turniejID]
+    )->getRow()->n ?? 0);
+    $goldenTrafiona = (int)($db->query(
+        "SELECT COUNT(*) AS n FROM typy ty JOIN terminarz t ON t.Id=ty.GameID
+         WHERE ty.uniID=? AND t.TurniejID=? AND ty.GoldenGame=1 AND ty.pkt>0",
+        [$gracz['uniID'], $turniejID]
+    )->getRow()->n ?? 0);
+
+    // Liczba typów łącznie (zakończone mecze)
+    $liczbaTypow = (int)($db->query(
+        "SELECT COUNT(*) AS n FROM typy ty JOIN terminarz t ON t.Id=ty.GameID
+         WHERE ty.uniID=? AND t.TurniejID=? AND t.zakonczony=1",
+        [$gracz['uniID'], $turniejID]
+    )->getRow()->n ?? 0);
+
+    // Trafienia kierunkowe (wygrał/remis/przegrał właściwie)
+    $trafieniaKierunkowe = (int)($db->query(
+        "SELECT COUNT(*) AS n FROM typy ty
+         JOIN terminarz t ON t.Id=ty.GameID
+         WHERE ty.uniID=? AND t.TurniejID=? AND t.zakonczony=1 AND ty.pkt>0",
+        [$gracz['uniID'], $turniejID]
+    )->getRow()->n ?? 0);
+
+    // ── Mini wszech czasów ──
+    $turniejeLiczace = $db->table('turnieje')
+        ->where('liczyDoWszechczasow', 1)
+        ->get()->getResultArray();
+    $idsLiczace = array_column($turniejeLiczace, 'Id');
+
+    $pktAllTime = 0;
+    $turniejeGracza = 0;
+    if (!empty($idsLiczace)) {
+        $pktAllTime = (int)($db->query(
+            "SELECT COALESCE(SUM(t.pkt),0) + COALESCE(SUM(o.pkt),0) AS suma
+             FROM uzytkownicy u
+             LEFT JOIN typy t ON t.uniID=u.uniID AND t.TurniejID IN (" . implode(',', $idsLiczace) . ")
+             LEFT JOIN odpowiedzi o ON o.uniidOdp=u.uniID AND o.TurniejID IN (" . implode(',', $idsLiczace) . ")
+             WHERE u.uniID=?",
+            [$gracz['uniID']]
+        )->getRow()->suma ?? 0);
+
+        $turniejeGracza = (int)($db->query(
+            "SELECT COUNT(DISTINCT TurniejID) AS n FROM typy
+             WHERE uniID=? AND TurniejID IN (" . implode(',', $idsLiczace) . ")",
+            [$gracz['uniID']]
+        )->getRow()->n ?? 0);
+    }
+
+    // ── Pozycja w rankingu aktywnego turnieju ──
+    $rankingPozycja = $statModel->getRankingPozycja($gracz['uniID'], $turniejID);
+
+    $jaMojeKonto = (session()->get('loggedInUser') === $gracz['uniID']);
+
+    $wstep = ['title' => esc($gracz['nick'])];
+
+    return view('typowanie/header', $wstep)
+         . view('ukladanka/sg/belkausera', [
+               'daneUzytkownika' => model(\App\Models\UserModel::class)
+                   ->getGameUserData(session()->get('loggedInUser'))
+           ])
+         . view('profil/pokaz', [
+               'gracz'               => $gracz,
+               'pktMecze'            => $pktMecze,
+               'pktPytania'          => $pktPytania,
+               'pktLacznie'          => $pktMecze + $pktPytania,
+               'dokladne'            => $dokladne,
+               'serie'               => $serie,
+               'ulubionyWynik'       => $ulubionyWynik,
+               'goldenUzyta'         => $goldenUzyta,
+               'goldenTrafiona'      => $goldenTrafiona,
+               'liczbaTypow'         => $liczbaTypow,
+               'trafieniaKierunkowe' => $trafieniaKierunkowe,
+               'rankingPozycja'      => $rankingPozycja,
+               'pktAllTime'          => $pktAllTime,
+               'turniejeGracza'      => $turniejeGracza,
+               'turniejName'         => $config['activeTournamentName'] ?? '',
+               'jaMojeKonto'         => $jaMojeKonto,
+           ])
+         . view('typowanie/footer');
+}
 
 }

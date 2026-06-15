@@ -1088,6 +1088,30 @@ public function edytujPytanie(int $pytanieID)
     return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
 }
 
+public function generujSlugiBrakujace()
+{
+    helper('slug');
+    $users = model(\App\Models\UserModel::class)
+        ->where('slug IS NULL OR slug =', '')
+        ->findAll();
+
+    $updated = 0;
+    foreach ($users as $user) {
+        $base = nickToSlug($user['nick']);
+        if ($base === '') $base = 'gracz';
+        $slug = uniqueSlug($base, $user['uniID']);
+        model(\App\Models\UserModel::class)
+            ->where('uniID', $user['uniID'])
+            ->set(['slug' => $slug])
+            ->update();
+        $updated++;
+    }
+
+    session()->setFlashdata('success', "Wygenerowano slugi dla {$updated} użytkowników.");
+    return redirect()->to('/hell');
+}
+
+
 
 }
 
