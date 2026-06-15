@@ -308,7 +308,7 @@ private function buildDigestHtml(array $data, string $url): string
 
     // ── helper: nagłówek sekcji ──────────────────────────────────────
     $h = fn(string $label) =>
-        '<tr><td style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;'
+        '<tr><td style="' . $f . 'font-size:20px;font-weight:700;text-transform:uppercase;'
         . 'letter-spacing:.06em;color:#9ca3af;padding:20px 0 6px 0;mso-line-height-rule:exactly;">'
         . $label . '</td></tr>';
 
@@ -316,7 +316,7 @@ private function buildDigestHtml(array $data, string $url): string
     $komentarzHtml = '';
     if (!empty($data['adminKomentarz'])) {
         $komentarzHtml =
-            '<tr><td style="' . $f . 'font-size:14px;color:#1e1b4b;padding:10px 14px;'
+            '<tr><td style="' . $f . 'font-size:16px;color:#1e1b4b;padding:10px 14px;'
             . 'border-left:3px solid #4f46e5;background:#f0f4ff;">'
             . esc($data['adminKomentarz']) . '</td></tr>'
             . '<tr><td style="padding:8px 0;font-size:0;">&nbsp;</td></tr>';
@@ -332,21 +332,21 @@ private function buildDigestHtml(array $data, string $url): string
             . '<tr>'
 
             . '<td width="32%" align="center" valign="top" bgcolor="#eef2ff" style="padding:14px 6px;">'
-            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Wszystkie punkty</p>'
+            . '<p style="' . $f . 'font-size:14px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Twoje punkty</p>'
             . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#4f46e5;margin:0;">' . (int)$data['wszystkiePkt'] . '</p>'
             . '</td>'
 
             . '<td width="2%" bgcolor="#ffffff" style="font-size:0;">&nbsp;</td>'
 
             . '<td width="32%" align="center" valign="top" bgcolor="#ecfdf5" style="padding:14px 6px;">'
-            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Wczoraj zdobyte</p>'
+            . '<p style="' . $f . 'font-size:14px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Wczoraj zdobyte</p>'
             . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#059669;margin:0;">' . (int)$data['wczorajPkt'] . '</p>'
             . '</td>'
 
             . '<td width="2%" bgcolor="#ffffff" style="font-size:0;">&nbsp;</td>'
 
             . '<td width="32%" align="center" valign="top" bgcolor="#fefce8" style="padding:14px 6px;">'
-            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Pozycja w rankingu</p>'
+            . '<p style="' . $f . 'font-size:14px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Twoja pozycja</p>'
             . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#d97706;margin:0;">' . (int)$data['rankingPozycja'] . '.</p>'
             . '</td>'
 
@@ -368,13 +368,13 @@ private function buildDigestHtml(array $data, string $url): string
 
             $rows .=
                 '<tr style="border-bottom:1px solid #f3f4f6;">'
-                . '<td style="' . $f . 'font-size:13px;padding:7px 6px;color:#111827;">'
+                . '<td style="' . $f . 'font-size:15px;padding:7px 6px;color:#111827;">'
                 . esc($m['homeName']) . '&nbsp;&ndash;&nbsp;' . esc($m['awayName']) . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:13px;font-weight:700;padding:7px 6px;color:#111827;white-space:nowrap;">'
+                . '<td align="center" style="' . $f . 'font-size:15px;font-weight:700;padding:7px 6px;color:#111827;white-space:nowrap;">'
                 . $wynik . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;color:#374151;white-space:nowrap;">'
+                . '<td align="center" style="' . $f . 'font-size:15px;padding:7px 6px;color:#374151;white-space:nowrap;">'
                 . $typTxt . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:13px;font-weight:700;padding:7px 6px;color:' . $pktCol . ';white-space:nowrap;">'
+                . '<td align="center" style="' . $f . 'font-size:15px;font-weight:700;padding:7px 6px;color:' . $pktCol . ';white-space:nowrap;">'
                 . $pktTxt . '</td>'
                 . '</tr>';
         }
@@ -384,10 +384,10 @@ private function buildDigestHtml(array $data, string $url): string
             '<tr><td style="padding:0 0 16px;">'
             . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
             . '<tr bgcolor="#f9fafb">'
-            . '<th align="left"   style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
-            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Wynik</th>'
-            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
-            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Pkt</th>'
+            . '<th align="left"   style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
+            . '<th align="center" style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Wynik</th>'
+            . '<th align="center" style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
+            . '<th align="center" style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Pkt</th>'
             . '</tr>'
             . $rows
             . '</table>'
@@ -399,7 +399,7 @@ private function buildDigestHtml(array $data, string $url): string
     if (!empty($data['wczorajPytania'])) {
         if (!empty($data['adminKomentarz2'])) {
             $wczorajPytaniaHtml .=
-                '<tr><td style="' . $f . 'font-size:14px;color:#14532d;padding:10px 14px;'
+                '<tr><td style="' . $f . 'font-size:16px;color:#14532d;padding:10px 14px;'
                 . 'border-left:3px solid #22c55e;background:#f0fff4;">'
                 . esc($data['adminKomentarz2']) . '</td></tr>'
                 . '<tr><td style="padding:6px 0;font-size:0;">&nbsp;</td></tr>';
@@ -420,13 +420,13 @@ private function buildDigestHtml(array $data, string $url): string
             $wczorajPytaniaHtml .=
                 '<tr><td style="padding:0 0 10px;">'
                 . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9fafb" style="border-collapse:collapse;">'
-                . '<tr><td style="' . $f . 'font-size:14px;font-weight:500;color:#111827;padding:10px 12px 6px;">'
+                . '<tr><td style="' . $f . 'font-size:16px;font-weight:500;color:#111827;padding:10px 12px 6px;">'
                 . esc($p['tresc']) . '</td></tr>'
                 . '<tr><td style="padding:0 12px 10px;">'
                 . '<table cellpadding="0" cellspacing="0" border="0"><tr valign="top">'
-                . '<td style="' . $f . 'font-size:12px;color:#6b7280;padding-right:16px;">Prawid&#322;owa:&nbsp;' . $prawidlowaHtml . '</td>'
-                . '<td style="' . $f . 'font-size:12px;color:#6b7280;padding-right:16px;">Twoja:&nbsp;' . $userOdpHtml . '</td>'
-                . '<td style="' . $f . 'font-size:12px;font-weight:700;color:' . $pktColor . ';">' . $pktLabel . '</td>'
+                . '<td style="' . $f . 'font-size:15px;color:#6b7280;padding-right:16px;">Prawid&#322;owa:&nbsp;' . $prawidlowaHtml . '</td>'
+                . '<td style="' . $f . 'font-size:15px;color:#6b7280;padding-right:16px;">Twoja:&nbsp;' . $userOdpHtml . '</td>'
+                . '<td style="' . $f . 'font-size:15px;font-weight:700;color:' . $pktColor . ';">' . $pktLabel . '</td>'
                 . '</tr></table>'
                 . '</td></tr>'
                 . '</table>'
@@ -447,11 +447,11 @@ private function buildDigestHtml(array $data, string $url): string
 
             $rows .=
                 '<tr style="border-bottom:1px solid #f3f4f6;">'
-                . '<td style="' . $f . 'font-size:13px;padding:7px 6px;color:#111827;">'
+                . '<td style="' . $f . 'font-size:16px;padding:7px 6px;color:#111827;">'
                 . esc($m['homeName']) . '&nbsp;&ndash;&nbsp;' . esc($m['awayName']) . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;color:#374151;white-space:nowrap;">'
+                . '<td align="center" style="' . $f . 'font-size:15px;padding:7px 6px;color:#374151;white-space:nowrap;">'
                 . esc($m['naszCzas']) . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;white-space:nowrap;">'
+                . '<td align="center" style="' . $f . 'font-size:15px;padding:7px 6px;white-space:nowrap;">'
                 . $typTxt . '</td>'
                 . '</tr>';
         }
@@ -461,9 +461,9 @@ private function buildDigestHtml(array $data, string $url): string
             '<tr><td style="padding:0 0 16px;">'
             . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
             . '<tr bgcolor="#f9fafb">'
-            . '<th align="left"   style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
-            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Godzina</th>'
-            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
+            . '<th align="left"   style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
+            . '<th align="center" style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Godzina</th>'
+            . '<th align="center" style="' . $f . 'font-size:15px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
             . '</tr>'
             . $rows
             . '</table>'
@@ -476,24 +476,24 @@ private function buildDigestHtml(array $data, string $url): string
         $dzisiajPytaniaHtml .= $h('Pytanie dnia');
         foreach ($data['dzisiajPytania'] as $p) {
             $opisHtml   = !empty($p['opis'])
-                ? '<tr><td style="' . $f . 'font-size:12px;color:#6b7280;padding:4px 12px 0;">' . esc($p['opis']) . '</td></tr>'
+                ? '<tr><td style="' . $f . 'font-size:15px;color:#6b7280;padding:4px 12px 0;">' . esc($p['opis']) . '</td></tr>'
                 : '';
             $zrodloHtml = !empty($p['zrodlo'])
-                ? '<tr><td style="' . $f . 'font-size:11px;color:#9ca3af;padding:2px 12px 0;">&#x1F4CA;&nbsp;' . esc($p['zrodlo']) . '</td></tr>'
+                ? '<tr><td style="' . $f . 'font-size:14px;color:#9ca3af;padding:2px 12px 0;">&#x1F4CA;&nbsp;' . esc($p['zrodlo']) . '</td></tr>'
                 : '';
             $userOdpHtml = $p['hasOdp']
-                ? '<tr><td style="' . $f . 'font-size:12px;color:#374151;padding:8px 12px 10px;">'
+                ? '<tr><td style="' . $f . 'font-size:15px;color:#374151;padding:8px 12px 10px;">'
                   . 'Twoja odpowied&#x17A;: <strong>' . esc($p['userOdp']) . '</strong>&nbsp;&nbsp;'
-                  . '<a href="' . $url . '" style="color:#4f46e5;font-size:11px;text-decoration:none;">zmie&#x144;</a>'
+                  . '<a href="' . $url . '" style="color:#4f46e5;font-size:15px;text-decoration:none;">zmie&#x144;</a>'
                   . '</td></tr>'
                 : '<tr><td align="right" style="padding:8px 12px 10px;">'
-                  . '<a href="' . $url . '" style="' . $f . 'font-size:12px;font-weight:700;color:#ef4444;text-decoration:none;">Wpisz odpowied&#x17A; &#x2192;</a>'
+                  . '<a href="' . $url . '" style="' . $f . 'font-size:15px;font-weight:700;color:#ef4444;text-decoration:none;">Wpisz odpowied&#x17A; &#x2192;</a>'
                   . '</td></tr>';
 
             $dzisiajPytaniaHtml .=
                 '<tr><td style="padding:0 0 10px;">'
                 . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffbeb" style="border-collapse:collapse;border:1px solid #fde68a;">'
-                . '<tr><td style="' . $f . 'font-size:14px;font-weight:500;color:#111827;padding:10px 12px 4px;">'
+                . '<tr><td style="' . $f . 'font-size:16px;font-weight:500;color:#111827;padding:10px 12px 4px;">'
                 . esc($p['tresc']) . '</td></tr>'
                 . $opisHtml
                 . $zrodloHtml
@@ -507,7 +507,7 @@ private function buildDigestHtml(array $data, string $url): string
     $komentarzClosingHtml = '';
     if (!empty($data['adminKomentarz3'])) {
         $komentarzClosingHtml =
-            '<tr><td style="' . $f . 'font-size:14px;color:#14532d;padding:10px 14px;'
+            '<tr><td style="' . $f . 'font-size:16px;color:#14532d;padding:10px 14px;'
             . 'border-left:3px solid #22c55e;background:#f0fff4;">'
             . esc($data['adminKomentarz3']) . '</td></tr>'
             . '<tr><td style="padding:8px 0;font-size:0;">&nbsp;</td></tr>';
@@ -541,9 +541,9 @@ private function buildDigestHtml(array $data, string $url): string
          . $komentarzClosingHtml
 
          . '<tr><td style="border-top:1px solid #e5e7eb;padding-top:20px;padding-bottom:8px;font-size:0;">&nbsp;</td></tr>'
-         . '<tr><td style="' . $f . 'font-size:13px;color:#9ca3af;padding-bottom:6px;">'
+         . '<tr><td style="' . $f . 'font-size:15px;color:#9ca3af;padding-bottom:6px;">'
          . 'may the odds be always in your <em>flavour</em></td></tr>'
-         . '<tr><td style="' . $f . 'font-size:12px;color:#d1d5db;padding-bottom:28px;">'
+         . '<tr><td style="' . $f . 'font-size:15px;color:#d1d5db;padding-bottom:28px;">'
          . 'Je&#x15B;li dobrze si&#x119; bawisz i doceniasz t&#x119; robot&#x119;, postaw kaw&#x119; &#x2615; &rarr; '
          . '<a href="https://buycoffee.to/wit" style="color:#d1d5db;text-decoration:none;">buycoffee.to/wit</a></td></tr>'
 
