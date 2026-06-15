@@ -306,63 +306,87 @@ private function buildDigestHtml(array $data, string $url): string
     $nick = esc($data['nick']);
     $f    = 'font-family:Arial,Helvetica,sans-serif;';
  
-    // ── Stałe stylistyczne ───────────────────────────────────────────
-    $colorBg       = '#f0f0f3';
-    $colorCard     = '#ffffff';
-    $colorHeader   = '#0d0d0f';
-    $colorAccent   = '#e8ff47';
-    $colorText     = '#1a1a2e';
-    $colorMuted    = '#555560';
-    $colorLabel    = '#aaaabc';
-    $colorGreen    = '#1a9e5c';
-    $colorGold     = '#b38a00';
-    $colorRed      = '#d93636';
-    $colorBgGray   = '#f8f8f4';
-    $colorBgGreen  = '#f0fff8';
-    $colorBgYellow = '#fffbf0';
-    $colorBorderY  = '#f0e68c';
-    $colorBorder   = '#f0f0f3';
+    // ── Stałe kolorystyczne ──────────────────────────────────────────
+    $cBg        = '#f0f0f3';
+    $cCard      = '#ffffff';
+    $cHeader    = '#0d0d0f';
+    $cAccent    = '#e8ff47';
+    $cText      = '#1a1a2e';
+    $cMuted     = '#555560';
+    $cLabel     = '#aaaabc';
+    $cGreen     = '#1a9e5c';
+    $cGold      = '#b38a00';
+    $cRed       = '#d93636';
+    $cBgGray    = '#f8f8f4';
+    $cBgGreen   = '#f0fff8';
+    $cBgYellow  = '#fffbf0';
+    $cBorderY   = '#f0e68c';
+    $cBorder    = '#f0f0f3';
  
-    $fsBody  = '18px';   // treść główna
-    $fsLabel = '14px';   // nagłówki sekcji uppercase, nagłówki tabel
-    $fsBig   = '30px';   // liczby statystyk
-    $fsLogo  = '26px';   // logo w headerze
+    // ── Stałe typograficzne ──────────────────────────────────────────
+    $fsBody     = '18px';
+    $fsSub      = '16px';
+    $fsSmall    = '15px';
+    $fsLabel    = '12px';
+    $fsStat     = '26px';
+    $fsScore    = '22px';
+    $fsLogo     = '24px';
  
-    $tdLabel = $f . 'font-size:' . $fsLabel . ';font-weight:700;letter-spacing:2px;'
-             . 'text-transform:uppercase;color:' . $colorLabel . ';';
- 
+    // ── Helper: nagłówek sekcji ──────────────────────────────────────
     $sectionLabel = fn(string $text) =>
-        '<p style="margin:0 0 12px;' . $tdLabel . '">' . $text . '</p>';
+        '<p style="margin:0 0 14px;' . $f . 'font-size:' . $fsLabel . ';font-weight:700;'
+        . 'letter-spacing:2px;text-transform:uppercase;color:' . $cLabel . ';">'
+        . $text . '</p>';
  
-    $thCell = fn(string $text, string $align = 'left') =>
-        '<td align="' . $align . '" style="' . $f . 'font-size:' . $fsLabel . ';font-weight:700;'
-        . 'letter-spacing:1px;text-transform:uppercase;color:' . $colorLabel . ';'
-        . 'padding:12px ' . ($align === 'left' ? '10px' : '8px') . ';white-space:nowrap;">'
-        . $text . '</td>';
+    // ── Helper: blok komentarza z lewą kreską ────────────────────────
+    $komentarzBlock = fn(string $text, string $borderColor, string $bgColor, string $marginBottom = '0') =>
+        '<table width="100%" cellpadding="0" cellspacing="0" border="0"'
+        . ($marginBottom ? ' style="margin-bottom:' . $marginBottom . ';"' : '') . '>'
+        . '<tr>'
+        . '<td width="4" bgcolor="' . $borderColor . '" style="font-size:0;">&nbsp;</td>'
+        . '<td style="padding:12px 16px;background:' . $bgColor . ';'
+        .   $f . 'font-size:' . $fsBody . ';color:' . $cText . ';line-height:1.6;">'
+        . $text
+        . '</td>'
+        . '</tr>'
+        . '</table>';
  
-    // ── HEADER ──────────────────────────────────────────────────────
+    // ── Helper: karta meczu (wyniki i nadchodzące) ───────────────────
+    $matchCard = fn(string $inner, string $bg = '', string $border = '', string $mb = '8px') =>
+        '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:' . $mb . ';">'
+        . '<tr>'
+        . '<td bgcolor="' . ($bg ?: $cBgGray) . '" style="padding:14px 16px;border-radius:8px;'
+        . ($border ? 'border:1px solid ' . $border . ';' : '') . '">'
+        . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
+        . $inner
+        . '</table>'
+        . '</td>'
+        . '</tr>'
+        . '</table>';
+ 
+    // ════════════════════════════════════════════════════════════════
+    // HEADER
+    // ════════════════════════════════════════════════════════════════
     $headerHtml =
         '<tr>'
-        . '<td bgcolor="' . $colorHeader . '" style="padding:28px 32px 24px;border-radius:12px 12px 0 0;">'
+        . '<td bgcolor="' . $cHeader . '" style="padding:24px 24px 20px;border-radius:12px 12px 0 0;">'
         . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
         . '<tr>'
         . '<td>'
-        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;letter-spacing:2px;'
-        .   'color:#ffffff;text-transform:uppercase;">TYPER</span>'
-        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;color:' . $colorAccent . ';">.</span>'
-        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;letter-spacing:2px;'
-        .   'color:#ffffff;text-transform:uppercase;">MŚ 2026</span>'
+        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;letter-spacing:2px;color:#ffffff;text-transform:uppercase;">TYPER</span>'
+        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;color:' . $cAccent . ';">.</span>'
+        . '<span style="' . $f . 'font-size:' . $fsLogo . ';font-weight:900;letter-spacing:2px;color:#ffffff;text-transform:uppercase;">M&#346; 2026</span>'
         . '</td>'
-        . '<td align="right" valign="middle">'
-        . '<span style="' . $f . 'font-size:' . $fsLabel . ';font-weight:700;letter-spacing:2px;'
-        .   'text-transform:uppercase;color:#555560;">Digest &middot; ' . date('d.m.Y') . '</span>'
+        . '<td align="right" valign="middle" style="white-space:nowrap;">'
+        . '<span style="' . $f . 'font-size:' . $fsLabel . ';font-weight:700;letter-spacing:1px;text-transform:uppercase;color:' . $cMuted . ';">'
+        . date('d.m.Y')
+        . '</span>'
         . '</td>'
         . '</tr>'
         . '<tr>'
-        . '<td colspan="2" style="padding-top:16px;">'
+        . '<td colspan="2" style="padding-top:14px;">'
         . '<p style="margin:0;' . $f . 'font-size:' . $fsBody . ';color:#a0a0b0;line-height:1.5;">'
-        . 'Hej <strong style="color:#ffffff;">' . $nick . '</strong>! &#x1F44B;&nbsp;'
-        . 'Oto Tw&oacute;j codzienny przegląd &mdash; wyniki, punkty i to, co czeka dzi&#x15B;.'
+        . 'Hej <strong style="color:#ffffff;">' . $nick . '</strong>! &#x1F44B; Oto Tw&oacute;j codzienny przegląd.'
         . '</p>'
         . '</td>'
         . '</tr>'
@@ -370,274 +394,297 @@ private function buildDigestHtml(array $data, string $url): string
         . '</td>'
         . '</tr>';
  
-    // ── helper: komentarz z lewą kreską ─────────────────────────────
-    $komentarzBlock = function(string $text, string $borderColor, string $bgColor) use ($f, $fsBody, $colorText): string {
-        return
-            '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
-            . '<tr>'
-            . '<td width="3" bgcolor="' . $borderColor . '" style="font-size:0;">&nbsp;</td>'
-            . '<td style="padding:10px 14px;background:' . $bgColor . ';'
-            .   $f . 'font-size:' . $fsBody . ';color:' . $colorText . ';line-height:1.6;">'
-            . $text
-            . '</td>'
-            . '</tr>'
-            . '</table>';
-    };
- 
-    // ── KOMENTARZ ADMINA (otwarcie) ──────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // KOMENTARZ ADMINA (otwarcie)
+    // ════════════════════════════════════════════════════════════════
     $komentarzHtml = '';
     if (!empty($data['adminKomentarz'])) {
         $komentarzHtml =
-            '<tr><td bgcolor="' . $colorCard . '" style="padding:0 32px;">'
-            . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
-            . '<tr><td style="padding:24px 0 0;">'
-            . $komentarzBlock(esc($data['adminKomentarz']), $colorAccent, $colorBgGray)
-            . '</td></tr>'
-            . '</table>'
+            '<tr><td bgcolor="' . $cCard . '" style="padding:20px 24px 0;">'
+            . $komentarzBlock(esc($data['adminKomentarz']), $cAccent, $cBgGray)
             . '</td></tr>';
     }
  
-    // ── STATYSTYKI ───────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // STATYSTYKI
+    // ════════════════════════════════════════════════════════════════
     $pktHtml = '';
     if (isset($data['wszystkiePkt'])) {
-        $kafelek = fn(string $bg, string $label, string $value, string $valueColor) =>
-            '<td width="32%" align="center" bgcolor="' . $bg . '" style="padding:20px 8px;border-radius:8px;">'
-            . '<p style="margin:0 0 4px;' . $f . 'font-size:' . $fsLabel . ';font-weight:700;'
-            .   'letter-spacing:1px;text-transform:uppercase;color:#aaaabc;">' . $label . '</p>'
-            . '<p style="margin:0;' . $f . 'font-size:30px;font-weight:900;color:' . $valueColor . ';">' . $value . '</p>'
+        $kafelek = fn(string $bg, string $label, string $value, string $vColor) =>
+            '<td width="32%" align="center" bgcolor="' . $bg . '" style="padding:14px 4px;border-radius:8px;">'
+            . '<p style="margin:0 0 4px;' . $f . 'font-size:11px;font-weight:700;letter-spacing:1px;'
+            .   'text-transform:uppercase;color:' . $cLabel . ';">' . $label . '</p>'
+            . '<p style="margin:0;' . $f . 'font-size:' . $fsStat . ';font-weight:900;color:' . $vColor . ';">' . $value . '</p>'
             . '</td>';
  
         $pktHtml =
-            '<tr><td bgcolor="' . $colorCard . '" style="padding:24px 32px 0;">'
+            '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">'
             . $sectionLabel('Twoje statystyki')
             . '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
-            . $kafelek($colorBgGray,   'Punkty og&oacute;&#322;em', (int)$data['wszystkiePkt'],    $colorText)
-            . '<td width="4%" style="font-size:0;">&nbsp;</td>'
-            . $kafelek($colorBgGreen,  'Wczoraj',                   '+' . (int)$data['wczorajPkt'], $colorGreen)
-            . '<td width="4%" style="font-size:0;">&nbsp;</td>'
-            . $kafelek($colorBgYellow, 'Miejsce',                   (int)$data['rankingPozycja'] . '.', $colorGold)
+            . $kafelek($cBgGray,   'Punkty',   (string)(int)$data['wszystkiePkt'],         $cText)
+            . '<td width="2%" style="font-size:0;">&nbsp;</td>'
+            . $kafelek($cBgGreen,  'Wczoraj',  '+' . (string)(int)$data['wczorajPkt'],     $cGreen)
+            . '<td width="2%" style="font-size:0;">&nbsp;</td>'
+            . $kafelek($cBgYellow, 'Miejsce',  (string)(int)$data['rankingPozycja'] . '.', $cGold)
             . '</tr></table>'
             . '</td></tr>';
     }
  
-    // ── WYNIKI Z OSTATNICH 24H ───────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // WYNIKI MECZÓW (ostatnie 24h)
+    // ════════════════════════════════════════════════════════════════
     $wczorajHtml = '';
     if (!empty($data['wczorajMecze'])) {
         $rows = '';
         foreach ($data['wczorajMecze'] as $m) {
-            $wynik  = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
-            $typTxt = $m['userHome'] !== null
+            $wynik  = (int)$m['homeScore'] . ' : ' . (int)$m['awayScore'];
+            $hasTyp = $m['userHome'] !== null;
+            $typTxt = $hasTyp
                 ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' &#x26BD;' : '')
-                : '<em style="color:' . $colorLabel . ';">brak</em>';
+                : '<em style="color:' . $cLabel . ';">brak</em>';
             $pkt    = (int)$m['pkt'];
-            $pktTxt = $pkt > 0 ? '+' . $pkt : '0';
-            $pktCol = $pkt > 0 ? $colorGreen : $colorLabel;
+            $pktTxt = $pkt > 0 ? '+' . $pkt . ' pkt' : '0 pkt';
+            $pktCol = $pkt > 0 ? $cGreen : $cLabel;
  
-            $tdBody = $f . 'font-size:' . $fsBody . ';color:' . $colorText . ';padding:12px 10px;';
- 
-            $rows .=
-                '<tr style="border-bottom:1px solid ' . $colorBorder . ';">'
-                . '<td style="' . $tdBody . '">'
+            $inner =
+                '<tr>'
+                . '<td style="' . $f . 'font-size:' . $fsBody . ';font-weight:600;color:' . $cText . ';">'
                 .   esc($m['homeName']) . ' &ndash; ' . esc($m['awayName'])
                 . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:' . $fsBody . ';font-weight:700;'
-                .   'color:' . $colorText . ';padding:12px 8px;white-space:nowrap;">' . $wynik . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:' . $fsBody . ';'
-                .   'color:' . $colorMuted . ';padding:12px 8px;white-space:nowrap;">' . $typTxt . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:' . $fsBody . ';font-weight:700;'
-                .   'color:' . $pktCol . ';padding:12px 8px;white-space:nowrap;">' . $pktTxt . '</td>'
+                . '<td align="right" style="' . $f . 'font-size:' . $fsScore . ';font-weight:900;'
+                .   'color:' . $cText . ';white-space:nowrap;">' . $wynik . '</td>'
+                . '</tr>'
+                . '<tr>'
+                . '<td style="' . $f . 'font-size:' . $fsSmall . ';color:' . $cLabel . ';padding-top:4px;">'
+                .   'Tw&oacute;j typ: <strong style="color:' . $cText . ';">' . $typTxt . '</strong>'
+                . '</td>'
+                . '<td align="right" style="' . $f . 'font-size:' . $fsBody . ';font-weight:900;'
+                .   'color:' . $pktCol . ';padding-top:4px;white-space:nowrap;">' . $pktTxt . '</td>'
                 . '</tr>';
+ 
+            $rows .= $matchCard($inner, $cBgGray, '', '8px');
         }
  
         $wczorajHtml =
-            '<tr><td bgcolor="' . $colorCard . '" style="padding:28px 32px 0;">'
+            '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">'
             . $sectionLabel('Wyniki z ostatnich 24h')
-            . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
-            . '<tr bgcolor="' . $colorBgGray . '">'
-            . $thCell('Mecz')
-            . $thCell('Wynik',    'center')
-            . $thCell('Tw&oacute;j typ', 'center')
-            . $thCell('Pkt',      'center')
-            . '</tr>'
             . $rows
-            . '</table>'
             . '</td></tr>';
     }
  
-    // ── KOMENTARZ 2 + WYNIKI PYTAŃ ──────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // KOMENTARZ 2 + WYNIKI PYTAŃ
+    // ════════════════════════════════════════════════════════════════
     $wczorajPytaniaHtml = '';
     if (!empty($data['wczorajPytania'])) {
-        $wczorajPytaniaHtml = '<tr><td bgcolor="' . $colorCard . '" style="padding:28px 32px 0;">';
+        $blok = '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">';
  
         if (!empty($data['adminKomentarz2'])) {
-            $wczorajPytaniaHtml .=
-                $komentarzBlock(esc($data['adminKomentarz2']), $colorGreen, $colorBgGreen)
-                . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
-                . '<tr><td style="padding:12px 0 0;font-size:0;">&nbsp;</td></tr>'
-                . '</table>';
+            $blok .= $komentarzBlock(esc($data['adminKomentarz2']), $cGreen, $cBgGreen, '16px');
         }
  
-        $wczorajPytaniaHtml .= $sectionLabel('Wyniki za pytania');
+        $blok .= $sectionLabel('Wyniki za pytania');
  
         foreach ($data['wczorajPytania'] as $p) {
             $prawidlowaHtml = $p['odpowiedz']
-                ? '<strong style="color:' . $colorGreen . ';">&#x2713;&nbsp;' . esc($p['odpowiedz']) . '</strong>'
-                : '<em style="color:' . $colorLabel . ';">nie podano</em>';
+                ? '<strong style="color:' . $cGreen . ';">&#x2713;&nbsp;' . esc($p['odpowiedz']) . '</strong>'
+                : '<em style="color:' . $cLabel . ';">nie podano</em>';
             $userOdpHtml = $p['userOdp']
-                ? '<strong style="color:' . $colorText . ';">' . esc($p['userOdp']) . '</strong>'
-                : '<span style="color:' . $colorRed . ';">brak odpowiedzi</span>';
-            $pktColor = (int)$p['pkt'] > 0 ? $colorGreen : $colorLabel;
-            $pktLabel = (int)$p['pkt'] > 0 ? '+' . (int)$p['pkt'] . ' pkt' : '0 pkt';
+                ? '<strong style="color:' . $cText . ';">' . esc($p['userOdp']) . '</strong>'
+                : '<span style="color:' . $cRed . ';">brak</span>';
+            $pkt      = (int)$p['pkt'];
+            $pktColor = $pkt > 0 ? $cGreen : $cLabel;
+            $pktLabel = $pkt > 0 ? '+' . $pkt . ' pkt' : '0 pkt';
  
-            $wczorajPytaniaHtml .=
+            $blok .=
                 '<table width="100%" cellpadding="0" cellspacing="0" border="0"'
-                . ' style="border-collapse:collapse;margin-bottom:10px;'
-                .   'border:1px solid ' . $colorBorder . ';border-radius:8px;">'
+                . ' style="margin-bottom:8px;border:1px solid ' . $cBorder . ';border-radius:8px;">'
                 . '<tr><td style="' . $f . 'font-size:' . $fsBody . ';font-weight:600;'
-                .   'color:' . $colorText . ';padding:12px 14px 6px;line-height:1.4;">'
+                .   'color:' . $cText . ';padding:14px 16px 8px;line-height:1.4;">'
                 . esc($p['tresc'])
                 . '</td></tr>'
-                . '<tr><td style="padding:0 14px 12px;">'
-                . '<table cellpadding="0" cellspacing="0" border="0"><tr>'
-                . '<td style="' . $f . 'font-size:' . $fsLabel . ';color:' . $colorLabel . ';padding-right:20px;">'
-                .   'Prawid&#322;owa:&nbsp;' . $prawidlowaHtml . '</td>'
-                . '<td style="' . $f . 'font-size:' . $fsLabel . ';color:' . $colorLabel . ';padding-right:20px;">'
-                .   'Twoja:&nbsp;' . $userOdpHtml . '</td>'
-                . '<td style="' . $f . 'font-size:' . $fsLabel . ';font-weight:700;color:' . $pktColor . ';">'
-                .   $pktLabel . '</td>'
+                . '<tr><td style="padding:0 16px 14px;">'
+                . '<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>'
+                . '<td style="' . $f . 'font-size:' . $fsSub . ';color:' . $cLabel . ';">'
+                .   'Prawid&#322;owa: ' . $prawidlowaHtml
+                . '</td>'
+                . '<td align="right" style="' . $f . 'font-size:' . $fsSub . ';color:' . $cLabel . ';white-space:nowrap;">'
+                .   'Twoja: ' . $userOdpHtml
+                .   ' &nbsp;<strong style="color:' . $pktColor . ';">' . $pktLabel . '</strong>'
+                . '</td>'
                 . '</tr></table>'
                 . '</td></tr>'
                 . '</table>';
         }
  
-        $wczorajPytaniaHtml .= '</td></tr>';
+        $blok .= '</td></tr>';
+        $wczorajPytaniaHtml = $blok;
     }
  
-    // ── NADCHODZĄCE MECZE ────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // NADCHODZĄCE MECZE
+    // ════════════════════════════════════════════════════════════════
     $dzisiajHtml = '';
     if (!empty($data['dzisiajMecze'])) {
         $rows = '';
         foreach ($data['dzisiajMecze'] as $m) {
-            $typTxt = $m['hasTyp']
-                ? '<strong style="color:' . $colorText . ';">'
-                .   (int)$m['userHome'] . ':' . (int)$m['userAway']
-                .   ($m['isGolden'] ? '&nbsp;&#x26BD;' : '')
-                . '</strong>'
-                : '<a href="' . $url . '" style="' . $f . 'font-size:13px;font-weight:700;'
-                .   'color:#ffffff;text-decoration:none;background:' . $colorRed . ';'
-                .   'padding:4px 12px;border-radius:4px;display:inline-block;">Obstaw!</a>';
+            if ($m['hasTyp']) {
+                $typRow =
+                    '<tr>'
+                    . '<td colspan="2" style="' . $f . 'font-size:' . $fsSub . ';color:' . $cLabel . ';padding-top:4px;">'
+                    .   'Tw&oacute;j typ: <strong style="color:' . $cText . ';">'
+                    .   (int)$m['userHome'] . ':' . (int)$m['userAway']
+                    .   ($m['isGolden'] ? ' &#x26BD;' : '')
+                    .   '</strong>'
+                    . '</td>'
+                    . '</tr>';
  
-            $rows .=
-                '<tr style="border-bottom:1px solid ' . $colorBorder . ';">'
-                . '<td style="' . $f . 'font-size:' . $fsBody . ';color:' . $colorText . ';padding:12px 10px;">'
-                .   esc($m['homeName']) . ' &ndash; ' . esc($m['awayName']) . '</td>'
-                . '<td align="center" style="' . $f . 'font-size:' . $fsBody . ';'
-                .   'color:' . $colorMuted . ';padding:12px 8px;white-space:nowrap;">'
-                .   esc($m['naszCzas']) . '</td>'
-                . '<td align="center" style="padding:12px 8px;white-space:nowrap;">' . $typTxt . '</td>'
-                . '</tr>';
+                $inner =
+                    '<tr>'
+                    . '<td style="' . $f . 'font-size:' . $fsBody . ';font-weight:600;color:' . $cText . ';">'
+                    .   esc($m['homeName']) . ' &ndash; ' . esc($m['awayName'])
+                    . '</td>'
+                    . '<td align="right" style="' . $f . 'font-size:' . $fsSmall . ';color:' . $cMuted . ';white-space:nowrap;">'
+                    .   esc($m['naszCzas'])
+                    . '</td>'
+                    . '</tr>'
+                    . $typRow;
+ 
+                $rows .= $matchCard($inner, $cBgGray, '', '8px');
+            } else {
+                $inner =
+                    '<tr>'
+                    . '<td style="' . $f . 'font-size:' . $fsBody . ';font-weight:600;color:' . $cText . ';">'
+                    .   esc($m['homeName']) . ' &ndash; ' . esc($m['awayName'])
+                    . '</td>'
+                    . '<td align="right" style="' . $f . 'font-size:' . $fsSmall . ';color:' . $cMuted . ';white-space:nowrap;">'
+                    .   esc($m['naszCzas'])
+                    . '</td>'
+                    . '</tr>'
+                    . '<tr>'
+                    . '<td colspan="2" style="padding-top:10px;">'
+                    . '<a href="' . $url . '" style="' . $f . 'font-size:17px;font-weight:700;'
+                    .   'color:#ffffff;text-decoration:none;background:' . $cRed . ';'
+                    .   'padding:8px 20px;border-radius:6px;display:inline-block;">Obstaw! &rarr;</a>'
+                    . '</td>'
+                    . '</tr>';
+ 
+                $rows .= $matchCard($inner, '#fff5f5', '#ffd0d0', '8px');
+            }
         }
  
         $dzisiajHtml =
-            '<tr><td bgcolor="' . $colorCard . '" style="padding:28px 32px 0;">'
+            '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">'
             . $sectionLabel('Nadchodz&#x105;ce mecze (24h)')
-            . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
-            . '<tr bgcolor="' . $colorBgGray . '">'
-            . $thCell('Mecz')
-            . $thCell('Godz.',        'center')
-            . $thCell('Tw&oacute;j typ', 'center')
-            . '</tr>'
             . $rows
-            . '</table>'
             . '</td></tr>';
     }
  
-    // ── PYTANIA DNIA (aktywne) ───────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // PYTANIA DNIA (aktywne)
+    // ════════════════════════════════════════════════════════════════
     $dzisiajPytaniaHtml = '';
     if (!empty($data['dzisiajPytania'])) {
-        $dzisiajPytaniaHtml = '<tr><td bgcolor="' . $colorCard . '" style="padding:28px 32px 0;">'
+        $blok = '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">'
             . $sectionLabel('Pytanie dnia');
  
         foreach ($data['dzisiajPytania'] as $p) {
             $opisHtml   = !empty($p['opis'])
-                ? '<tr><td bgcolor="' . $colorBgYellow . '" style="' . $f . 'font-size:' . $fsLabel . ';'
-                .   'color:' . $colorMuted . ';padding:4px 14px 0;">' . esc($p['opis']) . '</td></tr>'
+                ? '<tr><td bgcolor="' . $cBgYellow . '" style="' . $f . 'font-size:' . $fsSmall . ';'
+                .   'color:' . $cMuted . ';padding:4px 16px 0;">' . esc($p['opis']) . '</td></tr>'
                 : '';
             $zrodloHtml = !empty($p['zrodlo'])
-                ? '<tr><td bgcolor="' . $colorBgYellow . '" style="' . $f . 'font-size:' . $fsLabel . ';'
-                .   'color:' . $colorLabel . ';padding:2px 14px 0;">&#x1F4CA;&nbsp;' . esc($p['zrodlo']) . '</td></tr>'
+                ? '<tr><td bgcolor="' . $cBgYellow . '" style="' . $f . 'font-size:14px;'
+                .   'color:' . $cLabel . ';padding:2px 16px 0;">&#x1F4CA;&nbsp;' . esc($p['zrodlo']) . '</td></tr>'
                 : '';
+            $deadlineHtml =
+                '<tr><td bgcolor="' . $cBgYellow . '" style="' . $f . 'font-size:14px;'
+                . 'color:' . $cLabel . ';padding:4px 16px 0;">&#x1F4CA; Odpowiedz przed: '
+                . esc($p['deadline'] ?? '') . '</td></tr>';
  
-            $userOdpHtml = $p['hasOdp']
-                ? '<tr><td bgcolor="' . $colorBgYellow . '" style="padding:12px 14px 16px;border-radius:0 0 8px 8px;">'
-                .   '<table cellpadding="0" cellspacing="0" border="0"><tr>'
-                .   '<td style="' . $f . 'font-size:' . $fsBody . ';color:' . $colorMuted . ';padding-right:12px;">'
-                .     'Twoja odpowied&#x17A;: <strong style="color:' . $colorText . ';">' . esc($p['userOdp']) . '</strong>'
+            $odpHtml = $p['hasOdp']
+                ? '<tr><td bgcolor="' . $cBgYellow . '" style="padding:12px 16px 16px;border-radius:0 0 8px 8px;">'
+                .   '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'
+                .   '<td style="' . $f . 'font-size:' . $fsBody . ';color:' . $cMuted . ';">'
+                .     'Twoja: <strong style="color:' . $cText . ';">' . esc($p['userOdp']) . '</strong>'
                 .   '</td>'
-                .   '<td><a href="' . $url . '" style="' . $f . 'font-size:' . $fsLabel . ';'
-                .     'font-weight:700;color:' . $colorGold . ';text-decoration:none;">zmie&#x144; &rarr;</a></td>'
+                .   '<td align="right">'
+                .     '<a href="' . $url . '" style="' . $f . 'font-size:' . $fsSub . ';font-weight:700;'
+                .     'color:' . $cGold . ';text-decoration:none;">zmie&#x144; &rarr;</a>'
+                .   '</td>'
                 .   '</tr></table>'
                 . '</td></tr>'
-                : '<tr><td bgcolor="' . $colorBgYellow . '" align="right"'
-                .   ' style="padding:10px 14px 14px;border-radius:0 0 8px 8px;">'
+                : '<tr><td bgcolor="' . $cBgYellow . '" align="right"'
+                .   ' style="padding:12px 16px 16px;border-radius:0 0 8px 8px;">'
                 .   '<a href="' . $url . '" style="' . $f . 'font-size:' . $fsBody . ';font-weight:700;'
-                .     'color:' . $colorRed . ';text-decoration:none;">Wpisz odpowied&#x17A; &rarr;</a>'
+                .   'color:' . $cRed . ';text-decoration:none;">Wpisz odpowied&#x17A; &rarr;</a>'
                 . '</td></tr>';
  
-            $dzisiajPytaniaHtml .=
+            $blok .=
                 '<table width="100%" cellpadding="0" cellspacing="0" border="0"'
-                . ' style="border-collapse:collapse;border:1px solid ' . $colorBorderY . ';border-radius:8px;margin-bottom:10px;">'
-                . '<tr><td bgcolor="' . $colorBgYellow . '" style="' . $f . 'font-size:' . $fsBody . ';'
-                .   'font-weight:600;color:' . $colorText . ';padding:16px 14px 8px;line-height:1.4;'
+                . ' style="border:1px solid ' . $cBorderY . ';border-radius:8px;margin-bottom:10px;">'
+                . '<tr><td bgcolor="' . $cBgYellow . '" style="' . $f . 'font-size:' . $fsBody . ';'
+                .   'font-weight:600;color:' . $cText . ';padding:16px 16px 8px;line-height:1.4;'
                 .   'border-radius:8px 8px 0 0;">' . esc($p['tresc']) . '</td></tr>'
                 . $opisHtml
                 . $zrodloHtml
-                . $userOdpHtml
+                . $deadlineHtml
+                . $odpHtml
                 . '</table>';
         }
  
-        $dzisiajPytaniaHtml .= '</td></tr>';
+        $blok .= '</td></tr>';
+        $dzisiajPytaniaHtml = $blok;
     }
  
-    // ── KOMENTARZ ZAMKNIĘCIA ─────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // KOMENTARZ ZAMKNIĘCIA
+    // ════════════════════════════════════════════════════════════════
     $komentarzClosingHtml = '';
     if (!empty($data['adminKomentarz3'])) {
         $komentarzClosingHtml =
-            '<tr><td bgcolor="' . $colorCard . '" style="padding:24px 32px 0;">'
-            . $komentarzBlock(esc($data['adminKomentarz3']), $colorGreen, $colorBgGreen)
+            '<tr><td bgcolor="' . $cCard . '" style="padding:24px 24px 0;">'
+            . $komentarzBlock(esc($data['adminKomentarz3']), $cGreen, $cBgGreen)
             . '</td></tr>';
     }
  
-    // ── FOOTER ───────────────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // FOOTER
+    // ════════════════════════════════════════════════════════════════
     $footerHtml =
-        '<tr><td bgcolor="' . $colorCard . '" style="padding:32px 32px 28px;border-radius:0 0 12px 12px;">'
+        '<tr><td bgcolor="' . $cCard . '" style="padding:28px 24px 24px;border-radius:0 0 12px 12px;">'
         . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
-        . '<tr><td style="border-top:1px solid ' . $colorBorder . ';padding-top:20px;">'
-        . '<p style="margin:0 0 6px;' . $f . 'font-size:' . $fsLabel . ';color:' . $colorLabel . ';font-style:italic;">'
+        . '<tr><td style="border-top:1px solid ' . $cBorder . ';padding-top:20px;">'
+        . '<p style="margin:0 0 6px;' . $f . 'font-size:14px;color:' . $cLabel . ';font-style:italic;">'
         .   'may the odds be always in your <em>flavour</em>'
         . '</p>'
-        . '<p style="margin:0;' . $f . 'font-size:' . $fsLabel . ';color:#cccccc;">'
-        .   'Je&#x15B;li dobrze si&#x119; bawisz, postaw kaw&#x119; &#x2615; &rarr; '
+        . '<p style="margin:0;' . $f . 'font-size:14px;color:#cccccc;">'
+        .   'Postaw kaw&#x119; &#x2615; &rarr; '
         .   '<a href="https://buycoffee.to/wit" style="color:#cccccc;">buycoffee.to/wit</a>'
         . '</p>'
         . '</td></tr>'
         . '</table>'
         . '</td></tr>';
  
-    // ── SKŁADAMY EMAIL ───────────────────────────────────────────────
+    // ════════════════════════════════════════════════════════════════
+    // SKŁADAMY EMAIL
+    // ════════════════════════════════════════════════════════════════
     return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"'
          . ' "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
          . '<html xmlns="http://www.w3.org/1999/xhtml"><head>'
          . '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
          . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+         . '<style type="text/css">'
+         . 'body{margin:0;padding:0;background:' . $cBg . ';}'
+         . 'table{border-collapse:collapse;}'
+         . '.wrap{width:100%;max-width:520px;margin:0 auto;}'
+         . '</style>'
          . '</head>'
-         . '<body style="margin:0;padding:0;background:' . $colorBg . ';' . $f . '">'
+         . '<body style="margin:0;padding:0;background:' . $cBg . ';' . $f . '">'
  
-         . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' . $colorBg . '">'
-         . '<tr><td align="center" style="padding:32px 12px;">'
- 
-         . '<table width="580" cellpadding="0" cellspacing="0" border="0"'
-         . ' style="border-collapse:collapse;max-width:580px;">'
+         . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' . $cBg . '">'
+         . '<tr><td align="center" style="padding:24px 12px;">'
+         . '<table class="wrap" cellpadding="0" cellspacing="0" border="0">'
  
          . $headerHtml
          . $komentarzHtml
