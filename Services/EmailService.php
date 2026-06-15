@@ -304,155 +304,253 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz,
 private function buildDigestHtml(array $data, string $url): string
 {
     $nick = esc($data['nick']);
+    $f    = 'font-family:Arial,Helvetica,sans-serif;';
 
-    // ── Komentarz otwarcia ──
+    // ── helper: nagłówek sekcji ──────────────────────────────────────
+    $h = fn(string $label) =>
+        '<tr><td style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;'
+        . 'letter-spacing:.06em;color:#9ca3af;padding:20px 0 6px 0;mso-line-height-rule:exactly;">'
+        . $label . '</td></tr>';
+
+    // ── Komentarz admina (otwarcie) ──────────────────────────────────
     $komentarzHtml = '';
     if (!empty($data['adminKomentarz'])) {
-        $komentarzHtml = '<p style="background:#f0f4ff;border-left:3px solid #4f46e5;padding:10px 14px;'
-                       . 'border-radius:4px;margin-bottom:16px;">' . esc($data['adminKomentarz']) . '</p>';
+        $komentarzHtml =
+            '<tr><td style="' . $f . 'font-size:14px;color:#1e1b4b;padding:10px 14px;'
+            . 'border-left:3px solid #4f46e5;background:#f0f4ff;">'
+            . esc($data['adminKomentarz']) . '</td></tr>'
+            . '<tr><td style="padding:8px 0;font-size:0;">&nbsp;</td></tr>';
     }
 
-    // ── Blok punktów (WAŻNE -- na górze) ──
+    // ── Blok punktów (3 kolumny — table zamiast flex) ────────────────
     $pktHtml = '';
     if (isset($data['wszystkiePkt'])) {
-        $pktHtml = '<div style="background:#f0f4ff;border-radius:8px;padding:16px 20px;margin:16px 0;display:flex;gap:24px;flex-wrap:wrap;">'
-            . '<div style="text-align:center;flex:1;">'
-            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Wszystkie punkty</div>'
-            .   '<div style="font-size:28px;font-weight:700;color:#4f46e5;">' . (int)$data['wszystkiePkt'] . '</div>'
-            . '</div>'
-            . '<div style="text-align:center;flex:1;">'
-            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Wczoraj zdobyte</div>'
-            .   '<div style="font-size:28px;font-weight:700;color:#059669;">' . (int)$data['wczorajPkt'] . '</div>'
-            . '</div>'
-            . '<div style="text-align:center;flex:1;">'
-            .   '<div style="font-size:11px;text-transform:uppercase;color:#6b7280;letter-spacing:.05em;">Pozycja w rankingu</div>'
-            .   '<div style="font-size:28px;font-weight:700;color:#d97706;">' . (int)$data['rankingPozycja'] . '. miejsce</div>'
-            . '</div>'
-            . '</div>';
+        $pktHtml =
+            $h('Twoje statystyki') .
+            '<tr><td style="padding:4px 0 16px;">'
+            . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
+            . '<tr>'
+
+            . '<td width="32%" align="center" valign="top" bgcolor="#eef2ff" style="padding:14px 6px;">'
+            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Wszystkie punkty</p>'
+            . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#4f46e5;margin:0;">' . (int)$data['wszystkiePkt'] . '</p>'
+            . '</td>'
+
+            . '<td width="2%" bgcolor="#ffffff" style="font-size:0;">&nbsp;</td>'
+
+            . '<td width="32%" align="center" valign="top" bgcolor="#ecfdf5" style="padding:14px 6px;">'
+            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Wczoraj zdobyte</p>'
+            . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#059669;margin:0;">' . (int)$data['wczorajPkt'] . '</p>'
+            . '</td>'
+
+            . '<td width="2%" bgcolor="#ffffff" style="font-size:0;">&nbsp;</td>'
+
+            . '<td width="32%" align="center" valign="top" bgcolor="#fefce8" style="padding:14px 6px;">'
+            . '<p style="' . $f . 'font-size:10px;font-weight:700;text-transform:uppercase;color:#6b7280;margin:0 0 6px;">Pozycja w rankingu</p>'
+            . '<p style="' . $f . 'font-size:26px;font-weight:700;color:#d97706;margin:0;">' . (int)$data['rankingPozycja'] . '.</p>'
+            . '</td>'
+
+            . '</tr></table>'
+            . '</td></tr>';
     }
 
-    // ── Wczorajsze mecze ──
+    // ── Wczorajsze mecze ─────────────────────────────────────────────
     $wczorajHtml = '';
     if (!empty($data['wczorajMecze'])) {
         $rows = '';
         foreach ($data['wczorajMecze'] as $m) {
             $wynik  = (int)$m['homeScore'] . ':' . (int)$m['awayScore'];
             $typTxt = $m['userHome'] !== null
-                ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' ⚽' : '')
-                : '<em style="color:#6b7280;">brak</em>';
+                ? (int)$m['userHome'] . ':' . (int)$m['userAway'] . ($m['isGolden'] ? ' &#x26BD;' : '')
+                : '<em style="color:#9ca3af;">brak</em>';
             $pktTxt = $m['pkt'] > 0 ? '+' . $m['pkt'] . ' pkt' : '0 pkt';
-            $rows  .= '<tr style="border-bottom:1px solid #f3f4f6;">'
-                    . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;font-weight:700;">' . $wynik . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;font-weight:700;color:#4f46e5;">' . $pktTxt . '</td>'
-                    . '</tr>';
+            $pktCol = $m['pkt'] > 0 ? '#4f46e5' : '#9ca3af';
+
+            $rows .=
+                '<tr style="border-bottom:1px solid #f3f4f6;">'
+                . '<td style="' . $f . 'font-size:13px;padding:7px 6px;color:#111827;">'
+                . esc($m['homeName']) . '&nbsp;&ndash;&nbsp;' . esc($m['awayName']) . '</td>'
+                . '<td align="center" style="' . $f . 'font-size:13px;font-weight:700;padding:7px 6px;color:#111827;white-space:nowrap;">'
+                . $wynik . '</td>'
+                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;color:#374151;white-space:nowrap;">'
+                . $typTxt . '</td>'
+                . '<td align="center" style="' . $f . 'font-size:13px;font-weight:700;padding:7px 6px;color:' . $pktCol . ';white-space:nowrap;">'
+                . $pktTxt . '</td>'
+                . '</tr>';
         }
-        $wczorajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki z ostatnich 24h</h3>'
-                     . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
-                     . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
-                     . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
-                     . '<th style="padding:6px 8px;text-align:center;">Wynik</th>'
-                     . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
-                     . '<th style="padding:6px 8px;text-align:center;">Pkt</th>'
-                     . '</tr></thead><tbody>' . $rows . '</tbody></table>';
+
+        $wczorajHtml =
+            $h('Wyniki z ostatnich 24h') .
+            '<tr><td style="padding:0 0 16px;">'
+            . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
+            . '<tr bgcolor="#f9fafb">'
+            . '<th align="left"   style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
+            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Wynik</th>'
+            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
+            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Pkt</th>'
+            . '</tr>'
+            . $rows
+            . '</table>'
+            . '</td></tr>';
     }
 
-    // ── Wczorajsze pytanie(a) ──
+    // ── Wczorajsze pytania (wyniki) ──────────────────────────────────
     $wczorajPytaniaHtml = '';
     if (!empty($data['wczorajPytania'])) {
-        $komentarzPytanieHtml = '';
         if (!empty($data['adminKomentarz2'])) {
-            $komentarzPytanieHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
-                                  . 'border-radius:4px;margin:16px 0 8px;">' . esc($data['adminKomentarz2']) . '</p>';
+            $wczorajPytaniaHtml .=
+                '<tr><td style="' . $f . 'font-size:14px;color:#14532d;padding:10px 14px;'
+                . 'border-left:3px solid #22c55e;background:#f0fff4;">'
+                . esc($data['adminKomentarz2']) . '</td></tr>'
+                . '<tr><td style="padding:6px 0;font-size:0;">&nbsp;</td></tr>';
         }
-        $wczorajPytaniaHtml .= $komentarzPytanieHtml;
-        $wczorajPytaniaHtml .= '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Wyniki za pytania</h3>';
+
+        $wczorajPytaniaHtml .= $h('Wyniki za pytania');
 
         foreach ($data['wczorajPytania'] as $p) {
             $prawidlowaHtml = $p['odpowiedz']
-                ? '<span style="color:#059669;font-weight:700;">✓ ' . esc($p['odpowiedz']) . '</span>'
+                ? '<span style="color:#059669;font-weight:700;">&#x2713;&nbsp;' . esc($p['odpowiedz']) . '</span>'
                 : '<em style="color:#9ca3af;">nie podano</em>';
             $userOdpHtml = $p['userOdp']
                 ? esc($p['userOdp'])
-                : '<em style="color:#ef4444;">brak odpowiedzi</em>';
-            $pktColor = $p['pkt'] > 0 ? '#059669' : '#6b7280';
+                : '<span style="color:#ef4444;">brak odpowiedzi</span>';
+            $pktColor = $p['pkt'] > 0 ? '#059669' : '#9ca3af';
+            $pktLabel = $p['pkt'] > 0 ? '+' . $p['pkt'] . ' pkt' : '0 pkt';
 
-            $wczorajPytaniaHtml .= '<div style="border:1px solid #e5e7eb;border-radius:6px;padding:12px 14px;margin-bottom:10px;">'
-                . '<p style="margin:0 0 8px;font-size:14px;font-weight:500;">' . esc($p['tresc']) . '</p>'
-                . '<div style="display:flex;gap:16px;font-size:13px;flex-wrap:wrap;">'
-                . '<span><span style="color:#6b7280;">Prawidłowa:</span> ' . $prawidlowaHtml . '</span>'
-                . '<span><span style="color:#6b7280;">Twoja:</span> ' . $userOdpHtml . '</span>'
-                . '<span style="font-weight:700;color:' . $pktColor . ';">' . ($p['pkt'] > 0 ? '+' . $p['pkt'] : '0') . ' pkt</span>'
-                . '</div>'
-                . '</div>';
+            $wczorajPytaniaHtml .=
+                '<tr><td style="padding:0 0 10px;">'
+                . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9fafb" style="border-collapse:collapse;">'
+                . '<tr><td style="' . $f . 'font-size:14px;font-weight:500;color:#111827;padding:10px 12px 6px;">'
+                . esc($p['tresc']) . '</td></tr>'
+                . '<tr><td style="padding:0 12px 10px;">'
+                . '<table cellpadding="0" cellspacing="0" border="0"><tr valign="top">'
+                . '<td style="' . $f . 'font-size:12px;color:#6b7280;padding-right:16px;">Prawid&#322;owa:&nbsp;' . $prawidlowaHtml . '</td>'
+                . '<td style="' . $f . 'font-size:12px;color:#6b7280;padding-right:16px;">Twoja:&nbsp;' . $userOdpHtml . '</td>'
+                . '<td style="' . $f . 'font-size:12px;font-weight:700;color:' . $pktColor . ';">' . $pktLabel . '</td>'
+                . '</tr></table>'
+                . '</td></tr>'
+                . '</table>'
+                . '</td></tr>';
         }
+        $wczorajPytaniaHtml .= '<tr><td style="padding:4px 0;font-size:0;">&nbsp;</td></tr>';
     }
 
-    // ── Nadchodzące mecze ──
+    // ── Nadchodzące mecze ────────────────────────────────────────────
     $dzisiajHtml = '';
     if (!empty($data['dzisiajMecze'])) {
         $rows = '';
         foreach ($data['dzisiajMecze'] as $m) {
             $typTxt = $m['hasTyp']
-                ? '<strong>' . (int)$m['userHome'] . ':' . (int)$m['userAway'] . '</strong>' . ($m['isGolden'] ? ' ⚽' : '')
-                : '<a href="' . $url . '" style="color:#ef4444;font-weight:700;">Obstaw!</a>';
-            $rows  .= '<tr style="border-bottom:1px solid #f3f4f6;">'
-                    . '<td style="padding:6px 8px;">' . esc($m['homeName']) . ' – ' . esc($m['awayName']) . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;">' . esc($m['naszCzas']) . '</td>'
-                    . '<td style="padding:6px 8px;text-align:center;">' . $typTxt . '</td>'
-                    . '</tr>';
+                ? '<strong style="color:#111827;">' . (int)$m['userHome'] . ':' . (int)$m['userAway'] . '</strong>'
+                  . ($m['isGolden'] ? '&nbsp;&#x26BD;' : '')
+                : '<a href="' . $url . '" style="color:#ef4444;font-weight:700;text-decoration:none;">Obstaw!</a>';
+
+            $rows .=
+                '<tr style="border-bottom:1px solid #f3f4f6;">'
+                . '<td style="' . $f . 'font-size:13px;padding:7px 6px;color:#111827;">'
+                . esc($m['homeName']) . '&nbsp;&ndash;&nbsp;' . esc($m['awayName']) . '</td>'
+                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;color:#374151;white-space:nowrap;">'
+                . esc($m['naszCzas']) . '</td>'
+                . '<td align="center" style="' . $f . 'font-size:13px;padding:7px 6px;white-space:nowrap;">'
+                . $typTxt . '</td>'
+                . '</tr>';
         }
-        $dzisiajHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Nadchodzące mecze (24h)</h3>'
-                     . '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
-                     . '<thead><tr style="background:#f9fafb;font-size:11px;text-transform:uppercase;color:#9ca3af;">'
-                     . '<th style="padding:6px 8px;text-align:left;">Mecz</th>'
-                     . '<th style="padding:6px 8px;text-align:center;">Godzina</th>'
-                     . '<th style="padding:6px 8px;text-align:center;">Twój typ</th>'
-                     . '</tr></thead><tbody>' . $rows . '</tbody></table>';
+
+        $dzisiajHtml =
+            $h('Nadchodz&#x105;ce mecze (24h)') .
+            '<tr><td style="padding:0 0 16px;">'
+            . '<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">'
+            . '<tr bgcolor="#f9fafb">'
+            . '<th align="left"   style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Mecz</th>'
+            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Godzina</th>'
+            . '<th align="center" style="' . $f . 'font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;padding:5px 6px;">Tw&oacute;j typ</th>'
+            . '</tr>'
+            . $rows
+            . '</table>'
+            . '</td></tr>';
     }
 
-    // ── Dzisiejsze pytanie(a) ──
+    // ── Dzisiejsze pytania (aktywne) ─────────────────────────────────
     $dzisiajPytaniaHtml = '';
     if (!empty($data['dzisiajPytania'])) {
-        $dzisiajPytaniaHtml = '<h3 style="font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin:20px 0 8px;">Pytanie dnia</h3>';
+        $dzisiajPytaniaHtml .= $h('Pytanie dnia');
         foreach ($data['dzisiajPytania'] as $p) {
-            $opisHtml   = !empty($p['opis'])   ? '<p style="font-size:13px;color:#6b7280;margin:6px 0 0;">' . esc($p['opis']) . '</p>'   : '';
-            $zrodloHtml = !empty($p['zrodlo']) ? '<p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">Skąd będę wiedział: ' . esc($p['zrodlo']) . '</p>' : '';
+            $opisHtml   = !empty($p['opis'])
+                ? '<tr><td style="' . $f . 'font-size:12px;color:#6b7280;padding:4px 12px 0;">' . esc($p['opis']) . '</td></tr>'
+                : '';
+            $zrodloHtml = !empty($p['zrodlo'])
+                ? '<tr><td style="' . $f . 'font-size:11px;color:#9ca3af;padding:2px 12px 0;">&#x1F4CA;&nbsp;' . esc($p['zrodlo']) . '</td></tr>'
+                : '';
             $userOdpHtml = $p['hasOdp']
-                ? '<p style="font-size:13px;margin:8px 0 0;">Twoja odpowiedź: <strong>' . esc($p['userOdp']) . '</strong> <a href="' . $url . '" style="color:#4f46e5;font-size:12px;">zmień</a></p>'
-                : '<p style="text-align:right;font-size:12px;text-transform:uppercase;margin:8px 0 0;"><a href="' . $url . '" style="color:#ef4444;font-weight:700;">Wpisz odpowiedź →</a></p>';
+                ? '<tr><td style="' . $f . 'font-size:12px;color:#374151;padding:8px 12px 10px;">'
+                  . 'Twoja odpowied&#x17A;: <strong>' . esc($p['userOdp']) . '</strong>&nbsp;&nbsp;'
+                  . '<a href="' . $url . '" style="color:#4f46e5;font-size:11px;text-decoration:none;">zmie&#x144;</a>'
+                  . '</td></tr>'
+                : '<tr><td align="right" style="padding:8px 12px 10px;">'
+                  . '<a href="' . $url . '" style="' . $f . 'font-size:12px;font-weight:700;color:#ef4444;text-decoration:none;">Wpisz odpowied&#x17A; &#x2192;</a>'
+                  . '</td></tr>';
 
-            $dzisiajPytaniaHtml .= '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:10px 14px;margin-bottom:10px;">'
-                . '<p style="margin:0;font-weight:500;">' . esc($p['tresc']) . '</p>'
+            $dzisiajPytaniaHtml .=
+                '<tr><td style="padding:0 0 10px;">'
+                . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffbeb" style="border-collapse:collapse;border:1px solid #fde68a;">'
+                . '<tr><td style="' . $f . 'font-size:14px;font-weight:500;color:#111827;padding:10px 12px 4px;">'
+                . esc($p['tresc']) . '</td></tr>'
                 . $opisHtml
                 . $zrodloHtml
                 . $userOdpHtml
-                . '</div>';
+                . '</table>'
+                . '</td></tr>';
         }
     }
 
-    // ── Komentarz zamknięcia ──
+    // ── Komentarz zamknięcia ─────────────────────────────────────────
     $komentarzClosingHtml = '';
     if (!empty($data['adminKomentarz3'])) {
-        $komentarzClosingHtml = '<p style="background:#f0fff4;border-left:3px solid #22c55e;padding:10px 14px;'
-                              . 'border-radius:4px;margin-top:16px;">' . esc($data['adminKomentarz3']) . '</p>';
+        $komentarzClosingHtml =
+            '<tr><td style="' . $f . 'font-size:14px;color:#14532d;padding:10px 14px;'
+            . 'border-left:3px solid #22c55e;background:#f0fff4;">'
+            . esc($data['adminKomentarz3']) . '</td></tr>'
+            . '<tr><td style="padding:8px 0;font-size:0;">&nbsp;</td></tr>';
     }
 
-    return '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
-         . '<body style="font-family:sans-serif;background:#f9fafb;margin:0;padding:0;">'
-         . '<div style="max-width:600px;margin:24px auto;background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.07);">'
-         . '<p style="margin:0 0 16px;font-size:16px;">Hej <strong>' . $nick . '</strong>! 👋</p>'
+    // ── Składamy cały email (table-based layout) ─────────────────────
+    return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+         . '<html xmlns="http://www.w3.org/1999/xhtml"><head>'
+         . '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
+         . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+         . '</head>'
+         . '<body style="margin:0;padding:0;background:#f3f4f6;">'
+
+         . '<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4f6">'
+         . '<tr><td align="center" style="padding:24px 8px;">'
+
+         . '<table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="border-collapse:collapse;">'
+         . '<tr><td style="padding:28px 28px 0;">'
+
+         . '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
+
+         . '<tr><td style="' . $f . 'font-size:16px;color:#111827;padding-bottom:16px;">'
+         . 'Hej <strong>' . $nick . '</strong>! &#x1F44B;</td></tr>'
+
          . $komentarzHtml
-         . $pktHtml               // ← punkty wysoko
+         . $pktHtml
          . $wczorajHtml
-         . $wczorajPytaniaHtml    // ← wyniki pytań pod meczami wczoraj
+         . $wczorajPytaniaHtml
          . $dzisiajHtml
-         . $dzisiajPytaniaHtml    // ← aktywne pytania pod meczami dziś
+         . $dzisiajPytaniaHtml
          . $komentarzClosingHtml
-         . '<hr style="border:none;border-top:1px solid #f3f4f6;margin:24px 0;">'
-         . '<p style="font-size:14px;color:#9ca3af;margin:0;">may the odds be always in your <em>flavour</em></p>'
-         . '</div></body></html>';
+
+         . '<tr><td style="border-top:1px solid #e5e7eb;padding-top:20px;padding-bottom:8px;font-size:0;">&nbsp;</td></tr>'
+         . '<tr><td style="' . $f . 'font-size:13px;color:#9ca3af;padding-bottom:6px;">'
+         . 'may the odds be always in your <em>flavour</em></td></tr>'
+         . '<tr><td style="' . $f . 'font-size:12px;color:#d1d5db;padding-bottom:28px;">'
+         . 'Je&#x15B;li dobrze si&#x119; bawisz i doceniasz t&#x119; robot&#x119;, postaw kaw&#x119; &#x2615; &rarr; '
+         . '<a href="https://buycoffee.to/wit" style="color:#d1d5db;text-decoration:none;">buycoffee.to/wit</a></td></tr>'
+
+         . '</table>'
+         . '</td></tr></table>'
+         . '</td></tr></table>'
+         . '</body></html>';
 }
     
 
