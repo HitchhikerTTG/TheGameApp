@@ -214,7 +214,7 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
               . '</tr>'
               . '<tr><td colspan="2" style="padding-top:10px;">'
               . '<a href="' . $url . '" style="' . $f . 'font-size:17px;font-weight:700;color:#ffffff;'
-              .   'text-decoration:none;background:' . $cRed . ';padding:8px 20px;border-radius:6px;display:inline-block;">Typuj! &rarr;</a>'
+              .   'text-decoration:none;background:' . $cRed . ';padding:8px 20px;border-radius:6px;display:inline-block;">Typuj! &raquo;</a>'
               . '</td></tr>';
           echo $matchCard($inner, '#fff5f5', '#ffd0d0');
         endif ?>
@@ -268,7 +268,7 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
               </td>
             </tr></table>
             <?php else: ?>
-            <a href="<?= $url ?>" style="<?= $f ?>font-size:<?= $fsBody ?>;font-weight:700;color:<?= $cRed ?>;text-decoration:none;">Wpisz odpowied&#x17A; &rarr;</a>
+            <a href="<?= $url ?>" style="<?= $f ?>font-size:<?= $fsBody ?>;font-weight:700;color:<?= $cRed ?>;text-decoration:none;">Wpisz odpowied&#x17A; &raquo;</a>
             <?php endif ?>
           </td>
         </tr>
@@ -294,8 +294,9 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
         <tr>
           <td style="border-top:1px solid <?= $cBorder ?>;padding-top:20px;">
             <p style="margin:0 0 6px;<?= $f ?>font-size:14px;color:<?= $cLabel ?>;font-style:italic;">may the odds be always in your <em>flavour</em></p>
+            <p style="margin:0 0 6px;<?= $f ?>font-size:14px;color:<?= $cLabel ?>">Jeśli widzisz w tym mailu coś, co się nie zgadza - daj mi proszę znać (choćby odpisując na tego maila). Postaram się to naprostować. Dziękuję. </em></p>
             <p style="margin:0;<?= $f ?>font-size:14px;color:#cccccc;">
-              Postaw kaw&#x119; &#x2615; &rarr;
+              A jeśli dobrze się bawisz, pamietaj że zawsze możesz mi postawić kaw&#x119; &#x2615; &rarr;
               <a href="https://buycoffee.to/wit" style="color:#cccccc;">buycoffee.to/wit</a>
             </p>
           </td>
