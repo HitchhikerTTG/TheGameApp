@@ -114,4 +114,43 @@ class TabelaModel extends Model
             return $tabelaDanych;
     }
 
+
+    // ────────────────────────────────────────────────────────────────
+    // Odczyt pojedynczego gracza z gotowej (cache'owanej) tabeli
+    // ────────────────────────────────────────────────────────────────
+    public function getWierszGracza(int $turniejID, string $uniID): ?array
+    {
+        foreach ($this->gimmeTabelaGraczy($turniejID) as $wiersz) {
+            if ((string)($wiersz['uniID'] ?? '') === $uniID) {
+                return $wiersz;
+            }
+        }
+        return null;
+    }
+
+    // Pozycja gracza w rankingu (competition ranking - remisy dzielą miejsce)
+    public function getPozycjaGracza(int $turniejID, string $uniID): int
+    {
+        $tabela = $this->gimmeTabelaGraczy($turniejID);
+        usort($tabela, fn($a, $b) => $b['punkty'] <=> $a['punkty']);
+
+        $pozycja          = 1;
+        $poprzedniePunkty = null;
+        $licznik          = 0;
+
+        foreach ($tabela as $wiersz) {
+            $licznik++;
+            if ($poprzedniePunkty === null || $wiersz['punkty'] < $poprzedniePunkty) {
+                $pozycja          = $licznik;
+                $poprzedniePunkty = $wiersz['punkty'];
+            }
+            if ((string)($wiersz['uniID'] ?? '') === $uniID) {
+                return $pozycja;
+            }
+        }
+
+        return $licznik + 1;
+    }
+
+
 }

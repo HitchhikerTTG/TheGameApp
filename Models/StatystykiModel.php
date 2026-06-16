@@ -225,39 +225,21 @@ class StatystykiModel extends Model
     }
     
     // w StatystykiModel.php
-public function getRankingPozycja(string $userUniID, int $turniejID): int
-{
-    $db    = \Config\Database::connect();
-    $myPkt = $this->getAllPoints($userUniID, $turniejID);
-
-    $result = $db->query("
-        SELECT COUNT(*) AS lepszyGraczy
-        FROM (
-            SELECT u.uniID,
-                   COALESCE(SUM(ty.pkt), 0) + COALESCE(SUM(o.pkt), 0) AS suma
-            FROM uzytkownicy u
-            LEFT JOIN typy ty        ON ty.uniID    = u.uniID AND ty.TurniejID    = ?
-            LEFT JOIN odpowiedzi o   ON o.uniidOdp  = u.uniID AND o.TurniejID     = ?
-            WHERE u.PlaysTheActiveTournament = 1
-            GROUP BY u.uniID
-        ) ranking
-        WHERE ranking.suma > ?
-    ", [$turniejID, $turniejID, $myPkt])->getRow();
-
-    return (int)($result->lepszyGraczy ?? 0) + 1;
-}
-
-private function getAllPoints(string $userUniID, int $turniejID): int
-{
-    $db = \Config\Database::connect();
-    $pktMecze   = (int)($db->table('typy')->selectSum('pkt')
-        ->where('uniID', $userUniID)->where('TurniejID', $turniejID)
-        ->get()->getRow()->pkt ?? 0);
-    $pktPytania = (int)($db->table('odpowiedzi')->selectSum('pkt')
-        ->where('uniidOdp', $userUniID)->where('TurniejID', $turniejID)
-        ->get()->getRow()->pkt ?? 0);
-    return $pktMecze + $pktPytania;
-}
+    // Pozycja w rankingu i suma punktów liczone na podstawie tabelaGraczy_{turniejID}.json
+    // - tej samej, gotowej, cache'owanej tabeli, którą TabelaModel::przeliczTabeleGraczy()
+    // odświeża po każdym przeliczeniu punktów za mecz/pytanie. Jedno źródło prawdy dla
+    // rankingu, zero dodatkowych zapytań SQL.
+    public function getRankingPozycja(string $userUniID, int $turniejID): int
+    {
+        return model(TabelaModel::class)->getPozycjaGracza($turniejID, $userUniID);
+    }
+    
+    
+    public function getAllPoints(string $userUniID, int $turniejID): int
+    {
+        $wiersz = model(TabelaModel::class)->getWierszGracza($turniejID, $userUniID);
+        return (int)($wiersz['punkty'] ?? 0);
+    }
 
     // ────────────────────────────────────────────────────────────────
     // ŚREDNIE TURNIEJU -- do porównania gracza ze średnią

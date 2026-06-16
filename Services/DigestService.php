@@ -5,6 +5,7 @@ use App\Models\TerminarzModel;
 use App\Models\TypyModel;
 use App\Models\PytaniaModel;
 use App\Models\OdpowiedziModel;
+use App\Models\StatystykiModel;
 
 class DigestService
 {
@@ -12,6 +13,7 @@ class DigestService
     private TypyModel        $typyModel;
     private PytaniaModel     $pytaniaModel;
     private OdpowiedziModel  $odpowiedziModel;
+    pricate StatystykiModel  $statystykiModel;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class DigestService
         $this->typyModel       = model(TypyModel::class);
         $this->pytaniaModel    = model(PytaniaModel::class);
         $this->odpowiedziModel = model(OdpowiedziModel::class);
+        $this->statystykiModel = model(StatystykiModel::class);
     }
 
     public function buildForUser(
@@ -45,8 +48,8 @@ class DigestService
             'dzisiajMecze'    => $dzisiajMecze,
             'dzisiajPytania'  => $dzisiajPytania,
             'wczorajPkt'      => $wczorajPkt,
-            'wszystkiePkt'    => $this->getAllPoints($user['uniID'], $turniejID),
-            'rankingPozycja'  => $this->getRankingPozycja($user['uniID'], $turniejID),
+            'wszystkiePkt'    => $this->statystykiModel->getAllPoints($user['uniID'], $turniejID),
+            'rankingPozycja'  => $this->statystykiModel->getRankingPozycja($user['uniID'], $turniejID),
             'adminKomentarz'  => $adminKomentarz,
             'adminKomentarz2' => $adminKomentarz2,
             'adminKomentarz3' => $adminKomentarz3,
@@ -167,48 +170,4 @@ class DigestService
         return $wynik;
     }
 
-    private function getAllPoints(string $userUniID, int $turniejID): int
-    {
-        $db = \Config\Database::connect();
-
-        $pktMecze = (int)($db->table('typy')
-            ->selectSum('pkt')
-            ->where('uniID', $userUniID)
-            ->where('TurniejID', $turniejID)
-            ->get()->getRow()->pkt ?? 0);
-
-        $pktPytania = (int)($db->table('odpowiedzi')
-            ->selectSum('pkt')
-            ->where('uniidOdp', $userUniID)
-            ->where('TurniejID', $turniejID)
-            ->get()->getRow()->pkt ?? 0);
-
-        return $pktMecze + $pktPytania;
-    }
-
-    private function getRankingPozycja(string $userUniID, int $turniejID): int
-    {
-        $db = \Config\Database::connect();
-
-        // Policz ilu graczy ma więcej punktów łącznie
-        $myPkt = $this->getAllPoints($userUniID, $turniejID);
-
-        // Podzapytanie: suma punktów dla każdego gracza
-        $sql = "
-            SELECT COUNT(*) AS lepszyGraczy
-            FROM (
-                SELECT u.uniID,
-                       COALESCE(SUM(t.pkt), 0) + COALESCE(SUM(o.pkt), 0) AS suma
-                FROM uzytkownicy u
-                LEFT JOIN typy     t ON t.uniID    = u.uniID AND t.TurniejID    = ?
-                LEFT JOIN odpowiedzi o ON o.uniidOdp = u.uniID AND o.TurniejID = ?
-                WHERE u.PlaysTheActiveTournament = 1
-                GROUP BY u.uniID
-            ) AS ranking
-            WHERE ranking.suma > ?
-        ";
-
-        $result = $db->query($sql, [$turniejID, $turniejID, $myPkt])->getRow();
-        return (int)($result->lepszyGraczy ?? 0) + 1;
-    }
 }
