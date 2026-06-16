@@ -838,6 +838,7 @@ public function digest()
                                 ->countAllResults(),
         'pytaniaArchiwalne' => $pytaniaArchiwalne,
         'pytaniaAktywne'    => $pytaniaAktywne,
+        'szkic'             => $this->loadSzkicDigest($turniejID),
     ]);
 }
 
@@ -875,6 +876,113 @@ public function wyslijDigest()
     return redirect()->to('/hell/digest');
 }
 
+// ── Szkic digesta ────────────────────────────────────────────────
+
+private function digestSzkicPath(int $turniejID): string
+{
+    return WRITEPATH . "digest_szkic_{$turniejID}.json";
+}
+
+private function loadSzkicDigest(int $turniejID): array
+{
+    $path = $this->digestSzkicPath($turniejID);
+    return file_exists($path) ? (json_decode(file_get_contents($path), true) ?? []) : [];
+}
+
+public function zapiszSzkicDigest()
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    $szkic = [
+        'subject'          => trim(strip_tags($this->request->getPost('subject')          ?? '')),
+        'komentarz'        => trim(strip_tags($this->request->getPost('komentarz')        ?? '')),
+        'komentarzPytanie' => trim(strip_tags($this->request->getPost('komentarzPytanie') ?? '')),
+        'komentarzClosing' => trim(strip_tags($this->request->getPost('komentarzClosing') ?? '')),
+        'pytaniaWczoraj'   => array_map('intval', (array)($this->request->getPost('pytaniaWczoraj') ?? [])),
+        'pytaniaDzisiaj'   => array_map('intval', (array)($this->request->getPost('pytaniaDzisiaj') ?? [])),
+        'savedAt'          => date('Y-m-d H:i:s'),
+    ];
+
+    file_put_contents($this->digestSzkicPath($turniejID), json_encode($szkic, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    session()->setFlashdata('success', 'Szkic zapisany o ' . date('H:i') . '.');
+    return redirect()->to('/hell/digest');
+}
+
+// ── Podgląd digesta (render HTML w nowej karcie, bez wysyłki) ───
+
+public function podgladDigest()
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    $loggedInUniID = session()->get('loggedInUser');
+    $adminUser = model(\App\Models\UserModel::class)
+        ->select('uniID, nick, email')
+        ->where('uniID', $loggedInUniID)
+        ->first();
+
+    if (!$adminUser) {
+        return $this->response->setBody('<p>Błąd: brak danych użytkownika.</p>');
+    }
+
+    $komentarz        = trim(strip_tags($this->request->getPost('komentarz')        ?? ''));
+    $komentarzPytanie = trim(strip_tags($this->request->getPost('komentarzPytanie') ?? ''));
+    $komentarzClosing = trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
+    $pytaniaWczoraj   = array_map('intval', (array)($this->request->getPost('pytaniaWczoraj') ?? []));
+    $pytaniaDzisiaj   = array_map('intval', (array)($this->request->getPost('pytaniaDzisiaj') ?? []));
+
+    $data = (new \App\Services\DigestService())->buildForUser(
+        $adminUser, $turniejID,
+        $komentarz, $komentarzPytanie, $komentarzClosing,
+        $pytaniaWczoraj, $pytaniaDzisiaj
+    );
+
+    $html = view('emails/digest', array_merge($data, ['url' => base_url('typowanie')]));
+
+    return $this->response
+        ->setHeader('Content-Type', 'text/html; charset=UTF-8')
+        ->setBody($html);
+}
+
+// ── Test: wyślij digest tylko do zalogowanego admina ────────────
+
+public function wyslijDigestTest()
+{
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    $loggedInUniID = session()->get('loggedInUser');
+    $adminUser = model(\App\Models\UserModel::class)
+        ->select('uniID, nick, email')
+        ->where('uniID', $loggedInUniID)
+        ->first();
+
+    if (!$adminUser) {
+        session()->setFlashdata('fail', 'Błąd: brak danych użytkownika.');
+        return redirect()->to('/hell/digest');
+    }
+
+    $komentarz        = trim(strip_tags($this->request->getPost('komentarz')        ?? ''));
+    $komentarzPytanie = trim(strip_tags($this->request->getPost('komentarzPytanie') ?? ''));
+    $komentarzClosing = trim(strip_tags($this->request->getPost('komentarzClosing') ?? ''));
+    $subject          = trim(strip_tags($this->request->getPost('subject')          ?? 'Dzień dobry, {nick}! Co w trawce piszczy?'));
+    $pytaniaWczoraj   = array_map('intval', (array)($this->request->getPost('pytaniaWczoraj') ?? []));
+    $pytaniaDzisiaj   = array_map('intval', (array)($this->request->getPost('pytaniaDzisiaj') ?? []));
+
+    $sent = (new \App\Services\EmailService())->sendDigest(
+        [$adminUser], $turniejID,
+        $komentarz, $komentarzPytanie, $komentarzClosing,
+        '[TEST] ' . $subject,
+        $pytaniaWczoraj, $pytaniaDzisiaj
+    );
+
+    session()->setFlashdata(
+        $sent ? 'success' : 'fail',
+        $sent ? "Testowy digest wysłany na {$adminUser['email']}." : 'Nie udało się wysłać testu.'
+    );
+    return redirect()->to('/hell/digest');
+}
 
 
 public function wyslijKampanie()

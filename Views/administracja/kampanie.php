@@ -9,12 +9,30 @@
 <?= $this->section('content') ?>
 
 <div class="d-flex justify-content-between align-items-baseline mb-4">
-    <h4 class="mb-0">Kampanie email</h4>
-    <div class="d-flex gap-3 align-items-baseline">
-        <span class="text-muted small">Szablony: <code>public/maile/</code> · placeholder: <code>{nick}</code></span>
-        <a href="/hell/digest" class="btn btn-sm btn-outline-primary">📧 Poranny digest →</a>
+    <h4 class="mb-0">Komunikacja</h4>
+</div>
+
+<!-- Digest -- główna akcja -->
+<div class="card border-0 shadow-sm mb-4" style="border-left:4px solid var(--bs-primary) !important;">
+    <div class="card-body p-4 d-flex justify-content-between align-items-center gap-3">
+        <div>
+            <div class="fw-semibold mb-1">📧 Poranny digest</div>
+            <div class="text-muted small">
+                Spersonalizowany email dla każdego gracza -- wyniki, pytania, statystyki, komentarz admina.
+                Obsługuje szkice i podgląd przed wysyłką.
+            </div>
+        </div>
+        <a href="/hell/digest" class="btn btn-primary text-nowrap">Przygotuj digest →</a>
     </div>
 </div>
+
+<h6 class="text-muted mb-3 mt-2" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;">
+    Kampanie HTML
+</h6>
+<div class="text-muted small mb-3">
+    Szablony: <code>public/maile/</code> &middot; placeholder: <code>{nick}</code>
+</div>
+
 
 <?php if (empty($files)): ?>
     <div class="alert alert-warning">Brak plików <code>*.html</code> w <code>public/maile/</code>.</div>

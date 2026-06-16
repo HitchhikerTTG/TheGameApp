@@ -131,6 +131,9 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     
     $routes->get('hell/digest',         'AdminDash::digest');
     $routes->post('hell/digest/wyslij', 'AdminDash::wyslijDigest');
+    $routes->post('hell/digest/szkic',    'AdminDash::zapiszSzkicDigest');
+    $routes->post('hell/digest/podglad',  'AdminDash::podgladDigest');
+    $routes->post('hell/digest/test',     'AdminDash::wyslijDigestTest');
 
     
     //zapisywanie preferencji
