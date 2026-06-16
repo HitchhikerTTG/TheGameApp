@@ -13,7 +13,7 @@ class DigestService
     private TypyModel        $typyModel;
     private PytaniaModel     $pytaniaModel;
     private OdpowiedziModel  $odpowiedziModel;
-    pricate StatystykiModel  $statystykiModel;
+    private StatystykiModel  $statystykiModel;
 
     public function __construct()
     {
