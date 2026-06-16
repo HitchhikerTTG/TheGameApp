@@ -19,6 +19,7 @@ class UserModel extends Model{
     'notify_reminder',    // ← dodakj
     'digest_optin',
     'emoji',
+    'slug',
 
     ];
 
@@ -31,7 +32,7 @@ class UserModel extends Model{
         return $this->update($userId, $data);
     }
 
-    public function resetAllUsersActiveTournamentFlag()
+        public function resetAllUsersActiveTournamentFlag()
 {
     $data = [
         'PlaysTheActiveTournament' => false,
