@@ -49,21 +49,25 @@
         <strong><?= (int)$pktPytania ?></strong>
       </div>
 
-      <?php if ($liczbaTypow > 0): ?>
+            <?php if ($liczbaTypow > 0): ?>
       <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
         <span class="text-secondary" style="font-size:14px;">Trafnych typów (z pkt)</span>
         <strong><?= (int)$trafieniaKierunkowe ?> / <?= (int)$liczbaTypow ?>
-          <span class="text-secondary fw-normal">(<?= round($trafieniaKierunkowe / $liczbaTypow * 100) ?>%)</span>
+          <span class="text-secondary fw-normal">(<?= $skutecznoscKierunkowa ?>%)</span>
         </strong>
       </div>
-      <?php endif ?>
-
-      <?php if ($ulubionyWynik): ?>
       <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
-        <span class="text-secondary" style="font-size:14px;">Ulubiony trafiony wynik</span>
-        <strong class="ff-bebas" style="font-size:18px;">
-          <?= (int)$ulubionyWynik->HomeTyp ?> : <?= (int)$ulubionyWynik->AwayTyp ?>
-          <span class="text-secondary fw-normal" style="font-size:13px;">(<?= (int)$ulubionyWynik->liczba ?>×)</span>
+        <span class="text-secondary" style="font-size:14px;">Skuteczność dokładna</span>
+        <strong><?= (int)$dokladne ?> / <?= (int)$liczbaTypow ?>
+          <span class="text-secondary fw-normal">(<?= $skutecznoscDokladna ?>%)</span>
+        </strong>
+      </div>
+      <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
+        <span class="text-secondary" style="font-size:14px;">Średnio pkt / mecz</span>
+        <strong><?= $srednioPktNaMecz ?>
+          <span class="text-secondary fw-normal" style="font-size:13px;">
+            (śr. turnieju: <?= $srednieTurnieju['sredniaPktNaMecz'] ?>)
+          </span>
         </strong>
       </div>
       <?php endif ?>
@@ -80,12 +84,113 @@
         <strong><?= (int)$serie['najdluzsza'] ?> meczów</strong>
       </div>
 
-      <div class="d-flex justify-content-between py-2">
+<div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
         <span class="text-secondary" style="font-size:14px;">Obecna passa</span>
         <strong <?= $serie['obecna'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>>
           <?= (int)$serie['obecna'] ?> meczów<?= $serie['obecna'] > 2 ? ' 🔥' : '' ?>
         </strong>
       </div>
+
+      <?php if ($najczestszyWynikGracza): ?>
+      <div class="d-flex justify-content-between py-2">
+        <span class="text-secondary" style="font-size:14px;">Najczęściej wpisywany wynik</span>
+        <strong class="ff-bebas" style="font-size:18px;">
+          <?= (int)$najczestszyWynikGracza->HomeTyp ?> : <?= (int)$najczestszyWynikGracza->AwayTyp ?>
+          <span class="text-secondary fw-normal" style="font-size:13px;">(<?= (int)$najczestszyWynikGracza->liczba ?>×)</span>
+        </strong>
+      </div>
+      <?php endif ?>
+
+    </div>
+  </div>
+
+  <!-- NAJLEPSZY / NAJGORSZY MECZ -->
+  <?php if ($najlepszyMecz): ?>
+  <div class="d-flex gap-2 mb-3">
+    <div class="card match-card flex-fill">
+      <div class="card-body px-3 py-3 text-center">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);">Najlepszy mecz</div>
+        <div style="font-size:14px;margin-top:4px;"><?= esc($najlepszyMecz['HomeName']) ?> – <?= esc($najlepszyMecz['AwayName']) ?></div>
+        <div class="ff-bebas" style="font-size:22px;color:var(--ty-green);"><?= (int)$najlepszyMecz['pkt'] ?> pkt</div>
+      </div>
+    </div>
+    <div class="card match-card flex-fill">
+      <div class="card-body px-3 py-3 text-center">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);">Najgorszy mecz</div>
+        <div style="font-size:14px;margin-top:4px;"><?= esc($najgorszyMecz['HomeName']) ?> – <?= esc($najgorszyMecz['AwayName']) ?></div>
+        <div class="ff-bebas" style="font-size:22px;"><?= (int)$najgorszyMecz['pkt'] ?> pkt</div>
+      </div>
+    </div>
+  </div>
+  <?php endif ?>
+
+  <!-- TREND PUNKTOWY -->
+  <?php if (count($trendPunktowy) > 1): ?>
+  <div class="card match-card mb-3">
+    <div class="card-body px-3 py-3">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
+        Trend punktowy (suma narastająco)
+      </div>
+      <?php
+        $max = max($trendPunktowy) ?: 1;
+        $w = 300; $h = 60; $n = count($trendPunktowy);
+        $points = [];
+        foreach ($trendPunktowy as $i => $v) {
+            $x = $n > 1 ? ($i / ($n - 1)) * $w : 0;
+            $y = $h - ($v / $max) * $h;
+            $points[] = round($x, 1) . ',' . round($y, 1);
+        }
+      ?>
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:60px;" preserveAspectRatio="none">
+        <polyline points="<?= esc(implode(' ', $points), 'attr') ?>" fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+  <?php endif ?>
+
+  <!-- SZCZEGÓŁY MECZÓW -->
+  <?php if (!empty($szczegolyMeczow)): ?>
+  <details class="mb-3">
+    <summary class="section-label" style="cursor:pointer;">Szczegóły punktowe -- mecze (<?= count($szczegolyMeczow) ?>)</summary>
+    <div class="card match-card mt-2">
+      <div class="card-body px-3 py-2">
+        <?php foreach ($szczegolyMeczow as $m): ?>
+        <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--bs-border-color);font-size:14px;">
+          <div>
+            <?= esc($m['HomeName']) ?> <?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?> <?= esc($m['AwayName']) ?>
+            <div class="text-secondary" style="font-size:12px;">
+              Twój typ: <?= (int)$m['HomeTyp'] ?>:<?= (int)$m['AwayTyp'] ?><?= $m['GoldenGame'] ? ' ⚽' : '' ?>
+            </div>
+          </div>
+          <strong <?= $m['pkt'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$m['pkt'] ?> pkt</strong>
+        </div>
+        <?php endforeach ?>
+      </div>
+    </div>
+  </details>
+  <?php endif ?>
+
+  <!-- SZCZEGÓŁY PYTAŃ -->
+  <?php if (!empty($szczegolyPytan)): ?>
+  <details class="mb-3">
+    <summary class="section-label" style="cursor:pointer;">Szczegóły punktowe -- pytania (<?= count($szczegolyPytan) ?>)</summary>
+    <div class="card match-card mt-2">
+      <div class="card-body px-3 py-2">
+        <?php foreach ($szczegolyPytan as $p): ?>
+        <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--bs-border-color);font-size:14px;">
+          <div>
+            <?= esc($p['tresc']) ?>
+            <div class="text-secondary" style="font-size:12px;">
+              Twoja odp.: <?= esc($p['mojaOdp']) ?> · Poprawna: <?= esc($p['poprawna']) ?>
+            </div>
+          </div>
+          <strong <?= $p['pktZdobyte'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$p['pktZdobyte'] ?> / <?= (int)$p['pktMax'] ?> pkt</strong>
+        </div>
+        <?php endforeach ?>
+      </div>
+    </div>
+  </details>
+  <?php endif ?>
 
     </div>
   </div>
@@ -119,3 +224,7 @@
   </div>
 
 </div>
+
+
+      
+

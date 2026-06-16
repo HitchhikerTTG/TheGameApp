@@ -258,4 +258,29 @@ private function getAllPoints(string $userUniID, int $turniejID): int
         ->get()->getRow()->pkt ?? 0);
     return $pktMecze + $pktPytania;
 }
+
+    // ────────────────────────────────────────────────────────────────
+    // ŚREDNIE TURNIEJU -- do porównania gracza ze średnią
+    // ────────────────────────────────────────────────────────────────
+    public function getSrednieTurnieju(int $turniejID): array
+    {
+        $db = \Config\Database::connect();
+
+        $row = $db->query("
+            SELECT
+                COALESCE(AVG(ty.pkt), 0) AS sredniaPkt,
+                COALESCE(SUM(CASE WHEN ty.pkt > 0 THEN 1 ELSE 0 END) / COUNT(*) * 100, 0) AS sredniaSkutecznosc
+            FROM typy ty
+            JOIN terminarz t ON t.Id = ty.GameID
+            WHERE t.TurniejID = ? AND t.zakonczony = 1
+        ", [$turniejID])->getRow();
+
+        return [
+            'sredniaPktNaMecz'   => round((float)($row->sredniaPkt ?? 0), 2),
+            'sredniaSkutecznosc' => round((float)($row->sredniaSkutecznosc ?? 0), 1),
+        ];
+    }
+}
+
+
 }

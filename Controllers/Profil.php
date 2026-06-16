@@ -228,6 +228,65 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
     // ── Pozycja w rankingu aktywnego turnieju ──
     $rankingPozycja = $statModel->getRankingPozycja($gracz['uniID'], $turniejID);
 
+    // ── Lista meczów z punktami (za co dostał ile) ──
+    $szczegolyMeczow = $db->query("
+        SELECT t.Id, t.HomeName, t.AwayName, t.Date, t.ScoreHome, t.ScoreAway,
+               ty.HomeTyp, ty.AwayTyp, ty.pkt, ty.GoldenGame
+        FROM typy ty
+        JOIN terminarz t ON t.Id = ty.GameID
+        WHERE ty.uniID = ? AND t.TurniejID = ? AND t.zakonczony = 1
+        ORDER BY t.Date ASC, t.Time ASC
+    ", [$gracz['uniID'], $turniejID])->getResultArray();
+
+    // ── Lista pytań z punktami ──
+    $szczegolyPytan = $db->query("
+        SELECT p.id, p.tresc, p.odpowiedz AS poprawna, p.pkt AS pktMax,
+               o.odp AS mojaOdp, o.pkt AS pktZdobyte
+        FROM odpowiedzi o
+        JOIN pytania p ON p.id = o.idPyt
+        WHERE o.uniidOdp = ? AND o.TurniejID = ? AND p.zamkniete = 1
+        ORDER BY p.wazneDo ASC
+    ", [$gracz['uniID'], $turniejID])->getResultArray();
+
+    // ── Skuteczność / średnia punktów na mecz ──
+    $skutecznoscKierunkowa = $liczbaTypow > 0 ? round($trafieniaKierunkowe / $liczbaTypow * 100, 1) : 0;
+    $skutecznoscDokladna   = $liczbaTypow > 0 ? round($dokladne / $liczbaTypow * 100, 1) : 0;
+    $srednioPktNaMecz      = $liczbaTypow > 0 ? round($pktMecze / $liczbaTypow, 2) : 0;
+
+    // ── Najlepszy i najgorszy mecz (po punktach zdobytych) ──
+    $najlepszyMecz = null;
+    $najgorszyMecz = null;
+    foreach ($szczegolyMeczow as $m) {
+        if ($najlepszyMecz === null || $m['pkt'] > $najlepszyMecz['pkt']) {
+            $najlepszyMecz = $m;
+        }
+        if ($najgorszyMecz === null || $m['pkt'] < $najgorszyMecz['pkt']) {
+            $najgorszyMecz = $m;
+        }
+    }
+
+    // ── Porównanie ze średnią turnieju ──
+    $srednieTurnieju = $statModel->getSrednieTurnieju($turniejID);
+
+    // ── Najczęściej wpisywany wynik gracza (niezależnie od trafienia) ──
+    $najczestszyWynikGracza = $db->query("
+        SELECT ty.HomeTyp, ty.AwayTyp, COUNT(*) AS liczba
+        FROM typy ty
+        JOIN terminarz t ON t.Id = ty.GameID
+        WHERE ty.uniID = ? AND t.TurniejID = ?
+        GROUP BY ty.HomeTyp, ty.AwayTyp
+        ORDER BY liczba DESC LIMIT 1
+    ", [$gracz['uniID'], $turniejID])->getRow();
+
+    // ── Trend punktowy (suma narastająco, mecz po meczu) ──
+    $trendPunktowy = [];
+    $sumaNarastajaca = 0;
+    foreach ($szczegolyMeczow as $m) {
+        $sumaNarastajaca += (int)$m['pkt'];
+        $trendPunktowy[] = $sumaNarastajaca;
+    }
+
+
     $jaMojeKonto = (session()->get('loggedInUser') === $gracz['uniID']);
 
     $wstep = ['title' => esc($gracz['nick'])];
@@ -254,6 +313,16 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
                'turniejeGracza'      => $turniejeGracza,
                'turniejName'         => $config['activeTournamentName'] ?? '',
                'jaMojeKonto'         => $jaMojeKonto,
+               'szczegolyMeczow'        => $szczegolyMeczow,
+               'szczegolyPytan'         => $szczegolyPytan,
+               'skutecznoscKierunkowa'  => $skutecznoscKierunkowa,
+               'skutecznoscDokladna'    => $skutecznoscDokladna,
+               'srednioPktNaMecz'       => $srednioPktNaMecz,
+               'najlepszyMecz'          => $najlepszyMecz,
+               'najgorszyMecz'          => $najgorszyMecz,
+               'srednieTurnieju'        => $srednieTurnieju,
+               'najczestszyWynikGracza' => $najczestszyWynikGracza,
+               'trendPunktowy'          => $trendPunktowy,
            ])
          . view('typowanie/footer');
 }
