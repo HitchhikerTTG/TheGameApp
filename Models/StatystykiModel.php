@@ -282,5 +282,3 @@ private function getAllPoints(string $userUniID, int $turniejID): int
     }
 }
 
-
-}
