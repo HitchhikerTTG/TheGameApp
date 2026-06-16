@@ -39,14 +39,62 @@
   <!-- Szczegóły -->
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
-
-      <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
-        <span class="text-secondary" style="font-size:14px;">Punkty za mecze</span>
-        <strong><?= (int)$pktMecze ?></strong>
+      <div class="py-2" style="border-bottom:1px solid var(--bs-border-color);">
+        <?php if (!empty($szczegolyMeczow)): ?>
+        <details>
+          <summary class="d-flex justify-content-between" style="cursor:pointer;list-style:none;">
+            <span class="text-secondary" style="font-size:14px;">Punkty za mecze</span>
+            <strong><?= (int)$pktMecze ?></strong>
+          </summary>
+          <div class="mt-2">
+            <?php foreach ($szczegolyMeczow as $m): ?>
+            <div class="d-flex justify-content-between align-items-center py-2" style="border-top:1px solid var(--bs-border-color);font-size:13px;">
+              <div>
+                <?= esc($m['HomeName']) ?> <?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?> <?= esc($m['AwayName']) ?>
+                <div class="text-secondary" style="font-size:12px;">
+                  Twój typ: <?= (int)$m['HomeTyp'] ?>:<?= (int)$m['AwayTyp'] ?><?= $m['GoldenGame'] ? ' ⚽' : '' ?>
+                </div>
+              </div>
+              <strong <?= $m['pkt'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$m['pkt'] ?> pkt</strong>
+            </div>
+            <?php endforeach ?>
+          </div>
+        </details>
+        <?php else: ?>
+        <div class="d-flex justify-content-between">
+          <span class="text-secondary" style="font-size:14px;">Punkty za mecze</span>
+          <strong><?= (int)$pktMecze ?></strong>
+        </div>
+        <?php endif ?>
       </div>
-      <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--bs-border-color);">
-        <span class="text-secondary" style="font-size:14px;">Punkty za pytania</span>
-        <strong><?= (int)$pktPytania ?></strong>
+
+      <div class="py-2" style="border-bottom:1px solid var(--bs-border-color);">
+        <?php if (!empty($szczegolyPytan)): ?>
+        <details>
+          <summary class="d-flex justify-content-between" style="cursor:pointer;list-style:none;">
+            <span class="text-secondary" style="font-size:14px;">Punkty za pytania</span>
+            <strong><?= (int)$pktPytania ?></strong>
+          </summary>
+          <div class="mt-2">
+            <?php foreach ($szczegolyPytan as $p): ?>
+            <div class="d-flex justify-content-between align-items-center py-2" style="border-top:1px solid var(--bs-border-color);font-size:13px;">
+              <div>
+                <?= esc($p['tresc']) ?>
+                <div class="text-secondary" style="font-size:12px;">
+                  Twoja odp.: <?= esc($p['mojaOdp']) ?> · Poprawna: <?= esc($p['poprawna']) ?>
+                </div>
+              </div>
+              <strong <?= $p['pktZdobyte'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$p['pktZdobyte'] ?> / <?= (int)$p['pktMax'] ?> pkt</strong>
+            </div>
+            <?php endforeach ?>
+          </div>
+        </details>
+        <?php else: ?>
+        <div class="d-flex justify-content-between">
+          <span class="text-secondary" style="font-size:14px;">Punkty za pytania</span>
+          <strong><?= (int)$pktPytania ?></strong>
+        </div>
+        <?php endif ?>
       </div>
 
             <?php if ($liczbaTypow > 0): ?>
@@ -148,83 +196,4 @@
   </div>
   <?php endif ?>
 
-  <!-- SZCZEGÓŁY MECZÓW -->
-  <?php if (!empty($szczegolyMeczow)): ?>
-  <details class="mb-3">
-    <summary class="section-label" style="cursor:pointer;">Szczegóły punktowe -- mecze (<?= count($szczegolyMeczow) ?>)</summary>
-    <div class="card match-card mt-2">
-      <div class="card-body px-3 py-2">
-        <?php foreach ($szczegolyMeczow as $m): ?>
-        <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--bs-border-color);font-size:14px;">
-          <div>
-            <?= esc($m['HomeName']) ?> <?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?> <?= esc($m['AwayName']) ?>
-            <div class="text-secondary" style="font-size:12px;">
-              Twój typ: <?= (int)$m['HomeTyp'] ?>:<?= (int)$m['AwayTyp'] ?><?= $m['GoldenGame'] ? ' ⚽' : '' ?>
-            </div>
-          </div>
-          <strong <?= $m['pkt'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$m['pkt'] ?> pkt</strong>
-        </div>
-        <?php endforeach ?>
-      </div>
-    </div>
-  </details>
-  <?php endif ?>
-
-  <!-- SZCZEGÓŁY PYTAŃ -->
-  <?php if (!empty($szczegolyPytan)): ?>
-  <details class="mb-3">
-    <summary class="section-label" style="cursor:pointer;">Szczegóły punktowe -- pytania (<?= count($szczegolyPytan) ?>)</summary>
-    <div class="card match-card mt-2">
-      <div class="card-body px-3 py-2">
-        <?php foreach ($szczegolyPytan as $p): ?>
-        <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--bs-border-color);font-size:14px;">
-          <div>
-            <?= esc($p['tresc']) ?>
-            <div class="text-secondary" style="font-size:12px;">
-              Twoja odp.: <?= esc($p['mojaOdp']) ?> · Poprawna: <?= esc($p['poprawna']) ?>
-            </div>
-          </div>
-          <strong <?= $p['pktZdobyte'] > 0 ? 'style="color:var(--ty-green);"' : '' ?>><?= (int)$p['pktZdobyte'] ?> / <?= (int)$p['pktMax'] ?> pkt</strong>
-        </div>
-        <?php endforeach ?>
-      </div>
-    </div>
-  </details>
-  <?php endif ?>
-
-    </div>
-  </div>
-
-  <!-- WSZECH CZASY (mini) -->
-  <?php if ($turniejeGracza > 0): ?>
-  <p class="section-label mt-4 mb-2">Wszech czasów</p>
-  <div class="card match-card mb-3">
-    <div class="card-body px-3 py-3">
-      <div class="d-grid" style="grid-template-columns:1fr 1fr;gap:8px;text-align:center;">
-        <div>
-          <div class="ff-bebas" style="font-size:32px;"><?= (int)$pktAllTime ?></div>
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);">Punkty łącznie</div>
-        </div>
-        <div>
-          <div class="ff-bebas" style="font-size:32px;"><?= (int)$turniejeGracza ?></div>
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);">Turniejów</div>
-        </div>
-      </div>
-      <div class="text-center mt-2">
-        <a href="/wszechczasy" style="font-size:13px;color:var(--ty-accent);">Zobacz pełną tabelę wszech czasów →</a>
-      </div>
-    </div>
-  </div>
-  <?php endif ?>
-
-  <!-- LINKI -->
-  <div class="d-flex gap-2 mt-3">
-    <a href="/statystyki" class="btn btn-outline-secondary btn-sm flex-fill text-center">Statystyki turnieju</a>
-    <a href="/wszechczasy" class="btn btn-outline-secondary btn-sm flex-fill text-center">Wszech czasów</a>
-  </div>
-
-</div>
-
-
-      
 
