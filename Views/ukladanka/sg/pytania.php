@@ -22,8 +22,8 @@
         <p style="font-size:12px;color:var(--bs-tertiary-color);" class="mb-0 ms-auto">
             Weryfikujemy na podstawie: <?= esc($pytanie['zrodlo']) ?>
         </p>
-    </div> 
-    <?php endif; ?>
+     <?php endif; ?>
+        </div>
     <form method="post" action="<?= site_url('TheGame/zapiszOdpowiedzNaPytanie') ?>" class="question-form">
       <input type="hidden" name="pytanieID" value="<?= $pytanie['id'] ?>">
       <input type="hidden" name="uniid"     value="<?= session()->get('loggedInUser') ?>">
