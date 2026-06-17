@@ -21,7 +21,9 @@ function renderMarkdown(string $src): string {
 ?>
 
 <?php if (!empty($notatki)): ?>
-<hr class="my-3" style="border-color:var(--bs-border-color);">
+<?php $newestAt = $notatki[0]['created_at']; ?>
+<hr class="my-3" style="border-color:var(--bs-border-color);" id="notatki-hr">
+<p class="section-label mb-2" id="notatki-label">Ogłoszenia</p>
 <p class="section-label mb-2">Ogłoszenia</p>
 
 <div class="card match-card mb-4" id="notatki-card">
@@ -37,6 +39,9 @@ function renderMarkdown(string $src): string {
       <span class="notatka-date"><?= esc(substr($notatki[0]['created_at'], 0, 10)) ?></span>
       &nbsp;·&nbsp;
       <span class="notatka-counter">1 / <?= count($notatki) ?></span>
+            &nbsp;·&nbsp;
+      <span style="cursor:pointer;color:var(--bs-secondary-color);font-size:12px;"
+            onclick="notatkiUkryj()">Przeczytane | ukryj ✕</span>
     </div>
 
   </div>
@@ -56,6 +61,27 @@ function renderMarkdown(string $src): string {
   var dates   = <?= json_encode(array_column(array_values($notatki), 'created_at')) ?>;
   var total   = items.length;
   var current = 0;
+
+  var LS_KEY   = 'notatki_read_at';
+  var newestAt = <?= json_encode($newestAt) ?>;
+
+    // Ukryj jeśli user już "przeczytał" i nie pojawiło się nic nowego
+    var readAt = localStorage.getItem(LS_KEY);
+    if (readAt && readAt >= newestAt) {
+      ['notatki-card', 'notatki-hr', 'notatki-label'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    window.notatkiUkryj = function () {
+      localStorage.setItem(LS_KEY, newestAt);
+      ['notatki-card', 'notatki-hr', 'notatki-label'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    };
+
 
   function sync() {
     card.querySelector('.notatka-date').textContent    = dates[current].slice(0, 10);

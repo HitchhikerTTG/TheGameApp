@@ -17,17 +17,26 @@ if (!function_exists('str_to_slug')) {
 if (!function_exists('unique_slug')) {
     function uniqueSlug(string $base, string $excludeUniID = ''): string
     {
+        $reserved = [
+            'moj-profil', 'profil', 'tabela', 'statystyki', 'wszechczasy',
+            'typowanie', 'hell', 'login', 'logout', 'rejestracja', 'api',
+        ];
+    
+    
         $db        = \Config\Database::connect();
         $candidate = $base;
         $i         = 1;
 
         while (true) {
             $q = $db->table('uzytkownicy')->where('slug', $candidate);
-            if ($excludeUniID !== '') {
-                $q->where('uniID !=', $excludeUniID);
-            }
-            if ($q->countAllResults() === 0) {
-                return $candidate;
+            if (!in_array($candidate, $reserved, true)) {
+                $q = $db->table('uzytkownicy')->where('slug', $candidate);
+                if ($excludeUniID !== '') {
+                    $q->where('uniID !=', $excludeUniID);
+                }
+                if ($q->countAllResults() === 0) {
+                    return $candidate;
+                }
             }
             $candidate = $base . '-' . $i++;
         }
