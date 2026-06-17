@@ -31,9 +31,13 @@
     d.textContent = String(s);
     return d.innerHTML;
   }
-  function displayNick(emoji, nick) {
-    return (emoji ? escHtml(emoji) + '\u00a0' : '') + escHtml(nick);
-  }
+  
+  function displayNick(emoji, nick, slug) {
+    var label = (emoji ? escHtml(emoji) + ' ' : '') + escHtml(nick);
+    if (!slug) return label;
+    return '<a href="/profil/' + encodeURIComponent(slug) + '" style="color:inherit;text-decoration:none;">' + label + '</a>';
+    
+  } 
 
   function ustalPozycje(dane, f) {
     var sorted = dane.slice().sort(function(a, b) { return b[f] - a[f]; });
@@ -41,7 +45,7 @@
     return sorted.map(function(g, i) {
       if (i > 0 && g[f] !== sorted[i-1][f]) pos = i + 1;
       // ← NOWE: emoji przekazywane dalej, inaczej displayNick zawsze dostaje undefined
-      return { uid: g.uid, nick: g.nick, emoji: g.emoji || '', punkty: g[f], pozycja: pos };
+      return { uid: g.uid, nick: g.nick, slug: g.slug,emoji: g.emoji || '', punkty: g[f], pozycja: pos };
     });
   }
 
@@ -60,7 +64,7 @@
       html += '<div class="lb-row' + (isMe ? ' me' : '') + '">'
         + '<div class="ff-bebas lb-pos ' + medalClass(g.pozycja) + '">' + g.pozycja + '</div>'
         + '<div class="lb-nick' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
-        + '<a href="/profil/'+g.slug+'">'+displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</a></div>'
+        + displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</div>'
         + '<div class="ff-bebas lb-pts' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
         + g.punkty + '</div></div>';
     });
