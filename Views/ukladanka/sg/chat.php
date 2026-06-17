@@ -86,6 +86,16 @@ $(document).ready(function() {
       }
 
       var newest = data[0];
+      
+      var feed = document.getElementById('shoutbox-feed');
+      var shouldStickToBottom = true;
+
+      if (feed) {
+        var distanceFromBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight;
+        shouldStickToBottom = distanceFromBottom < 80;
+      }      
+      
+      
       if (lastMessageId !== newest.id) {
         lastMessageId = newest.id;
         var truncated = newest.message.length > 45
@@ -117,8 +127,15 @@ $(document).ready(function() {
           + '</div>';
       });
       $('#shoutbox-feed').html(html);
-      var feed = document.getElementById('shoutbox-feed');
-      if (feed) feed.scrollTop = feed.scrollHeight;
+      
+      
+        feed = document.getElementById('shoutbox-feed');
+
+        if (feed && shouldStickToBottom) {
+          feed.scrollTop = feed.scrollHeight;
+        }
+
+      
 
     }).fail(function(jqXHR) {
       if (jqXHR.status === 401) {
