@@ -22,13 +22,13 @@ function renderMarkdown(string $src): string {
 
 <?php if (!empty($notatki)): ?>
 <?php $newestAt = $notatki[0]['created_at']; ?>
-<div id="notatki-ukryte" style="display:none;margin-bottom:8px;">
-  <span style="cursor:pointer;font-size:12px;color:var(--bs-secondary-color);"
-        onclick="notatkiPokaz()">Ogłoszenia ↓</span>
-</div>
+
 <hr class="my-3" style="border-color:var(--bs-border-color);" id="notatki-hr">
+<div id="notatki-ukryte" style="display:none;margin-bottom:8px;">
+  <p class="section-label mb-2"
+        onclick="notatkiPokaz()">Ogłoszenia ↓</p>
+</div>
 <p class="section-label mb-2" id="notatki-label">Ogłoszenia</p>
-<p class="section-label mb-2">Ogłoszenia</p>
 
 <div class="card match-card mb-4" id="notatki-card">
   <div class="px-3 pt-3 pb-1">
