@@ -69,6 +69,7 @@ class TabelaModel extends Model
                 'uid'              => $uzytkownik['id'],
                 'uniID'              => $uzytkownik['uniID'],
                 'nick'             => $uzytkownik['nick'],
+                'slug'              => $uzytkownik['slug'],
                 'emoji'            => $uzytkownik['emoji'] ?? '',   // ← dodać
                 'punkty'           => $liczbapkt,
                 'punktyZaMecze'    => $liczbaPktZaTypy,

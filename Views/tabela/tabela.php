@@ -60,7 +60,7 @@
       html += '<div class="lb-row' + (isMe ? ' me' : '') + '">'
         + '<div class="ff-bebas lb-pos ' + medalClass(g.pozycja) + '">' + g.pozycja + '</div>'
         + '<div class="lb-nick' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
-        + displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</div>'
+        + '<a href="/profil/'+g.slug+'">'+displayNick(g.emoji, g.nick) + (isMe ? ' ← Ty' : '') + '</a></div>'
         + '<div class="ff-bebas lb-pts' + (isMe ? '" style="color:var(--ty-accent)"' : '"') + '>'
         + g.punkty + '</div></div>';
     });

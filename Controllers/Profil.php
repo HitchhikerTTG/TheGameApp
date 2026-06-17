@@ -327,4 +327,15 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
          . view('typowanie/footer');
 }
 
+    public function mojProfil()
+{
+    $uniID = session()->get('loggedInUser');
+    if (!$uniID) return redirect()->to('/login');
+
+    $gracz = model(\App\Models\UserModel::class)->where('uniID', $uniID)->first();
+    if (!$gracz || empty($gracz['slug'])) return redirect()->to('/profil');
+
+    return redirect()->to('/profil/' . $gracz['slug']);
+}
+
 }
