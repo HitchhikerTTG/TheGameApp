@@ -58,6 +58,7 @@ function renderMarkdown(string $src): string {
   <?php endif; ?>
 </div>
 
+<script>
 (function () {
   var LS_KEY   = 'notatki_read_at';
   var newestAt = <?= json_encode($newestAt) ?>;
@@ -116,4 +117,5 @@ function renderMarkdown(string $src): string {
     sync();
   };
 })();
+</script>
 <?php endif; ?>
