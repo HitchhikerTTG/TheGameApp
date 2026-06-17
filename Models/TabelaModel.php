@@ -67,6 +67,7 @@ class TabelaModel extends Model
 
             $wyniki[] = [
                 'uid'              => $uzytkownik['id'],
+                'uniID'              => $uzytkownik['uniID'],
                 'nick'             => $uzytkownik['nick'],
                 'emoji'            => $uzytkownik['emoji'] ?? '',   // ← dodać
                 'punkty'           => $liczbapkt,
@@ -128,29 +129,29 @@ class TabelaModel extends Model
         return null;
     }
 
-    // Pozycja gracza w rankingu (competition ranking - remisy dzielą miejsce)
-    public function getPozycjaGracza(int $turniejID, string $uniID): int
-    {
-        $tabela = $this->gimmeTabelaGraczy($turniejID);
-        usort($tabela, fn($a, $b) => $b['punkty'] <=> $a['punkty']);
+        // Pozycja gracza w rankingu (competition ranking - remisy dzielą miejsce)
+        public function getPozycjaGracza(int $turniejID, string $uniID): int
+        {
+            $tabela = $this->gimmeTabelaGraczy($turniejID);
+            usort($tabela, fn($a, $b) => $b['punkty'] <=> $a['punkty']);
 
-        $pozycja          = 1;
-        $poprzedniePunkty = null;
-        $licznik          = 0;
+            $pozycja          = 1;
+            $poprzedniePunkty = null;
+            $licznik          = 0;
 
-        foreach ($tabela as $wiersz) {
-            $licznik++;
-            if ($poprzedniePunkty === null || $wiersz['punkty'] < $poprzedniePunkty) {
-                $pozycja          = $licznik;
-                $poprzedniePunkty = $wiersz['punkty'];
+            foreach ($tabela as $wiersz) {
+                $licznik++;
+                if ($poprzedniePunkty === null || $wiersz['punkty'] < $poprzedniePunkty) {
+                    $pozycja          = $licznik;
+                    $poprzedniePunkty = $wiersz['punkty'];
+                }
+                if ((string)($wiersz['uniID'] ?? '') === $uniID) {
+                    return $pozycja;
+                }
             }
-            if ((string)($wiersz['uniID'] ?? '') === $uniID) {
-                return $pozycja;
-            }
+
+            return $licznik + 1;
         }
-
-        return $licznik + 1;
-    }
 
 
 }

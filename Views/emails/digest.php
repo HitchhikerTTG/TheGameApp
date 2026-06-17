@@ -76,15 +76,6 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
     </td>
   </tr>
 
-  <!-- KOMENTARZ ADMINA -->
-  <?php if (!empty($adminKomentarz)): ?>
-  <tr>
-    <td bgcolor="<?= $cCard ?>" style="padding:20px 24px 0;">
-      <?= $komentarzBlock(esc($adminKomentarz), $cAccent, $cBgGray) ?>
-    </td>
-  </tr>
-  <?php endif ?>
-
   <!-- STATYSTYKI -->
   <?php if (isset($wszystkiePkt)): ?>
   <tr>
@@ -108,6 +99,15 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
           </td>
         </tr>
       </table>
+    </td>
+  </tr>
+  <?php endif ?>
+
+  <!-- KOMENTARZ ADMINA -->
+  <?php if (!empty($adminKomentarz)): ?>
+  <tr>
+    <td bgcolor="<?= $cCard ?>" style="padding:20px 24px 0;">
+      <?= $komentarzBlock(esc($adminKomentarz), $cAccent, $cBgGray) ?>
     </td>
   </tr>
   <?php endif ?>
@@ -146,10 +146,6 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
   <?php if (!empty($wczorajPytania)): ?>
   <tr>
     <td bgcolor="<?= $cCard ?>" style="padding:24px 24px 0;">
-      <?php if (!empty($adminKomentarz2)): ?>
-        <?= $komentarzBlock(esc($adminKomentarz2), $cGreen, $cBgGreen) ?>
-        <div style="height:16px;font-size:0;">&nbsp;</div>
-      <?php endif ?>
       <?= $sectionLabel('Wyniki za pytania') ?>
       <?php foreach ($wczorajPytania as $p):
         $prawidlowa = $p['odpowiedz']
@@ -185,6 +181,16 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
   </tr>
   <?php endif ?>
 
+
+  <?php if (!empty($adminKomentarz2)): ?>
+    <tr>
+     <td bgcolor="<?= $cCard ?>" style="padding:20px 24px 0;">
+        <?= $komentarzBlock(esc($adminKomentarz2), $cGreen, $cBgGreen) ?>
+        <div style="height:16px;font-size:0;">&nbsp;</div>
+     </td>
+  </tr>
+  <?php endif ?>
+  
   <!-- NADCHODZĄCE MECZE -->
   <?php if (!empty($dzisiajMecze)): ?>
   <tr>
@@ -311,3 +317,4 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
 
 </body>
 </html>
+
