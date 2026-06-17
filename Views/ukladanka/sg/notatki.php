@@ -24,9 +24,9 @@ function renderMarkdown(string $src): string {
 <?php $newestAt = $notatki[0]['created_at']; ?>
 
 <hr class="my-3" style="border-color:var(--bs-border-color);" id="notatki-hr">
-<div id="notatki-ukryte" style="display:none;margin-bottom:8px;">
+<div id="notatki-ukryte" style="display:none;margin-bottom:12 px;">
   <p class="section-label mb-2"
-        onclick="notatkiPokaz()">Ogłoszenia ↓</p>
+        onclick="notatkiPokaz()">Pokaż ogłoszenia ↓</p>
 </div>
 <p class="section-label mb-2" id="notatki-label">Ogłoszenia</p>
 
