@@ -22,6 +22,10 @@ function renderMarkdown(string $src): string {
 
 <?php if (!empty($notatki)): ?>
 <?php $newestAt = $notatki[0]['created_at']; ?>
+<div id="notatki-ukryte" style="display:none;margin-bottom:8px;">
+  <span style="cursor:pointer;font-size:12px;color:var(--bs-secondary-color);"
+        onclick="notatkiPokaz()">Ogłoszenia ↓</span>
+</div>
 <hr class="my-3" style="border-color:var(--bs-border-color);" id="notatki-hr">
 <p class="section-label mb-2" id="notatki-label">Ogłoszenia</p>
 <p class="section-label mb-2">Ogłoszenia</p>
@@ -54,34 +58,45 @@ function renderMarkdown(string $src): string {
   <?php endif; ?>
 </div>
 
-<script>
 (function () {
+  var LS_KEY   = 'notatki_read_at';
+  var newestAt = <?= json_encode($newestAt) ?>;
+
+  var UKRYTE = ['notatki-card', 'notatki-hr', 'notatki-label'];
+
+  function schowaj() {
+    UKRYTE.forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    var u = document.getElementById('notatki-ukryte'); if (u) u.style.display = '';
+  }
+
+  function pokaz() {
+    UKRYTE.forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.style.display = '';
+    });
+    var u = document.getElementById('notatki-ukryte'); if (u) u.style.display = 'none';
+  }
+
+  // Ukryj jeśli user już "przeczytał" i nie pojawiło się nic nowego
+  var readAt = localStorage.getItem(LS_KEY);
+  if (readAt && readAt >= newestAt) { schowaj(); }
+
+  window.notatkiUkryj = function () {
+    localStorage.setItem(LS_KEY, newestAt);
+    schowaj();
+  };
+
+  window.notatkiPokaz = function () {
+    localStorage.removeItem(LS_KEY);
+    pokaz();
+  };
+
   var card    = document.getElementById('notatki-card');
   var items   = card.querySelectorAll('.notatka-a');
   var dates   = <?= json_encode(array_column(array_values($notatki), 'created_at')) ?>;
   var total   = items.length;
   var current = 0;
-
-  var LS_KEY   = 'notatki_read_at';
-  var newestAt = <?= json_encode($newestAt) ?>;
-
-    // Ukryj jeśli user już "przeczytał" i nie pojawiło się nic nowego
-    var readAt = localStorage.getItem(LS_KEY);
-    if (readAt && readAt >= newestAt) {
-      ['notatki-card', 'notatki-hr', 'notatki-label'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-      });
-    }
-
-    window.notatkiUkryj = function () {
-      localStorage.setItem(LS_KEY, newestAt);
-      ['notatki-card', 'notatki-hr', 'notatki-label'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-      });
-    };
-
 
   function sync() {
     card.querySelector('.notatka-date').textContent    = dates[current].slice(0, 10);
@@ -101,5 +116,4 @@ function renderMarkdown(string $src): string {
     sync();
   };
 })();
-</script>
 <?php endif; ?>
