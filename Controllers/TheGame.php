@@ -124,7 +124,7 @@ class TheGame extends BaseController
 
     // BEZ ZMIAN: 1 zapytanie do bazy
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
-    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);o
+    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
     if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
         return view('typowanie/header', ['title' => $turniejName])
