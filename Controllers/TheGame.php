@@ -574,14 +574,12 @@ foreach ($meczeArchiwalne as &$mecz) {
     $typyModel = model(TypyModel::class);
     $terminarzModel = model(TerminarzModel::class);
 
-    // Check if the typ can be saved based on the match time
-        if (!$typyModel->canSaveTyp($gameID)) {
-          session()->set('sprawdzilem godzine i wszystko gra', 'NIE');
+            if (!$typyModel->canSaveTyp($gameID)) {
           return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
         } 
 
     $currentGoldenGame = $typyModel->usedGoldenBall($userUniId, $turniejID);
-    
+
     // Reguła "zamrożona po starcie": nie wolno przenieść złotej z meczu już rozpoczętego.
     if ($goldenGame == 1 && $currentGoldenGame && $currentGoldenGame != $gameID
         && $terminarzModel->czyRozpoczety($currentGoldenGame)) {
@@ -590,15 +588,10 @@ foreach ($meczeArchiwalne as &$mecz) {
             'message' => 'Złota piłka jest zamrożona -- mecz, na którym ją ustawiłeś, już się rozpoczął.',
         ]);
     }
-    
-    
-      session()->set('Wartość ', $typyModel->canSaveTyp($gameID));
-
 
     if ($typyModel->zapiszTyp($data)) {
 
     $previousGoldenGameID = 0;
-    session()->set('usedGoldenBall', $currentGoldenGame); // nie wiem czy to zostawić
 
     if ($goldenGame == 1) {
         // Automatycznie przenieś -- wyczyść poprzedni mecz w DB
@@ -606,13 +599,12 @@ foreach ($meczeArchiwalne as &$mecz) {
             $typyModel->removeGoldenGame($userUniId, $currentGoldenGame, $turniejID);
             $previousGoldenGameID = $currentGoldenGame;
         }
-        session()->set('usedGoldenBall', $gameID);
 
     } elseif ($goldenGame == 0 && $currentGoldenGame == $gameID) {
         $typyModel->removeGoldenGame($userUniId, $gameID, $turniejID);
-        session()->set('usedGoldenBall', 0);
     }
-
+    
+    
     (new EmailService())->queueBetSaved($userUniId, (int)$gameID, (string)$homeScore, (string)$awayScore, (int)$goldenGame);
 
     return $this->response->setJSON([

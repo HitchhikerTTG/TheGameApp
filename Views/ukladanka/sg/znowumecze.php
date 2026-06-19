@@ -1,6 +1,11 @@
 <?php $lastDate = null; ?>
 <?php $usedGoldenBall   = $usedGoldenBall   ?? 0;
       $goldenBallLocked = $goldenBallLocked ?? false; ?>
+<?php if ($goldenBallLocked): ?>
+  <p class="golden-used-note mt-3 mb-1" style="font-size:13px;color:var(--bs-secondary-color);">
+    ⚽ Złota piłka juz została wykorzystana.
+  </p>
+<?php endif; ?>
 <?php foreach ($mecze as $match):
     if (!isset($match['details'])) continue;
 
@@ -110,23 +115,20 @@
 </div>
 
 
-        <?php
-        if ($goldenBallLocked) { $goldenLabel = '⚽ Złota piłka zamrożona [mecz trwa]'; $goldenDisabled = true; }
-        else                   { $goldenLabel = '⚽ Złota piłka czyli punkty x2';     $goldenDisabled = false; }
-        ?>
-        <div class="golden-row mb-3 <?= $isGolden ? 'active' : '' ?> <?= $goldenDisabled ? 'disabled-golden' : '' ?>"
+               <?php if (!$goldenBallLocked): ?>
+        <div class="golden-row mb-3 <?= $isGolden ? 'active' : '' ?>"
              id="golden-row-<?= $match['Id'] ?>"
-             <?= !$goldenDisabled ? 'onclick="typerToggleGolden(' . $match['Id'] . ')"' : '' ?>>
-          <span class="golden-label"><?= $goldenLabel ?></span>
+             onclick="typerToggleGolden(<?= $match['Id'] ?>)">
+          <span class="golden-label">⚽ Złota piłka czyli punkty x2</span>
           <div class="form-check form-switch mb-0 pe-none">
             <input class="form-check-input golden-game-checkbox" type="checkbox"
                    id="goldenGame<?= $match['Id'] ?>" name="goldenGame" value="1"
                    data-game-id="<?= $match['Id'] ?>"
                    <?= $isGolden ? 'checked' : '' ?>
-                   <?= $goldenDisabled ? 'disabled' : '' ?>
                    onclick="event.stopPropagation()">
           </div>
         </div>
+        <?php endif; ?>
 
         <?php if (!empty($match['details']['odds'])): ?>
         <div class="d-flex gap-2 mb-3">
