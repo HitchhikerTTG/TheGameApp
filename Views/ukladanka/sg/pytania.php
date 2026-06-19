@@ -112,7 +112,7 @@ $(document).on('click', '.edit-answer-btn', function() {
     var $label = $form.find('.odpowiedz-label');
     var $input = $form.find('.odpowiedz-input');
     $label.addClass('d-none');
-    $form.find('.odpowiedz-label').css('display', '');
+    $input.removeClass('d-none');
     $input[0].focus();
     $form.find('.action-btn').removeClass('done').addClass('pending').text('Zapisz zmiany →');
 });
@@ -128,8 +128,8 @@ $(document).on('submit', '.question-form', function(e) {
     $.post($form.attr('action'), $form.serialize(), function(response) {
         if (response.status === 'success') {
             var newAnswer = $form.find('.odpowiedz-input').val();
-            $form.find('.odpowiedz-label').find('sp an:first').text(newAnswer);
-            $form.find('.odpowiedz-label').removeClass('d-none');
+            $form.find('.odpowiedz-label').find('span:first').text(newAnswer);
+            $form.find('.odpowiedz-label').removeClass('d-none').css('display', '');    // odsłoń w OBU ścieżkach
             $form.find('.odpowiedz-input').addClass('d-none');
             $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
         } else {
