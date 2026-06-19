@@ -75,7 +75,7 @@ class TheGame extends BaseController
 
         //$model = model(TabelaModel::class);
         $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
-
+    
         //$userModel = model(UserModel::class);
         $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
 
@@ -124,7 +124,7 @@ class TheGame extends BaseController
 
     // BEZ ZMIAN: 1 zapytanie do bazy
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
-    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);o
 
     if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
         return view('typowanie/header', ['title' => $turniejName])
@@ -559,7 +559,8 @@ foreach ($meczeArchiwalne as &$mecz) {
     if ($typyModel->zapiszTyp($data)) {
 
     $previousGoldenGameID = 0;
-    $currentGoldenGame    = session()->get('usedGoldenBall');
+    $currentGoldenGame = $typyModel->usedGoldenBall($userUniId, $turniejID);
+    session()->set('usedGoldenBall', $currentGoldenGame);
 
     if ($goldenGame == 1) {
         // Automatycznie przenieś -- wyczyść poprzedni mecz w DB
