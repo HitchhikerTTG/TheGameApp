@@ -121,10 +121,20 @@ class TheGame extends BaseController
 
     // BEZ ZMIAN: odczyt JSON z dysku
     $tabelaDanych = $this->tabelaModel->gimmeTabelaGraczy($turniejID);
-
+    
     // BEZ ZMIAN: 1 zapytanie do bazy
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
-    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+    $typyModel        = model(TypyModel::class);
+    $terminarzModel   = model(TerminarzModel::class);
+    $goldenBallGameID = (int) $typyModel->usedGoldenBall($loggedInUserId, $turniejID);
+    $goldenBallLocked = $goldenBallGameID > 0
+        && (bool) $terminarzModel->czyRozpoczety($goldenBallGameID);
+    $daneUzytkownika['usedGoldenBall'] = $goldenBallGameID;
+
+
+
+//  $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
 
     if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
         return view('typowanie/header', ['title' => $turniejName])
@@ -231,11 +241,16 @@ class TheGame extends BaseController
                'mecze'          => $mecze4,
                'turniejID'      => $turniejID,
                'userID'         => $loggedInUserId,
-               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall'],
+               'usedGoldenBall'=>$goldenBallGameID,
+               'goldenBallLocked'=>$goldenBallLocked,
+
            ])
            . view('ukladanka/sg/pytania', ['pytania' => $pytania])
            . view('tabela/tabela', $daneTurniejowe)
-           . view('ukladanka/sg/SkryptTypowania')
+           . view('ukladanka/sg/SkryptTypowania', [
+               'goldenBallGameID' => $goldenBallGameID,
+               'goldenBallLocked' => $goldenBallLocked,
+           ])
            . view('typowanie/footer');
 }
 
@@ -356,7 +371,14 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
 
     //$userModel = model(UserModel::class);
     $daneUzytkownika = $this->userModel->getGameUserData($loggedInUserId);
-    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+//    $daneUzytkownika['usedGoldenBall'] = session()->get('usedGoldenBall', 0);
+
+    $typyModel        = model(TypyModel::class);
+    $terminarzModel   = model(TerminarzModel::class);
+    $goldenBallGameID = (int) $typyModel->usedGoldenBall($loggedInUserId, $turniejID);
+    $goldenBallLocked = $goldenBallGameID > 0
+        && (bool) $terminarzModel->czyRozpoczety($goldenBallGameID);
+    $daneUzytkownika['usedGoldenBall'] = $goldenBallGameID;
 
 
         if (empty($daneUzytkownika['PlaysTheActiveTournament'])) {
@@ -410,9 +432,13 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
                'mecze' => $mecze4,
                'turniejID' => $turniejID,
                'userID' => $loggedInUserId,
-               'usedGoldenBall' => $daneUzytkownika['usedGoldenBall']
+               'usedGoldenBall'   => $goldenBallGameID,
+               'goldenBallLocked' => $goldenBallLocked,
            ])
-           .view('ukladanka/sg/SkryptTypowania')
+           . view('ukladanka/sg/SkryptTypowania', [
+               'goldenBallGameID' => $goldenBallGameID,
+               'goldenBallLocked' => $goldenBallLocked,
+           ])
            .view('typowanie/footer');
 }
 
@@ -546,6 +572,7 @@ foreach ($meczeArchiwalne as &$mecz) {
 
 
     $typyModel = model(TypyModel::class);
+    $terminarzModel = model(TerminarzModel::class);
 
     // Check if the typ can be saved based on the match time
         if (!$typyModel->canSaveTyp($gameID)) {
@@ -553,14 +580,25 @@ foreach ($meczeArchiwalne as &$mecz) {
           return $this->response->setJSON(['success' => false, 'message' => 'Nie można zapisać typu, ponieważ jest za późno']);
         } 
 
-        session()->set('Wartość ', $typyModel->canSaveTyp($gameID));
+    $currentGoldenGame = $typyModel->usedGoldenBall($userUniId, $turniejID);
+    
+    // Reguła "zamrożona po starcie": nie wolno przenieść złotej z meczu już rozpoczętego.
+    if ($goldenGame == 1 && $currentGoldenGame && $currentGoldenGame != $gameID
+        && $terminarzModel->czyRozpoczety($currentGoldenGame)) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Złota piłka jest zamrożona -- mecz, na którym ją ustawiłeś, już się rozpoczął.',
+        ]);
+    }
+    
+    
+      session()->set('Wartość ', $typyModel->canSaveTyp($gameID));
 
 
     if ($typyModel->zapiszTyp($data)) {
 
     $previousGoldenGameID = 0;
-    $currentGoldenGame = $typyModel->usedGoldenBall($userUniId, $turniejID);
-    session()->set('usedGoldenBall', $currentGoldenGame);
+    session()->set('usedGoldenBall', $currentGoldenGame); // nie wiem czy to zostawić
 
     if ($goldenGame == 1) {
         // Automatycznie przenieś -- wyczyść poprzedni mecz w DB

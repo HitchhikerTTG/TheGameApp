@@ -5,9 +5,8 @@ $(document).ready(function () {
   // savedGoldenGameID = mecz, na którym złota piłka jest ZAPISANA w DB
   // (odczytujemy z DOM -- który golden-row ma klasę 'active' przy ładowaniu)
   var $initActive       = $('.golden-row.active').first();
-  var savedGoldenGameID = $initActive.length
-    ? parseInt($initActive.attr('id').replace('golden-row-', ''))
-    : 0;
+    var savedGoldenGameID   = <?= (int)($goldenBallGameID ?? 0) ?>;   // z bazy, NIE z DOM
+  var goldenLocked        = <?= !empty($goldenBallLocked) ? 'true' : 'false' ?>;
   var pendingGoldenGameID = 0; // zaznaczona, ale jeszcze NIE zapisana
 
   /* ── STEPPER ────────────────────────────────────────────────────── */
@@ -43,6 +42,7 @@ $(document).ready(function () {
   }
 
   window.typerToggleGolden = function (id) {
+    if (goldenLocked) return;
     var $row = $('#golden-row-' + id);
     var $chk = $('#goldenGame' + id);
     $row.toggleClass('active');

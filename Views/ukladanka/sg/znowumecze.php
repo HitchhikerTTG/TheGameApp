@@ -1,5 +1,6 @@
 <?php $lastDate = null; ?>
-
+<?php $usedGoldenBall   = $usedGoldenBall   ?? 0;
+      $goldenBallLocked = $goldenBallLocked ?? false; ?>
 <?php foreach ($mecze as $match):
     if (!isset($match['details'])) continue;
 
@@ -110,9 +111,8 @@
 
 
         <?php
-        if ($usedGoldenBall == 0)               { $goldenLabel = '⚽ Złota piłka -- 2× punkty'; $goldenDisabled = false; }
-        elseif ($usedGoldenBall == $match['Id']) { $goldenLabel = '⚽ Złota piłka -- 2× punkty'; $goldenDisabled = false; }
-        else                                     { $goldenLabel = 'Złota piłka użyta na inny mecz'; $goldenDisabled = true; }
+        if ($goldenBallLocked) { $goldenLabel = '⚽ Złota piłka zamrożona [mecz trwa]'; $goldenDisabled = true; }
+        else                   { $goldenLabel = '⚽ Złota piłka czyli punkty x2';     $goldenDisabled = false; }
         ?>
         <div class="golden-row mb-3 <?= $isGolden ? 'active' : '' ?> <?= $goldenDisabled ? 'disabled-golden' : '' ?>"
              id="golden-row-<?= $match['Id'] ?>"
