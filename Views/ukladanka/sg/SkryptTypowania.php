@@ -97,8 +97,6 @@ $(document).ready(function () {
             pendingGoldenGameID = 0;
             resetGoldenRow(gameId);
           }
-            });
-          }
 
         } else {
           alert(response.message);
