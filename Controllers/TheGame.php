@@ -260,17 +260,11 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
     if (!file_exists($configPath)) {
         return $this->response->setJSON([]);
     }
-    $config     = json_decode(file_get_contents($configPath), true);
-    $turniejID  = $config['activeTournamentId'];
-    $compID     = $config['activeCompetitionId'];
+    $config    = json_decode(file_get_contents($configPath), true);
+    $turniejID = $config['activeTournamentId'];
 
-    $terminarz  = model(\App\Models\TerminarzModel::class)
+    $terminarz = model(\App\Models\TerminarzModel::class)
                     ->getRozpoczeteNieZakonczone($turniejID);
-
-    if (!empty($terminarz)) {
-        $service = new \App\Services\MeczService();
-        $service->odswiezLiveMecze($terminarz, (int)$turniejID, (string)$compID);
-    }
 
     $result = [];
     foreach ($terminarz as $mecz) {
