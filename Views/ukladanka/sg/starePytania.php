@@ -6,7 +6,8 @@
 <p class="section-label mb-2">Archiwum pytań</p>
 
 <?php foreach ($pytania as $pytanie):
-    $hasAnswer   = !empty($pytanie['dotychczasowa_odpowiedz']);
+    $odp = $pytanie['dotychczasowa_odpowiedz'] ?? null;
+    $hasAnswer = ($odp !== null && $odp !== '');
     $rightAnswer = !empty($pytanie['odpowiedz']);
     $odpowiedzi  = $pytanie['odpowiedzi'] ?? [];
 

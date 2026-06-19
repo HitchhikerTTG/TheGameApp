@@ -5,7 +5,8 @@
 <?php foreach ($pytania as $pytanie):
     $wazneDoTimestamp = strtotime($pytanie['wazneDo']);
     $isPast    = (time() > $wazneDoTimestamp);
-    $hasAnswer = !empty($pytanie['dotychczasowa_odpowiedz']);
+    $odp = $pytanie['dotychczasowa_odpowiedz'] ?? null;
+    $hasAnswer = ($odp !== null && $odp !== '');
 ?>
 <div class="card match-card mb-3">
   <div class="card-body px-3 py-3">
@@ -31,7 +32,7 @@
       <label class="odpowiedz-label shout-input w-100 d-flex align-items-center justify-content-between mb-2"
              style="border-radius:10px;line-height:2.4;padding:6px 12px;<?= $hasAnswer ? '' : 'display:none!important;' ?>">
         <span><?= $hasAnswer ? esc($pytanie['dotychczasowa_odpowiedz']) : '' ?></span>
-        <?php if ($hasAnswer && !$isPast): ?>
+        <?php if (!$isPast): ?>
           <span class="edit-answer-btn ms-2" style="cursor:pointer;opacity:0.5;flex-shrink:0;"
                 title="Edytuj odpowiedź">✏</span>
         <?php endif; ?>
@@ -111,7 +112,7 @@ $(document).on('click', '.edit-answer-btn', function() {
     var $label = $form.find('.odpowiedz-label');
     var $input = $form.find('.odpowiedz-input');
     $label.addClass('d-none');
-    $input.removeClass('d-none');
+    $form.find('.odpowiedz-label').css('display', '');
     $input[0].focus();
     $form.find('.action-btn').removeClass('done').addClass('pending').text('Zapisz zmiany →');
 });
@@ -127,7 +128,7 @@ $(document).on('submit', '.question-form', function(e) {
     $.post($form.attr('action'), $form.serialize(), function(response) {
         if (response.status === 'success') {
             var newAnswer = $form.find('.odpowiedz-input').val();
-            $form.find('.odpowiedz-label').find('span:first').text(newAnswer);
+            $form.find('.odpowiedz-label').find('sp an:first').text(newAnswer);
             $form.find('.odpowiedz-label').removeClass('d-none');
             $form.find('.odpowiedz-input').addClass('d-none');
             $form.find('.action-btn').removeClass('pending').addClass('done').text('✓ Zapisano');
