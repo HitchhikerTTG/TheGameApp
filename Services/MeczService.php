@@ -477,12 +477,13 @@ public function odswiezLiveMecze(array $mecze, int $turniejID, string $competiti
     // Sprawdź czy którykolwiek potrzebuje odświeżenia (próg: 2 minuty)
     $needsRefresh = false;
     foreach ($startedMecze as $mecz) {
-        $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
-        if (!file_exists($jsonPath) || (time() - filemtime($jsonPath)) > 120) {
-            $needsRefresh = true;
-            break;
-        }
+    $livePath = WRITEPATH . "live/{$mecz['ApiID']}.json";
+    // Sprawdzaj świeżość pliku live, nie statycznego – static JSON już nie będzie aktualizowany w tej metodzie
+    if (!file_exists($livePath) || (time() - filemtime($livePath)) > 120) {
+        $needsRefresh = true;
+        break;
     }
+}
     if (!$needsRefresh) return;
 
     $liveController = new \App\Controllers\LiveScore();
@@ -506,52 +507,107 @@ public function odswiezLiveMecze(array $mecze, int $turniejID, string $competiti
         $this->common->custom_log("History API error: " . $e->getMessage());
     }
 
-    // Indeksuj po home_id_away_id -- spójne między wszystkimi endpointami
-    $liveIndex = [];
-    foreach ($liveMecze as $lm) {
-        $liveIndex[$lm['home_id'] . '_' . $lm['away_id']] = $lm;
+$liveIndex = [];
+foreach ($liveMecze as $lm) {
+    if (!empty($lm['fixture_id'])) {
+        $liveIndex[(string)$lm['fixture_id']] = $lm;
     }
+}
 
-    $historyIndex = [];
-    foreach ($historyMecze as $hm) {
-        $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;
+$historyIndex = [];
+foreach ($historyMecze as $hm) {
+    if (!empty($hm['fixture_id'])) {
+        $historyIndex[(string)$hm['fixture_id']] = $hm;
     }
+}
 
-    foreach ($startedMecze as $mecz) {
-        $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
-        if (!file_exists($jsonPath)) continue;
+$terminarzModel = model(\App\Models\TerminarzModel::class);
+$liveDir = WRITEPATH . 'live/';
+if (!is_dir($liveDir)) {
+    mkdir($liveDir, 0755, true);
+}
 
-        $existing = json_decode(file_get_contents($jsonPath), true) ?? [];
-        $key = $mecz['HomeID'] . '_' . $mecz['AwayID'];
+foreach ($startedMecze as $mecz) {
+    $key      = (string)$mecz['ApiID'];  // fixture_id
+    $livePath = $liveDir . $key . '.json';
 
-        if (isset($historyIndex[$key])) {
-            // Mecz zakończony -- wynik z API
-            $parts = explode('-', $historyIndex[$key]['score'] ?? '0-0');
-            $existing['status']             = 'Zakonczony';
-            $existing['home_team']['score'] = trim($parts[0] ?? '0');
-            $existing['away_team']['score'] = trim($parts[1] ?? '0');
-            unset($existing['minute']);
+    // Statyczny JSON zostawiamy bez zmian do Step 6
+    $staticPath = WRITEPATH . "mecze/{$turniejID}/{$key}.json";
 
-        } elseif (isset($liveIndex[$key])) {
-            // Mecz trwa -- aktualizuj wynik i minutę
-            $parts = explode('-', $liveIndex[$key]['score'] ?? '0-0');
-            $existing['status']             = 'Live';
-            $existing['minute']             = $liveIndex[$key]['time'] ?? null;
-            $existing['home_team']['score'] = trim($parts[0] ?? '0');
-            $existing['away_team']['score'] = trim($parts[1] ?? '0');
+    if (isset($historyIndex[$key])) {
+        // --- CASE A: mecz zakończony w history feed ---
+        $hm     = $historyIndex[$key];
+        $scores = $hm['scores'] ?? [];
+        // scores.score = wynik ostateczny (po dogrywce/karnych jeśli były)
+        $finalScore = $scores['score'] ?? '0 - 0';
+        [$homeScore, $awayScore] = $this->parseScore($finalScore);
 
-        } else {
-            // Fallback: nie ma w live ani history po 3h → zakończony
-            if (!empty($existing['date']) && !empty($existing['time'])) {
-                $matchTime = strtotime($existing['date'] . ' ' . $existing['time']);
-                if ($matchTime && time() > $matchTime + 10800) {
-                    $existing['status'] = 'Zakonczony';
-                }
-            }
+        $timeLabel = 'FT';
+        if (!empty($scores['ps_score'])) $timeLabel = 'AP';
+        elseif (!empty($scores['et_score'])) $timeLabel = 'AET';
+
+        file_put_contents($livePath, json_encode([
+            'fixture_id'   => $key,
+            'match_id'     => (string)($hm['id'] ?? ''),
+            'status'       => 'FINISHED',
+            'time'         => $timeLabel,
+            'score'        => $finalScore,
+            'ht_score'     => $scores['ht_score'] ?? '',
+            'ft_score'     => $scores['ft_score'] ?? '',
+            'et_score'     => $scores['et_score'] ?? '',
+            'ps_score'     => $scores['ps_score'] ?? '',
+            'last_changed' => date('Y-m-d H:i:s'),
+            'home_score'   => $homeScore,
+            'away_score'   => $awayScore,
+        ], JSON_PRETTY_PRINT));
+
+        // KLUCZOWA ZMIANA: aktualizacja DB -- to naprawia "zombie live matches"
+        $terminarzModel->setZakonczony((int)$mecz['Id']);
+
+    } elseif (isset($liveIndex[$key])) {
+        // --- CASE B: mecz trwa ---
+        $lm     = $liveIndex[$key];
+        $scores = $lm['scores'] ?? [];
+        $raw    = $scores['score'] ?? '0 - 0';
+        [$homeScore, $awayScore] = $this->parseScore($raw);
+
+        file_put_contents($livePath, json_encode([
+            'fixture_id'   => $key,
+            'match_id'     => (string)($lm['id'] ?? ''),
+            'status'       => $lm['status'] ?? 'IN PLAY',
+            'time'         => (string)($lm['time'] ?? ''),
+            'score'        => $raw,
+            'ht_score'     => $scores['ht_score'] ?? '',
+            'last_changed' => date('Y-m-d H:i:s'),
+            'home_score'   => $homeScore,
+            'away_score'   => $awayScore,
+        ], JSON_PRETTY_PRINT));
+
+    } else {
+        // --- CASE C: brak w obu feedach -- fallback ---
+        $matchTime = strtotime($mecz['Date'] . ' ' . $mecz['Time'] . ' UTC');
+        if ($matchTime && time() > $matchTime + 6600) {  // 110 min
+            $existing = file_exists($livePath)
+                ? (json_decode(file_get_contents($livePath), true) ?? [])
+                : [];
+
+            file_put_contents($livePath, json_encode([
+                'fixture_id'   => $key,
+                'match_id'     => $existing['match_id'] ?? '',
+                'status'       => 'FINISHED_FALLBACK',
+                'time'         => 'FT',
+                'score'        => $existing['score'] ?? '? - ?',
+                'ht_score'     => $existing['ht_score'] ?? '',
+                'last_changed' => date('Y-m-d H:i:s'),
+                'home_score'   => $existing['home_score'] ?? 0,
+                'away_score'   => $existing['away_score'] ?? 0,
+            ], JSON_PRETTY_PRINT));
+
+            $terminarzModel->setZakonczony((int)$mecz['Id']);
         }
-
-        file_put_contents($jsonPath, json_encode($existing, JSON_PRETTY_PRINT));
     }
+    // Static JSON celowo NIE jest już tu modyfikowany (dane live oddzielone)
+}
 }
 
 
@@ -641,6 +697,14 @@ public function wygenerujTypyDlaMeczu($matchId) {
     }
 
     file_put_contents("{$baseDir}/{$matchId}.json", $jsonData);
+}
+
+private function parseScore(string $score): array
+{
+    $parts     = explode(' - ', $score);  // spacja-myślnik-spacja, nie samo '-'
+    $homeScore = isset($parts[0]) ? (int)trim($parts[0]) : 0;
+    $awayScore = isset($parts[1]) ? (int)trim($parts[1]) : 0;
+    return [$homeScore, $awayScore];
 }
 
 }

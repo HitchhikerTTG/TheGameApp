@@ -237,7 +237,10 @@ public function getMecze24h(int $turniejId, bool $onlyIds = false): array
     return $query->findAll();
 }
 
-	
+	public function setZakonczony(int $id): bool
+{
+    return $this->update($id, ['zakonczony' => 1]) !== false;
+}
 
 }
 

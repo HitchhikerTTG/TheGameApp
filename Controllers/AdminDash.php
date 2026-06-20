@@ -597,38 +597,36 @@ public function mecze()
         $wszystkieMecze = (new \App\Services\MeczService())
                             ->getRozegraneMeczeTurnieju($turniejID) ?? [];
 
-        // Enrich z JSON + fallback do History API dla meczów bez wyniku
-        $historyIndex = $this->_pobierzHistoryIndex($terminarz, $compID);
+// Brak wywołania API na stronie admina -- live/ jest źródłem prawdy
+foreach ([&$terminarz, &$wszystkieMecze] as &$lista) {
+    foreach ($lista as &$m) {
+        // Dane statyczne (nazwy, czas) -- z mecze/ JSON
+        $staticPath = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
+        $d = file_exists($staticPath)
+            ? (json_decode(file_get_contents($staticPath), true) ?? [])
+            : [];
 
-        foreach ([&$terminarz, &$wszystkieMecze] as &$lista) {
-            foreach ($lista as &$m) {
-                $path = WRITEPATH . "mecze/{$turniejID}/{$m['ApiID']}.json";
-                $d = file_exists($path)
-                    ? (json_decode(file_get_contents($path), true) ?? [])
-                    : [];
+        $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
+        $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
+        $m['naszCzas']   = $d['naszCzas'] ?? null;
+        $m['naszaData']  = $d['naszaData'] ?? null;
+        $m['liczbaTypow'] = model(\App\Models\TypyModel::class)->liczbaTypowDlaMeczu((int)$m['Id']);
 
-                $m['plHomeName'] = $d['home_team']['plName'] ?? $d['home_team']['name'] ?? null;
-                $m['plAwayName'] = $d['away_team']['plName'] ?? $d['away_team']['name'] ?? null;
-                $m['naszCzas']   = $d['naszCzas'] ?? null;
-                $m['naszaData']  = $d['naszaData'] ?? null;
-                $m['apiScoreH']  = $d['home_team']['score'] ?? null;
-                $m['apiScoreA']  = $d['away_team']['score'] ?? null;
-                $m['apiStatus']  = $d['status'] ?? null;
-                $m['liczbaTypow'] = model(\App\Models\TypyModel::class)->liczbaTypowDlaMeczu((int)$m['Id']);
+        // Dane live (wyniki, status, minuta) -- z live/ JSON
+        $livePath = WRITEPATH . "live/{$m['ApiID']}.json";
+        $live = file_exists($livePath)
+            ? (json_decode(file_get_contents($livePath), true) ?? [])
+            : [];
 
-                // Fallback: History API
-                if ($m['apiScoreH'] === null) {
-                    if (isset($historyIndex[(int)$m['ApiID']])) {
-                        $parts = explode(' - ', $historyIndex[(int)$m['ApiID']]['scores']['ft_score'] ?? '');
-                        $m['apiScoreH'] = (int)trim($parts[0] ?? '0');
-                        $m['apiScoreA'] = (int)trim($parts[1] ?? '0');
-                        $m['apiStatus'] = 'Zakonczony';
-                    }
-                }
-
-            }
-        }
-        unset($lista, $m);
+        $m['apiScoreH']   = $live['home_score']  ?? null;
+        $m['apiScoreA']   = $live['away_score']  ?? null;
+        $m['apiStatus']   = $live['status']      ?? null;
+        $m['liveMinute']  = $live['time']        ?? null;
+        $m['liveHtScore'] = $live['ht_score']    ?? null;
+        $m['liveScore']   = $live['score']       ?? null;   // np. "2 - 1" do wyświetlenia
+    }
+}
+unset($lista, $m);
     }
 
     return view('administracja/hell_mecze', [

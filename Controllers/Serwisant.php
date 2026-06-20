@@ -602,10 +602,19 @@ protected $_key;
     
     // W zapiszWynikMeczu(), po pobraniu $terminarz -- dodaj enrichment z JSON:
 foreach ($terminarz as &$mecz) {
-    if (empty($mecz['ScoreHome']) && empty($mecz['ScoreAway'])) {
-        $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
-        if (file_exists($jsonPath)) {
-            $json = json_decode(file_get_contents($jsonPath), true);
+    $livePath = WRITEPATH . "live/{$mecz['ApiID']}.json";
+    if (file_exists($livePath)) {
+        $live = json_decode(file_get_contents($livePath), true) ?? [];
+        $mecz['ScoreHome']  = $live['home_score']  ?? $mecz['ScoreHome'];
+        $mecz['ScoreAway']  = $live['away_score']  ?? $mecz['ScoreAway'];
+        $mecz['liveStatus'] = $live['status']      ?? null;
+        $mecz['liveMinute'] = $live['time']        ?? null;
+        $mecz['liveHtScore']= $live['ht_score']    ?? null;
+    } elseif (empty($mecz['ScoreHome']) && empty($mecz['ScoreAway'])) {
+        // fallback -- live plik jeszcze nie istnieje
+        $staticPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
+        if (file_exists($staticPath)) {
+            $json = json_decode(file_get_contents($staticPath), true);
             $mecz['ScoreHome'] = $json['home_team']['score'] ?? null;
             $mecz['ScoreAway'] = $json['away_team']['score'] ?? null;
         }
@@ -664,38 +673,6 @@ if ($this->request->getMethod() === 'POST') {
     }
 
     $data['terminarz'] = $terminarz;
-    
-    // Po pobraniu $terminarz, przed $data['terminarz'] = $terminarz:
-$liveController = new \App\Controllers\LiveScore();
-try {
-    $dzisiajHistory = $liveController->getHistory([
-        'competition_id' => $config['activeCompetitionId'],
-        'from' => date('Y-m-d'),
-        'to'   => date('Y-m-d'),
-    ]);
-    
-    // ← DODAJ TUTAJ:
-    log_message('debug', 'activeCompetitionId: ' . $config['activeCompetitionId']);
-    log_message('debug', 'History count: ' . count($dzisiajHistory));
-    log_message('debug', 'History keys: ' . json_encode(array_column($dzisiajHistory, 'score', 'home_id')));
-
-    $historyIndex = [];
-    foreach ($dzisiajHistory as $hm) {
-        $historyIndex[$hm['home_id'] . '_' . $hm['away_id']] = $hm;
-    }
-} catch (\Exception $e) {
-    $historyIndex = [];
-}
-
-foreach ($terminarz as &$mecz) {
-    $key = $mecz['HomeID'] . '_' . $mecz['AwayID'];
-    if (empty($mecz['ScoreHome']) && isset($historyIndex[$key])) {
-        $parts = explode('-', $historyIndex[$key]['score'] ?? '');
-        $mecz['ScoreHome'] = trim($parts[0] ?? '');
-        $mecz['ScoreAway'] = trim($parts[1] ?? '');
-    }
-}
-
 
     return view('serwisant/meczoweCzaryMary', $data);
 }
@@ -707,14 +684,15 @@ public function wyniki()
     $terminarzModel = model(TerminarzModel::class);
     $terminarz  = $terminarzModel->getRozpoczeteNieZakonczone($config['activeTournamentId'] ?? 0);
 
-    foreach ($terminarz as &$mecz) {
-        $jsonPath = WRITEPATH . "mecze/{$config['activeTournamentId']}/{$mecz['ApiID']}.json";
-        if (file_exists($jsonPath)) {
-            $json = json_decode(file_get_contents($jsonPath), true);
-            $mecz['ScoreHome'] = $mecz['ScoreHome'] ?? ($json['home_team']['score'] ?? null);
-            $mecz['ScoreAway'] = $mecz['ScoreAway'] ?? ($json['away_team']['score'] ?? null);
-        }
+foreach ($terminarz as &$mecz) {
+    $livePath = WRITEPATH . "live/{$mecz['ApiID']}.json";
+    if (file_exists($livePath)) {
+        $live = json_decode(file_get_contents($livePath), true) ?? [];
+        $mecz['ScoreHome']  = $mecz['ScoreHome']  ?? ($live['home_score'] ?? null);
+        $mecz['ScoreAway']  = $mecz['ScoreAway']  ?? ($live['away_score'] ?? null);
+        $mecz['liveStatus'] = $live['status']      ?? null;
     }
+}
 
     if ($this->request->getMethod() === 'POST') {
         if (!$this->validate(['H' => 'required|is_natural', 'A' => 'required|is_natural'])) {

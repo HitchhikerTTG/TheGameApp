@@ -255,12 +255,9 @@ class TheGame extends BaseController
 }
 
 
-public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
-    $configPath = WRITEPATH . 'ActiveTournament.json';
-    if (!file_exists($configPath)) {
-        return $this->response->setJSON([]);
-    }
-    $config    = json_decode(file_get_contents($configPath), true);
+public function livePoll(): \CodeIgniter\HTTP\ResponseInterface
+{
+    $config    = get_active_tournament_config();
     $turniejID = $config['activeTournamentId'];
 
     $terminarz = model(\App\Models\TerminarzModel::class)
@@ -268,16 +265,25 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface {
 
     $result = [];
     foreach ($terminarz as $mecz) {
-        $jsonPath = WRITEPATH . "mecze/{$turniejID}/{$mecz['ApiID']}.json";
-        if (!file_exists($jsonPath)) continue;
-        $data = json_decode(file_get_contents($jsonPath), true) ?? [];
-        $result[] = [
-            'apiId'     => $mecz['ApiID'],
-            'homeScore' => $data['home_team']['score'] ?? null,
-            'awayScore' => $data['away_team']['score'] ?? null,
-            'minute'    => $data['minute'] ?? null,
-            'status'    => $data['status'] ?? null,
-        ];
+        $livePath = WRITEPATH . "live/{$mecz['ApiID']}.json";
+        if (file_exists($livePath)) {
+            $live     = json_decode(file_get_contents($livePath), true) ?? [];
+            $result[] = [
+                'apiId'        => $mecz['ApiID'],
+                'homeScore'    => $live['home_score']   ?? null,
+                'awayScore'    => $live['away_score']   ?? null,
+                'minute'       => $live['time']         ?? null,
+                'status'       => $live['status']       ?? null,
+                'ht_score'     => $live['ht_score']     ?? null,
+                'score'        => $live['score']        ?? null,
+                'last_changed' => $live['last_changed'] ?? null,
+            ];
+        } else {
+            $result[] = [
+                'apiId'  => $mecz['ApiID'],
+                'status' => 'NOT STARTED',
+            ];
+        }
     }
     return $this->response->setJSON($result);
 }
