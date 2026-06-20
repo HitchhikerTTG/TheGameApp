@@ -242,6 +242,29 @@ public function getMecze24h(int $turniejId, bool $onlyIds = false): array
     return $this->update($id, ['zakonczony' => 1]) !== false;
 }
 
+    public function getMeczeZakonczone24h(int $turniejID): array
+{
+    return $this->where('TurniejID', $turniejID)
+        ->where('zakonczony', 1)
+        ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s', strtotime('-1 day')))
+        ->where("CONCAT(Date, ' ', Time) <",  date('Y-m-d H:i:s'))
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+}
+
+public function getMeczePrzyszle24h(int $turniejID): array
+{
+    return $this->where('TurniejID', $turniejID)
+        ->where('zakonczony', 0)
+        ->where('Rozpoczety', 0)
+        ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s'))
+        ->where("CONCAT(Date, ' ', Time) <=", date('Y-m-d H:i:s', strtotime('+24 hours')))
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+}
+
 }
 
 
