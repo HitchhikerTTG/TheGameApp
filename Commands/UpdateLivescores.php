@@ -46,8 +46,8 @@ $historyMecze = [];
 
 try {
     $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $compID]);  // ← ZMIANA
-    CLI::write('Live mecze z API: ' . count($liveMecze), 'cyan');                      // ← DODAĆ
-    CLI::write(json_encode($liveMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');
+    //CLI::write('Live mecze z API: ' . count($liveMecze), 'cyan');                      // ← DODAĆ
+    //CLI::write(json_encode($liveMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');
 } catch (\Throwable $e) {
     log_message('error', '[live:update] getLivescoresSimple: ' . $e->getMessage());
     CLI::write('BŁĄD live: ' . $e->getMessage(), 'red');                               // ← DODAĆ
@@ -59,8 +59,8 @@ try {
         'from'           => date('Y-m-d'),
         'to'             => date('Y-m-d'),
     ]);
-    CLI::write('History mecze z API: ' . count($historyMecze), 'cyan');               // ← DODAĆ
-    CLI::write(json_encode($historyMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');  // ← DODA
+    //CLI::write('History mecze z API: ' . count($historyMecze), 'cyan');               // ← DODAĆ
+    //CLI::write(json_encode($historyMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');  // ← DODA
 } catch (\Throwable $e) {
     log_message('error', '[live:update] getHistory: ' . $e->getMessage());
     
@@ -93,8 +93,11 @@ if (isset($historyIndex[$key])) {
 
     // scores.score = wynik ostateczny (po dogrywce/karnych jeśli były)
     // ft_score = wynik po 90 min -- tylko składowa, NIE nadrzędny
-    $finalScore = $scores['score'] ?? '0 - 0';
-    [$homeScore, $awayScore] = $this->parseScore($finalScore);
+    $finalScore = $hm['score']    ?? '0 - 0';
+$ht_score   = $hm['ht_score'] ?? '';
+$ft_score   = $hm['ft_score'] ?? '';
+$et_score   = $hm['et_score'] ?? '';
+$ps_score   = $hm['ps_score'] ?? '';
 
     // Ustal znacznik czasu końca meczu
     $timeLabel = 'FT';
@@ -129,7 +132,7 @@ if (isset($historyIndex[$key])) {
             if (isset($liveIndex[$key])) {
                 $lm     = $liveIndex[$key];
                 $scores = $lm['scores'] ?? [];
-                $raw    = $scores['score'] ?? '0 - 0';
+                $raw      = $lm['score']    ?? '0 - 0';
                 [$homeScore, $awayScore] = $this->parseScore($raw);
 
                 $this->writeLiveJson($livePath, [
@@ -138,7 +141,7 @@ if (isset($historyIndex[$key])) {
                     'status'       => $lm['status'] ?? 'IN PLAY',
                     'time'         => (string)($lm['time'] ?? ''),
                     'score'        => $raw,
-                    'ht_score'     => $scores['ht_score'] ?? '',
+                    '$ht_score'    => $lm['ht_score'] ?? '';
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $homeScore,
                     'away_score'   => $awayScore,
