@@ -1,0 +1,199 @@
+@startuml TheGameApp – Architektura Staging
+!theme plain
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam backgroundColor #FAFAFA
+skinparam ArrowColor #555555
+
+skinparam rectangle {
+  BackgroundColor #EEF2FF
+  BorderColor #6366F1
+  FontColor #1E1B4B
+}
+skinparam database {
+  BackgroundColor #FEF9C3
+  BorderColor #CA8A04
+  FontColor #713F12
+}
+skinparam component {
+  BackgroundColor #F0FDF4
+  BorderColor #16A34A
+  FontColor #14532D
+}
+skinparam node {
+  BackgroundColor #F0F9FF
+  BorderColor #0284C7
+  FontColor #0C4A6E
+}
+skinparam cloud {
+  BackgroundColor #FFF7ED
+  BorderColor #EA580C
+  FontColor #7C2D12
+}
+skinparam actor {
+  BackgroundColor #F5F3FF
+  BorderColor #7C3AED
+  FontColor #3B0764
+}
+
+title TheGameApp – Środowisko Staging (staging.jakiwynik.com)
+
+' ──────────────── AKTORZY ────────────────
+actor "Użytkownik\n(przeglądarka)" as User
+actor "Administrator" as Admin
+
+' ──────────────── SERWER STAGING ────────────────
+node "Serwer cPanel – Staging\nstaging.jakiwynik.com" as StagingServer {
+
+  ' ── WARSTWA HTTP ──
+  rectangle "Apache / PHP 8.2\nmod_rewrite → index.php" as WebServer
+
+  ' ── CODEIGNITER 4 ──
+  rectangle "CodeIgniter 4 Framework" as CI4 {
+
+    ' Filtry wejściowe
+    component "AuthCheckFilter\n(authcheck)" as AuthFilter
+
+    ' Routing
+    component "Router\n(Config/Routes.php)" as Router
+
+    ' KONTROLERY
+    package "Kontrolery" as Controllers {
+      component "[Auth]\nlogowanie / rejestracja\nreset hasła" as AuthCtrl
+      component "[TheGame]\ngłówny interfejs gry\nzarządzanie zakładami\ntabele wyników" as TheGameCtrl
+      component "[ExperimentalTyper]\nnowy interfejs gry\n(eksperymentalny)" as ExpTyperCtrl
+      component "[AdminDash]\nkampanie e-mail\nturnieje / pytania\nzarządzanie digest" as AdminCtrl
+      component "[Serwisant]\nzapisywanie wyników\nprzeliczanie punktów" as SerwisantCtrl
+      component "[Profil]\nustawienia użytkownika\nrecord / turnieje" as ProfilCtrl
+      component "[Tabela]\ntabele rankingowe" as TabelaCtrl
+      component "[EmailController]\nwysyłanie e-maili" as EmailCtrl
+      component "[LiveScore]\nwyniki na żywo" as LiveCtrl
+    }
+
+    ' SERWISY
+    package "Serwisy" as Services {
+      component "MeczService\n– pobieranie meczów\n– walidacja JSON\n– filtry (24h / unplayed)" as MeczSvc
+      component "EmailService\n– kolejka e-maili\n– okno 3-minutowe\n– kampanie broadcast" as EmailSvc
+      component "DigestService\n– dzienny digest\n– punkty wczoraj/dziś\n– HTML na e-mail" as DigestSvc
+    }
+
+    ' MODELE
+    package "Modele (MySQL)" as Models {
+      component "UserModel" as UserM
+      component "TypyModel" as TypyM
+      component "TerminarzModel" as TermM
+      component "TabelaModel" as TabM
+      component "StatystykiModel" as StatM
+      component "PytaniaModel\nOdpowiedziModel" as QAM
+      component "ShoutboxModel\nRecuerdaModel" as OtherM
+    }
+
+    ' WIDOKI
+    package "Widoki (PHP Templates)" as Views {
+      component "auth/ – formularze logowania" as AuthViews
+      component "typowanie/ – interfejs zakładów" as GameViews
+      component "administracja/ – panel admina" as AdminViews
+      component "emails/ – szablony e-mail" as EmailViews
+      component "tabela/ – tabele rankingowe" as TableViews
+    }
+
+    ' KOMENDY SPARK
+    package "Komendy CLI (Spark)" as Commands {
+      component "email:process\n(ProcessEmailQueue)" as CmdProcess
+      component "email:reminders\n(SendReminders)" as CmdReminders
+    }
+  }
+
+  ' ── PLIK KONFIGURACYJNY ──
+  rectangle "Config/\nApp.php · Database.php · Routes.php\nFilters.php · ActiveTournament.php" as Configs
+
+  ' ── PAMIĘĆ PLIKOWA (WRITEPATH) ──
+  rectangle "System plików (WRITEPATH)" as FileStorage {
+    component "mecze/{TurniejID}/{ApiID}.json\n– dane meczów (cache)" as JsonMecze
+    component "typy/{MeczID}.json\n– podsumowania zakładów" as JsonTypy
+    component "ActiveTournament.json\n– aktywny turniej" as JsonTourney
+    component "digest_szkic_{TurniejID}.json\n– szkice digestów" as JsonDigest
+    component "session/ · cache/ · logs/" as SysFiles
+  }
+}
+
+' ──────────────── BAZA DANYCH ────────────────
+database "MySQL\nremedium_ci1\nlocalhost:3306" as MySQL {
+  component "uzytkownicy" as TUsers
+  component "terminarz · typy · turnieje" as TMatches
+  component "pytania · odpowiedzi" as TQA
+  component "email_queue · email_campaigns" as TEmail
+  component "statystyki · tabela · notatki" as TStats
+}
+
+' ──────────────── ZEWNĘTRZNE USŁUGI ────────────────
+cloud "Postmark API\n(e-mail transakcyjny)" as Postmark
+
+cloud "API Danych Meczowych\n(zewnętrzne źródło JSON)" as MatchAPI
+
+' ──────────────── ŚRODOWISKO PRODUKCYJNE (referencja) ────────────────
+node "Produkcja\nwiniwoni.pl\ntypowanie.jakiwynik.com" as Production #FFE4E1 {
+  component "Identyczny stos\nCI4 / MySQL / cPanel" as ProdStack
+}
+
+' ──────────────── PRZEPŁYWY ────────────────
+
+User --> WebServer : HTTPS
+Admin --> WebServer : HTTPS
+
+WebServer --> AuthFilter : każde żądanie
+AuthFilter --> Router
+Router --> Controllers
+
+' Kontrolery → Serwisy
+TheGameCtrl --> MeczSvc
+TheGameCtrl --> EmailSvc
+AdminCtrl --> EmailSvc
+AdminCtrl --> DigestSvc
+EmailCtrl --> EmailSvc
+SerwisantCtrl --> MeczSvc
+
+' Serwisy → Modele
+MeczSvc --> TermM
+MeczSvc --> TypyM
+EmailSvc --> UserM
+EmailSvc --> TEmail
+DigestSvc --> TermM
+DigestSvc --> TypyM
+DigestSvc --> QAM
+
+' Kontrolery → Modele (bezpośrednio)
+AuthCtrl --> UserM
+ProfilCtrl --> UserM
+TabelaCtrl --> TabM
+SerwisantCtrl --> TypyM
+SerwisantCtrl --> TermM
+
+' Modele → MySQL
+Models --> MySQL
+
+' Serwisy → Pliki
+MeczSvc --> JsonMecze : cache JSON
+MeczSvc --> JsonTypy : zapis podsumowań
+DigestSvc --> JsonDigest : szkice
+CI4 --> JsonTourney : odczyt aktywnego turnieju
+CI4 --> SysFiles
+
+' Kontrolery → Widoki
+Controllers --> Views
+
+' Komendy CLI
+CmdProcess --> EmailSvc : cron
+CmdReminders --> EmailSvc : cron
+
+' Zewnętrzne usługi
+EmailSvc --> Postmark : HTTP API
+MeczSvc --> MatchAPI : HTTP (pobieranie meczów)
+
+' Konfiguracja
+Configs ..> CI4 : ładowanie przy starcie
+
+' Staging vs. Produkcja (deploy)
+StagingServer ..> Production : wdrożenie przez\ncPanel (.cpanel.yml)
+
+@enduml
