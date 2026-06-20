@@ -128,6 +128,7 @@ if (isset($historyIndex[$key])) {
             if (isset($liveIndex[$key])) {
                 $lm     = $liveIndex[$key];
                 $raw      = $lm['score']    ?? '0 - 0';
+                [$homeScore, $awayScore] = $this->parseScore($raw);
                 $ht_score = $lm['ht_score'] ?? '';
 
                 $this->writeLiveJson($livePath, [
@@ -136,7 +137,7 @@ if (isset($historyIndex[$key])) {
                     'status'       => $lm['status'] ?? 'IN PLAY',
                     'time'         => (string)($lm['time'] ?? ''),
                     'score'        => $raw,
-                    '$ht_score'     => $lm['ht_score'] ?? '';
+                    'ht_score'     => $lm['ht_score'] ?? '',
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $homeScore,
                     'away_score'   => $awayScore,
