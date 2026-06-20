@@ -83,5 +83,14 @@ public function liczbaPrawidlowychOdpowiedzi($userUniID) {
                 ->countAllResults();
 }
 
+public function punktyZaPytanGraczy(array $pytanieIds): array
+{
+    if (empty($pytanieIds)) return [];
+    return $this->db->table('odpowiedzi')
+        ->select('odpowiedzi.uniidOdp as uniID, SUM(odpowiedzi.pkt) as pkt')
+        ->whereIn('odpowiedzi.idPyt', $pytanieIds)
+        ->groupBy('odpowiedzi.uniidOdp')
+        ->get()->getResultArray();
+}
 
 }

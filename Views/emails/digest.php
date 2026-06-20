@@ -103,6 +103,31 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
   </tr>
   <?php endif ?>
 
+<!-- NAJLEPSZY TYPER -->
+<?php if (!empty($najlepszyTyper)): ?>
+<tr>
+  <td bgcolor="<?= $cCard ?>" style="padding:16px 24px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+           style="background:#1a1a2e;border-radius:8px;">
+      <tr>
+        <td style="padding:14px 18px;">
+          <p style="margin:0;<?= $f ?>font-size:<?= $fsSub ?>;color:#ffffff;line-height:1.5;">
+            &#x1F3C6;&nbsp;<strong>Najlepszy typer ostatnich 24h</strong> to
+            <strong style="color:<?= $cAccent ?>;"><?= esc($najlepszyTyper['nick']) ?></strong>,
+            kt&oacute;ry zdobył
+            <strong style="color:<?= $cAccent ?>;"><?= (int)$najlepszyTyper['pkt'] ?> punkt&oacute;w</strong>
+            (<?= (int)$najlepszyTyper['pktMecze'] ?> z mecz&oacute;w
+            i <?= (int)$najlepszyTyper['pktPytania'] ?> za pytanie).
+            Gratulacje!
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<?php endif ?>
+
+
   <!-- KOMENTARZ ADMINA -->
   <?php if (!empty($adminKomentarz)): ?>
   <tr>

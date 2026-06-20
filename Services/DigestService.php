@@ -31,7 +31,8 @@ class DigestService
         string $adminKomentarz2,
         string $adminKomentarz3,
         array  $pytaniaWczorajIds = [],
-        array  $pytaniaDzisiajIds = []
+        array  $pytaniaDzisiajIds = [],
+        array  $najlepszyTyper = []
     ): array {
         $wczorajMecze   = $this->getWczorajszeMecze($user, $turniejID);
         $dzisiajMecze   = $this->getDzisiajszeMecze($user, $turniejID);
@@ -53,6 +54,8 @@ class DigestService
             'adminKomentarz'  => $adminKomentarz,
             'adminKomentarz2' => $adminKomentarz2,
             'adminKomentarz3' => $adminKomentarz3,
+            'najlepszyTyper'  => $najlepszyTyper,
+            
         ];
     }
 
@@ -169,5 +172,50 @@ class DigestService
         }
         return $wynik;
     }
+    
+    public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): array
+{
+    $meczIds = array_column(
+        $this->terminarzModel->getMeczeZakonczone24h($turniejID),
+        'Id'
+    );
+
+    $punktyGraczy = [];
+
+    foreach ($this->typyModel->punktyZaMeczeGraczy($meczIds) as $row) {
+        $id = $row['uniID'];
+        $punktyGraczy[$id] = [
+            'nick'       => $row['nick'] ?? $id,
+            'pktMecze'   => (int)$row['pkt'],
+            'pktPytania' => 0,
+        ];
+    }
+
+    foreach ($this->odpowiedziModel->punktyZaPytanGraczy($pytaniaWczorajIds) as $row) {
+        $id = $row['uniID'];
+        if (isset($punktyGraczy[$id])) {
+            $punktyGraczy[$id]['pktPytania'] = (int)$row['pkt'];
+        } else {
+            $punktyGraczy[$id] = ['nick' => $id, 'pktMecze' => 0, 'pktPytania' => (int)$row['pkt']];
+        }
+    }
+
+    if (empty($punktyGraczy)) return [];
+
+    $best = null;
+    foreach ($punktyGraczy as $g) {
+        $total = $g['pktMecze'] + $g['pktPytania'];
+        if ($best === null || $total > $best['pkt']) {
+            $best = [
+                'nick'       => $g['nick'],
+                'pkt'        => $total,
+                'pktMecze'   => $g['pktMecze'],
+                'pktPytania' => $g['pktPytania'],
+            ];
+        }
+    }
+
+    return $best ?? [];
+}
 
 }

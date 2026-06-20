@@ -199,6 +199,38 @@ public function canSaveTyp($gameID) {
                 ->countAllResults();
     }
 
+    public function punktyZaMeczeGraczy(array $meczIds): array
+    {
+        if (empty($meczIds)) return [];
+        return $this->db->table('typy')
+            ->select('typy.uniID, uzytkownicy.nick, SUM(typy.pkt) as pkt')
+            ->join('uzytkownicy', 'uzytkownicy.uniID = typy.uniID', 'left')
+            ->whereIn('typy.GameID', $meczIds)
+            ->groupBy('typy.uniID')
+            ->get()->getResultArray();
+    } 
+    
+    public function getMeczeZakonczone24h(int $turniejID): array
+{
+    return $this->where('TurniejID', $turniejID)
+        ->where('zakonczony', 1)
+        ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s', strtotime('-1 day')))
+        ->where("CONCAT(Date, ' ', Time) <",  date('Y-m-d H:i:s'))
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+}
 
+public function getMeczePrzyszle24h(int $turniejID): array
+{
+    return $this->where('TurniejID', $turniejID)
+        ->where('zakonczony', 0)
+        ->where('Rozpoczety', 0)
+        ->where("CONCAT(Date, ' ', Time) >=", date('Y-m-d H:i:s'))
+        ->where("CONCAT(Date, ' ', Time) <=", date('Y-m-d H:i:s', strtotime('+24 hours')))
+        ->orderBy('Date', 'ASC')
+        ->orderBy('Time', 'ASC')
+        ->findAll();
+}
 
 }

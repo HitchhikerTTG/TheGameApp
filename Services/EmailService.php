@@ -249,9 +249,10 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz,
     $digestService = new \App\Services\DigestService();
     $url  = base_url('typowanie');
     $sent = 0;
+    $najlepszyTyper = $digestService->getNajlepszyTyper($turniejID, $pytaniaWczorajIds);  // ← nowe, raz przed pętlą
 
     foreach ($users as $user) {
-        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3,$pytaniaWczorajIds, $pytaniaDzisiajIds);
+        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3,$pytaniaWczorajIds, $pytaniaDzisiajIds,$najlepszyTyper);
         $html    = $this->buildDigestHtml($data, $url);
         $subject = str_replace('{nick}', $user['nick'] ?? '', $subjectTemplate);
 
