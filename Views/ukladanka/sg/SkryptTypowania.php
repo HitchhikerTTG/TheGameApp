@@ -123,9 +123,11 @@ $(document).ready(function () {
           if (match.awayScore !== null) $scores.eq(1).text(parseInt(match.awayScore));
 
           if (match.minute) {
-          $card.find('.match-minute').text(parseInt(match.minute));
-        }
-        if (match.status === 'FINISHED' || match.status === 'FINISHED_FALLBACK') {
+              var $minuteSpan = $card.find('.match-minute');
+              $minuteSpan.text(parseInt(match.minute));
+              $card.find('.live-minute-wrapper').show(); // pokaż ukryty wrapper
+          }
+          if (match.status === 'FINISHED' || match.status === 'FINISHED_FALLBACK') {
            // Usuń live indykatory
             $card.find('.status-badge').removeClass('status-live').addClass('status-done').text('Zakończony');
             $card.find('.match-minute').closest('span').remove();
@@ -155,6 +157,8 @@ $(document).ready(function () {
     });
   }
     setInterval(refreshLiveScores, 60000);
+    refreshLiveScores(); // od razu przy ładowaniu
+
   }
 
 

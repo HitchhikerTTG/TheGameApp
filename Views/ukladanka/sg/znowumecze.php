@@ -54,15 +54,20 @@
 
   <!-- HEAD -->
   <div class="match-head d-flex align-items-center justify-content-between px-3 py-2">
-    <span class="match-time">
-      <?= $naszCzas ?>
-      <?php if ($isLive && isset($match['details']['minute'])): ?>
-        · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
-      <?php elseif ($isFinished || $isScored): ?>
-        · Zakończony
+  
+  <span class="match-time">
+    <?= $naszCzas ?>
+    <?php if ($isLive && $statusRaw === 'HALF TIME BREAK'): ?>
+      · Przerwa
+    <?php elseif ($isLive && isset($match['details']['minute'])): ?>
+      · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
+    <?php elseif ($match['rozpoczety'] == 1 && !$isScored): ?>
+      <span class="live-minute-wrapper" style="display:none"> · <span style="color:var(--ty-red)">●</span> <span class="match-minute"></span>'</span>
+    <?php elseif ($isFinished || $isScored): ?>
+      · Zakończony
+    <?php endif; ?>
+  </span>
 
-      <?php endif; ?>
-    </span>
       <?php if ($isUpcoming): ?>
         <span class="status-badge status-upcoming">Przyjmuje typy</span>
       <?php elseif ($isLive): ?>
