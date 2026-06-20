@@ -41,29 +41,28 @@ class UpdateLivescores extends BaseCommand
         $liveController = new LiveScore();
 
         // --- Pobierz dane z API ---
-        $liveMecze    = [];
-        $historyMecze = [];
+$liveMecze    = [];
+$historyMecze = [];
 
-        try {
-            $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $compID]);
-            // getLivescoresSimple() zwraca tablicę meczów bezpośrednio
-            } catch (\Throwable $e) {
-            log_message('error', '[live:update] getLivescoresSimple: ' . $e->getMessage());
-            $liveMecze = [];
-        }
+try {
+    $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $compID]);  // ← ZMIANA
+    CLI::write('Live mecze z API: ' . count($liveMecze), 'cyan');                      // ← DODAĆ
+} catch (\Throwable $e) {
+    log_message('error', '[live:update] getLivescoresSimple: ' . $e->getMessage());
+    CLI::write('BŁĄD live: ' . $e->getMessage(), 'red');                               // ← DODAĆ
+}
 
-        try {
-            $historyMecze = $liveController->getHistory([
-                'competition_id' => $compID,
-                'from'           => date('Y-m-d'),
-                'to'             => date('Y-m-d'),
-            ]);
-            // getHistory() zwraca tablicę meczów bezpośrednio
-        } catch (\Throwable $e) {
-            log_message('error', '[live:update] getHistory: ' . $e->getMessage());
-            $historyMecze = [];
-        }
-
+try {
+    $historyMecze = $liveController->getHistory([                                      // ← ZMIANA
+        'competition_id' => $compID,
+        'from'           => date('Y-m-d'),
+        'to'             => date('Y-m-d'),
+    ]);
+    CLI::write('History mecze z API: ' . count($historyMecze), 'cyan');               // ← DODAĆ
+} catch (\Throwable $e) {
+    log_message('error', '[live:update] getHistory: ' . $e->getMessage());
+    CLI::write('BŁĄD history: ' . $e->getMessage(), 'red');                           // ← DODAĆ
+}
         // --- Indeksy po fixture_id (= nasz ApiID) ---
         $liveIndex    = [];
         foreach ($liveMecze as $lm) {
