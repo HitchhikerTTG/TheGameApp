@@ -169,6 +169,27 @@
       <?php endif; ?>
     </div>
   </div>
+  
+  <?php
+  $goals     = $match['details']['goals'] ?? [];
+  $homeGoals = array_filter($goals, fn($g) => ($g['home_away'] ?? '') === 'home');
+  $awayGoals = array_filter($goals, fn($g) => ($g['home_away'] ?? '') === 'away');
+  if (!empty($goals)): ?>
+    <div class="d-flex justify-content-between px-1 mt-1"
+         id="scorers-<?= $match['ApiID'] ?>"
+         style="font-size:11px; line-height:1.7;">
+      <div>
+        <?php foreach ($homeGoals as $g): ?>
+          <div><?= $g['type'] === 'owngoal' ? '⚽(og)' : '⚽' ?> <?= (int)$g['minute'] ?>' <?= esc($g['player']) ?></div>
+        <?php endforeach; ?>
+      </div>
+      <div class="text-end">
+        <?php foreach ($awayGoals as $g): ?>
+          <div><?= esc($g['player']) ?> <?= (int)$g['minute'] ?>' <?= $g['type'] === 'owngoal' ? '⚽(og)' : '⚽' ?></div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  <?php endif; ?>
 
       <?php if ($userHome !== null): ?>
         <p class="text-center mb-0" style="font-size:13px;">

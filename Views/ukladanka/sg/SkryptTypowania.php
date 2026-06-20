@@ -123,11 +123,30 @@ $(document).ready(function () {
           if (match.awayScore !== null) $scores.eq(1).text(parseInt(match.awayScore));
 
           if (match.minute) {
-            $card.find('.match-minute').text(parseInt(match.minute));
+          $card.find('.match-minute').text(parseInt(match.minute));
+        }
+
+        // NOWE: strzelcy bramek
+        if (Array.isArray(match.goals) && match.goals.length > 0) {
+          var homeHtml = '', awayHtml = '';
+          match.goals.forEach(function(g) {
+            var ball = (g.type === 'owngoal') ? '⚽(og)' : '⚽';
+            var min  = parseInt(g.minute) + '\'';
+            if (g.home_away === 'home') {
+              homeHtml += '<div>' + ball + ' ' + min + ' ' + g.player + '</div>';
+            } else {
+              awayHtml += '<div>' + g.player + ' ' + min + ' ' + ball + '</div>';
+            }
+          });
+          var $scorers = $('#scorers-' + match.apiId);
+          if ($scorers.length) {
+            $scorers.find('div:first-child').html(homeHtml);
+            $scorers.find('.text-end').html(awayHtml);
           }
-        });
+        }
       });
-    }
+    });
+  }
     setInterval(refreshLiveScores, 60000);
   }
 

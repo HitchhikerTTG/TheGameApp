@@ -115,6 +115,7 @@ if (isset($historyIndex[$key])) {
         'last_changed' => date('Y-m-d H:i:s'),
         'home_score'   => $homeScore,
         'away_score'   => $awayScore,
+        'goals'        => $this->fetchGoals((string)($hm['id'] ?? '')),
     ]);
 
     $terminarzModel->setZakonczony((int)$mecz['Id']);
@@ -139,6 +140,7 @@ if (isset($historyIndex[$key])) {
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $homeScore,
                     'away_score'   => $awayScore,
+                    'goals'        => $this->fetchGoals((string)($hm['id'] ?? '')),
                 ]);
 
                 CLI::write("↻ Live [{$key}] {$lm['time']}' {$raw}", 'cyan');
@@ -163,6 +165,7 @@ if (isset($historyIndex[$key])) {
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $existingLive['home_score'] ?? 0,
                     'away_score'   => $existingLive['away_score'] ?? 0,
+                    'goals'   => $existing['goals'] ?? [],  // ← przepisz bez request do API
                 ]);
 
                 $terminarzModel->setZakonczony((int)$mecz['Id']);
@@ -188,6 +191,32 @@ if (isset($historyIndex[$key])) {
         $awayScore = isset($parts[1]) ? (int)trim($parts[1]) : 0;
         return [$homeScore, $awayScore];
     }
+    
+    private function fetchGoals(string $matchId): array
+{
+    if (empty($matchId)) return [];
+    try {
+        $liveController = new LiveScore();
+        $events = $liveController->getEvents(['id' => $matchId]);
+        // getEvents() zwraca $data['event'] -- tablicę zdarzeń
+        $goals = [];
+        foreach ($events as $event) {
+            if (in_array($event['type'] ?? '', ['goal', 'owngoal'])) {
+                $goals[] = [
+                    'minute'    => $event['time']      ?? '',
+                    'player'    => $event['player']    ?? '',
+                    'home_away' => $event['home_away'] ?? '',
+                    'type'      => $event['type']      ?? 'goal',
+                ];
+            }
+        }
+        return $goals;
+    } catch (\Throwable $e) {
+        log_message('error', '[live:update] getEvents: ' . $e->getMessage());
+        return [];
+    }
+}
+
 
     private function writeLiveJson(string $path, array $data): void
     {

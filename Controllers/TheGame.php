@@ -154,6 +154,14 @@ class TheGame extends BaseController
         $mecz['details'] = file_exists($jsonPath)
             ? json_decode(file_get_contents($jsonPath), true)
             : null;
+            
+        if ($mecz['rozpoczety'] && $mecz['details'] !== null) {
+        $livePath = WRITEPATH . "live/{$mecz['ApiID']}.json";
+        if (file_exists($livePath)) {
+            $liveData = json_decode(file_get_contents($livePath), true) ?? [];
+            $mecz['details']['goals'] = $liveData['goals'] ?? [];
+        }
+    } 
 
         if ($mecz['rozpoczety']) {
             $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
@@ -277,6 +285,7 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface
                 'ht_score'     => $live['ht_score']     ?? null,
                 'score'        => $live['score']        ?? null,
                 'last_changed' => $live['last_changed'] ?? null,
+                'goals'        => $live['goals']        ?? [],
             ];
         } else {
             $result[] = [
