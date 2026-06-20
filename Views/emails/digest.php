@@ -112,13 +112,13 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
       <tr>
         <td style="padding:14px 18px;">
           <p style="margin:0;<?= $f ?>font-size:<?= $fsSub ?>;color:#ffffff;line-height:1.5;">
-            &#x1F3C6;&nbsp;<strong>Najlepszy typer ostatnich 24h</strong> to
-            <strong style="color:<?= $cAccent ?>;"><?= esc($najlepszyTyper['nick']) ?></strong>,
-            kt&oacute;ry zdobył
+            <strong>🚀 Najlepszy typer ostatnich 24h</strong> to
+            <strong style="color:<?= $cAccent ?>;"><?= esc($najlepszyTyper['nick']) ?>💪🏻</strong>.
+            Wczorajsza zdobycz najlepszego z typerów to: 
             <strong style="color:<?= $cAccent ?>;"><?= (int)$najlepszyTyper['pkt'] ?> punkt&oacute;w</strong>
             (<?= (int)$najlepszyTyper['pktMecze'] ?> z mecz&oacute;w
             i <?= (int)$najlepszyTyper['pktPytania'] ?> za pytanie).
-            Gratulacje!
+            Gratulacje👏🏻!
           </p>
         </td>
       </tr>

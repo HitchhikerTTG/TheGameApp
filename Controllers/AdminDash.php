@@ -930,10 +930,13 @@ public function podgladDigest()
     $pytaniaWczoraj   = array_map('intval', (array)($this->request->getPost('pytaniaWczoraj') ?? []));
     $pytaniaDzisiaj   = array_map('intval', (array)($this->request->getPost('pytaniaDzisiaj') ?? []));
 
-    $data = (new \App\Services\DigestService())->buildForUser(
+    $digestService = new \App\Services\DigestService();
+    $najlepszyTyper = $digestService->getNajlepszyTyper($turniejID, $pytaniaWczoraj);
+    $data = $digestService->buildForUser(
         $adminUser, $turniejID,
         $komentarz, $komentarzPytanie, $komentarzClosing,
-        $pytaniaWczoraj, $pytaniaDzisiaj
+        $pytaniaWczoraj, $pytaniaDzisiaj,
+        $najlepszyTyper
     );
 
     $html = view('emails/digest', array_merge($data, ['url' => base_url('typowanie')]));
