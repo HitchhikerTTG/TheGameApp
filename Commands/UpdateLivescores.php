@@ -197,6 +197,8 @@ if (isset($historyIndex[$key])) {
         $liveController = new LiveScore();
         $events = $liveController->getEvents(['id' => $matchId]);
         // getEvents() zwraca $data['event'] -- tablicę zdarzeń
+        CLI::write("fetchGoals(id={$matchId}) → " . gettype($events) . ' count=' . (is_array($events) ? count($events) : 'n/a'), 'dark_gray');  // ← DODAĆ
+        CLI::write(json_encode($events, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');  // ← DODAĆ
         $goals = [];
         foreach ($events as $event) {
             if (in_array($event['type'] ?? '', ['goal', 'owngoal'])) {
@@ -208,6 +210,7 @@ if (isset($historyIndex[$key])) {
                 ];
             }
         }
+        CLI::write("Goals zapisanych: " . count($goals), 'green');  // ← DODAĆ
         return $goals;
     } catch (\Throwable $e) {
         log_message('error', '[live:update] getEvents: ' . $e->getMessage());
