@@ -89,15 +89,11 @@ try {
             // Case A: Mecz zakończony – pojawił się w history
 if (isset($historyIndex[$key])) {
     $hm     = $historyIndex[$key];
-    $scores = $hm['scores'] ?? [];
-
-    // scores.score = wynik ostateczny (po dogrywce/karnych jeśli były)
-    // ft_score = wynik po 90 min -- tylko składowa, NIE nadrzędny
     $finalScore = $hm['score']    ?? '0 - 0';
-$ht_score   = $hm['ht_score'] ?? '';
-$ft_score   = $hm['ft_score'] ?? '';
-$et_score   = $hm['et_score'] ?? '';
-$ps_score   = $hm['ps_score'] ?? '';
+    $ht_score   = $hm['ht_score'] ?? '';
+    $ft_score   = $hm['ft_score'] ?? '';
+    $et_score   = $hm['et_score'] ?? '';
+    $ps_score   = $hm['ps_score'] ?? '';
 
     // Ustal znacznik czasu końca meczu
     $timeLabel = 'FT';
@@ -131,9 +127,8 @@ $ps_score   = $hm['ps_score'] ?? '';
             // Case B: Mecz trwa – jest w live feed
             if (isset($liveIndex[$key])) {
                 $lm     = $liveIndex[$key];
-                $scores = $lm['scores'] ?? [];
                 $raw      = $lm['score']    ?? '0 - 0';
-                [$homeScore, $awayScore] = $this->parseScore($raw);
+                $ht_score = $lm['ht_score'] ?? '';
 
                 $this->writeLiveJson($livePath, [
                     'fixture_id'   => $key,
@@ -141,7 +136,7 @@ $ps_score   = $hm['ps_score'] ?? '';
                     'status'       => $lm['status'] ?? 'IN PLAY',
                     'time'         => (string)($lm['time'] ?? ''),
                     'score'        => $raw,
-                    '$ht_score'    => $lm['ht_score'] ?? '';
+                    '$ht_score'     => $lm['ht_score'] ?? '';
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $homeScore,
                     'away_score'   => $awayScore,
