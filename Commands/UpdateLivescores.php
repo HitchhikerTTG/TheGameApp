@@ -45,21 +45,23 @@ class UpdateLivescores extends BaseCommand
         $historyMecze = [];
 
         try {
-            $liveResponse = $liveController->getLivescoresSimple(['competition_id' => $compID]);
-            $liveMecze    = $liveResponse['data']['match'] ?? [];
-        } catch (\Throwable $e) {
+            $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $compID]);
+            // getLivescoresSimple() zwraca tablicę meczów bezpośrednio
+            } catch (\Throwable $e) {
             log_message('error', '[live:update] getLivescoresSimple: ' . $e->getMessage());
+            $liveMecze = [];
         }
 
         try {
-            $historyResponse = $liveController->getHistory([
+            $historyMecze = $liveController->getHistory([
                 'competition_id' => $compID,
                 'from'           => date('Y-m-d'),
                 'to'             => date('Y-m-d'),
             ]);
-            $historyMecze = $historyResponse['data']['match'] ?? [];
+            // getHistory() zwraca tablicę meczów bezpośrednio
         } catch (\Throwable $e) {
             log_message('error', '[live:update] getHistory: ' . $e->getMessage());
+            $historyMecze = [];
         }
 
         // --- Indeksy po fixture_id (= nasz ApiID) ---
