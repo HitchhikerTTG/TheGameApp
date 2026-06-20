@@ -162,6 +162,8 @@ class TheGame extends BaseController
             $mecz['details']['goals'] = $liveData['goals'] ?? [];
             $mecz['details']['minute'] = $liveData['time']   ?? null;  // ← dodać
             $mecz['details']['status'] = $liveData['status'] ?? $mecz['details']['status'] ?? null; // ← dodać
+            $mecz['details']['home_team']['score'] = $liveData['home_score'] ?? $mecz['details']['home_team']['score'] ?? null;
+            $mecz['details']['away_team']['score'] = $liveData['away_score'] ?? $mecz['details']['away_team']['score'] ?? null;
         }
     } 
 
