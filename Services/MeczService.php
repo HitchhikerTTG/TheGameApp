@@ -471,7 +471,7 @@ function saveMatchesAsJsonFiles($turniejID, $matches) {
 
 public function odswiezLiveMecze(array $mecze, int $turniejID, string $competitionApiId): void
 {
-    $startedMecze = array_filter($mecze, fn($m) => !empty($m['rozpoczety']));
+    $startedMecze = array_filter($mecze, fn($m) => !empty($m['Rozpoczety']));
     if (empty($startedMecze)) return;
 
     // Sprawdź czy którykolwiek potrzebuje odświeżenia (próg: 2 minuty)
