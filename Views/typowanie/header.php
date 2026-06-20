@@ -18,14 +18,16 @@
 function initTheme() {
   var saved = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-bs-theme', saved);
-  document.getElementById('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = saved === 'dark' ? '🌙' : '☀️';   // ← dodać null check
 }
 function toggleTheme() {
   var current = document.documentElement.getAttribute('data-bs-theme');
   var next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-bs-theme', next);
   localStorage.setItem('theme', next);
-  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  var btn = document.getElementById('themeToggle');             // ← dodać null check
+  if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
 }
 initTheme();
 

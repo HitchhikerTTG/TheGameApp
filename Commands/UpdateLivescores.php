@@ -140,7 +140,7 @@ if (isset($historyIndex[$key])) {
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $homeScore,
                     'away_score'   => $awayScore,
-                    'goals'        => $this->fetchGoals((string)($hm['id'] ?? '')),
+                    'goals'        => $this->fetchGoals((string)($lm['id'] ?? '')),
                 ]);
 
                 CLI::write("↻ Live [{$key}] {$lm['time']}' {$raw}", 'cyan');
@@ -165,7 +165,7 @@ if (isset($historyIndex[$key])) {
                     'last_changed' => date('Y-m-d H:i:s'),
                     'home_score'   => $existingLive['home_score'] ?? 0,
                     'away_score'   => $existingLive['away_score'] ?? 0,
-                    'goals'   => $existing['goals'] ?? [],  // ← przepisz bez request do API
+                    'goals'   => $existingLive['goals'] ?? [],  // ← przepisz bez request do API
                 ]);
 
                 $terminarzModel->setZakonczony((int)$mecz['Id']);
