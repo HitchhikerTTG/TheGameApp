@@ -47,6 +47,7 @@ $historyMecze = [];
 try {
     $liveMecze = $liveController->getLivescoresSimple(['competition_id' => $compID]);  // ← ZMIANA
     CLI::write('Live mecze z API: ' . count($liveMecze), 'cyan');                      // ← DODAĆ
+    CLI::write(json_encode($liveMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');
 } catch (\Throwable $e) {
     log_message('error', '[live:update] getLivescoresSimple: ' . $e->getMessage());
     CLI::write('BŁĄD live: ' . $e->getMessage(), 'red');                               // ← DODAĆ
@@ -59,8 +60,10 @@ try {
         'to'             => date('Y-m-d'),
     ]);
     CLI::write('History mecze z API: ' . count($historyMecze), 'cyan');               // ← DODAĆ
+    CLI::write(json_encode($historyMecze, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');  // ← DODA
 } catch (\Throwable $e) {
     log_message('error', '[live:update] getHistory: ' . $e->getMessage());
+    
     CLI::write('BŁĄD history: ' . $e->getMessage(), 'red');                           // ← DODAĆ
 }
         // --- Indeksy po fixture_id (= nasz ApiID) ---
