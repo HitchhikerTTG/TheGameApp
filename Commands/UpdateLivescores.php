@@ -96,12 +96,9 @@ if (isset($historyIndex[$key])) {
     $ps_score   = $hm['ps_score'] ?? '';
 
     // Ustal znacznik czasu końca meczu
-    $timeLabel = 'FT';
-    if (!empty($scores['ps_score'])) {
-        $timeLabel = 'AP';   // po rzutach karnych
-    } elseif (!empty($scores['et_score'])) {
-        $timeLabel = 'AET';  // po dogrywce
-    }
+    $timeLabel = 'Zakończony';
+    if (!empty($ps_score)) { $timeLabel = 'Karne'; }
+    elseif (!empty($et_score)) { $timeLabel = 'Po dogrywce'; }
 
     $this->writeLiveJson($livePath, [
         'fixture_id'   => $key,
@@ -109,10 +106,10 @@ if (isset($historyIndex[$key])) {
         'status'       => 'FINISHED',
         'time'         => $timeLabel,
         'score'        => $finalScore,       // wynik ostateczny
-        'ht_score'     => $scores['ht_score'] ?? '',
-        'ft_score'     => $scores['ft_score'] ?? '',  // 90 min
-        'et_score'     => $scores['et_score'] ?? '',  // dogrywka
-        'ps_score'     => $scores['ps_score'] ?? '',  // karne
+        'ht_score' => $ht_score,
+        'ft_score' => $ft_score,
+        'et_score' => $et_score,
+        'ps_score' => $ps_score,
         'last_changed' => date('Y-m-d H:i:s'),
         'home_score'   => $homeScore,
         'away_score'   => $awayScore,
@@ -214,6 +211,7 @@ if (isset($historyIndex[$key])) {
         return $goals;
     } catch (\Throwable $e) {
         log_message('error', '[live:update] getEvents: ' . $e->getMessage());
+        CLI::write('fetchGoals błąd: ' . $e->getMessage(), 'red');  // 
         return [];
     }
 }

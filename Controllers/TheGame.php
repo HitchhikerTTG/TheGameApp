@@ -160,6 +160,8 @@ class TheGame extends BaseController
         if (file_exists($livePath)) {
             $liveData = json_decode(file_get_contents($livePath), true) ?? [];
             $mecz['details']['goals'] = $liveData['goals'] ?? [];
+            $mecz['details']['minute'] = $liveData['time']   ?? null;  // ← dodać
+            $mecz['details']['status'] = $liveData['status'] ?? $mecz['details']['status'] ?? null; // ← dodać
         }
     } 
 

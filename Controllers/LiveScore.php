@@ -42,7 +42,8 @@ class LiveScore extends BaseController
     public function getEvents($params = []) {
         $url  = $this->_buildUrl('scores/events.json', $params);
         $data = $this->_makeRequest($url);
-        return $data['event'];
+        CLI::write(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'orange');
+        return $data['event'] ?? []; 
     }
 
     public function getHTH($params = []) {
