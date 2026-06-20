@@ -17,8 +17,9 @@
     
     $statusRaw  = $match['details']['status'] ?? '';
     $isScored   = !empty($match['zakonczony']);
-    $isFinished = ($statusRaw === 'Zakonczony') && !$isScored;
-    $isLive     = ($match['rozpoczety'] == 1 && !$isFinished && !$isScored);
+    $liveFinished = in_array($statusRaw, ['FINISHED', 'FINISHED_FALLBACK', 'Zakonczony']);
+    $isFinished   = $liveFinished && !$isScored;
+    $isLive       = ($match['rozpoczety'] == 1 && !$liveFinished && !$isScored);
     $isUpcoming = ($match['rozpoczety'] == 0 && !$isScored);
 
     $homeScore = $match['details']['home_team']['score'] ?? null;

@@ -125,6 +125,13 @@ $(document).ready(function () {
           if (match.minute) {
           $card.find('.match-minute').text(parseInt(match.minute));
         }
+        if (match.status === 'FINISHED' || match.status === 'FINISHED_FALLBACK') {
+           // Usuń live indykatory
+            $card.find('.status-badge').removeClass('status-live').addClass('status-done').text('Zakończony');
+            $card.find('.match-minute').closest('span').remove();
+            $card.find('.score-display').removeClass('score-live');
+            return;
+        }
 
         // NOWE: strzelcy bramek
         if (Array.isArray(match.goals) && match.goals.length > 0) {
