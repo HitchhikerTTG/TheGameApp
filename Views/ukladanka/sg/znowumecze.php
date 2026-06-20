@@ -21,8 +21,8 @@
     $isLive     = ($match['rozpoczety'] == 1 && !$isFinished && !$isScored);
     $isUpcoming = ($match['rozpoczety'] == 0 && !$isScored);
 
-    $mecz['details']['home_team']['score'] = $liveData['home_score'] ?? $mecz['details']['home_team']['score'] ?? null;
-    $mecz['details']['away_team']['score'] = $liveData['away_score'] ?? $mecz['details']['away_team']['score'] ?? null;
+    $homeScore = $match['details']['home_team']['score'] ?? null;
+    $awayScore = $match['details']['away_team']['score'] ?? null;
     $userHome  = $match['typy']['HomeTyp'] ?? null;
     $userAway  = $match['typy']['AwayTyp'] ?? null;
     $isGolden  = ($match['Id'] == $usedGoldenBall);
