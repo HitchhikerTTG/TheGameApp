@@ -201,14 +201,15 @@ if (isset($historyIndex[$key])) {
         CLI::write(json_encode($events, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), 'white');  // ← DODAĆ
         $goals = [];
         foreach ($events as $event) {
-            if (in_array($event['type'] ?? '', ['goal', 'owngoal'])) {
-                $goals[] = [
-                    'minute'    => $event['time']      ?? '',
-                    'player'    => $event['player']    ?? '',
-                    'home_away' => $event['home_away'] ?? '',
-                    'type'      => $event['type']      ?? 'goal',
-                ];
-            }
+            $eventType = $event['event'] ?? '';                              // ← 'event', nie 'type'
+            if (!in_array($eventType, ['GOAL', 'OWN_GOAL'], true)) continue; // ← uppercase
+
+            $goals[] = [
+                'minute'    => $event['time']      ?? '',
+                'player'    => $event['player']    ?? '',
+                'home_away' => $event['home_away'] === 'h' ? 'home' : 'away', // ← 'h'→'home', 'a'→'away'
+                'type'      => $eventType === 'OWN_GOAL' ? 'owngoal' : 'goal',
+            ];
         }
         CLI::write("Goals zapisanych: " . count($goals), 'green');  // ← DODAĆ
         return $goals;
