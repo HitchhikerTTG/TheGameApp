@@ -104,10 +104,11 @@ public function pojedynek()
     $userModel = model(\App\Models\UserModel::class);
 
     $loggedInUniID = session()->get('loggedInUser');
-    $loggedIn      = $userModel->where('uniID', $loggedInUniID)->first();
-
-    if (empty($slug1) && $loggedIn) {
-        $slug1 = $loggedIn['slug'] ?? '';
+    $loggedIn = $userModel->select('nick, emoji, slug, uniID, id')
+                      ->where('uniID', $loggedInUniID)
+                      ->first();
+    if (empty($slug1) && !empty($loggedIn['slug'])) {
+      $slug1 = $loggedIn['slug'];
     }
 
     $gracz1 = $slug1 ? $userModel->where('slug', $slug1)->first() : null;
@@ -116,8 +117,9 @@ public function pojedynek()
     $gracze = $db->query("
         SELECT u.nick, u.emoji, u.slug
         FROM uzytkownicy u
-        JOIN ktowcogra k ON k.userID = u.uniID AND k.turniejID = ?
+        JOIN ktowcogra k ON k.userID = u.id AND k.turniejID = ?
         WHERE u.activated = 1
+          AND u.slug IS NOT NULL AND u.slug != ''
         ORDER BY u.nick ASC
     ", [$turniejID])->getResultArray();
 
@@ -158,8 +160,8 @@ public function pojedynek()
                'gracze'      => $gracze,
                'porownanie'  => $porownanie,
                'turniejName' => $config['activeTournamentName'] ?? '',
-               'slug1'       => $slug1,
-               'slug2'       => $slug2,
+               'slug1' => $slug1,
+                'slug2' => $slug2,
            ])
          . view('typowanie/footer');
 }

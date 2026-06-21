@@ -213,6 +213,7 @@ class Auth extends BaseController
             'email' => $email,
             'passhash' => Hash::encrypt($password),
             'uniID'=> $uniid,
+            'slug'    => uniqueSlug(nickToSlug($nick)),
          ];
 
 
