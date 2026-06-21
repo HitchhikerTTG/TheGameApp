@@ -206,6 +206,36 @@
       <?php endif; ?>
 
     <?php endif; ?>
+    
+    <?php if ($isLive && !empty($match['podsumowanieTypow'])):
+  $p     = $match['podsumowanieTypow'];
+  $total = ($p['countWin1'] ?? 0) + ($p['countDraw'] ?? 0) + ($p['countWin2'] ?? 0);
+?>
+  <div class="mt-2 pt-2" style="border-top:1px solid var(--bs-border-color);">
+    <div class="text-secondary mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;">Rozkład typów graczy</div>
+    <div class="d-flex gap-3 text-center">
+      <div>
+        <div class="ff-bebas" style="font-size:22px;"><?= (int)($p['countWin1'] ?? 0) ?></div>
+        <div style="font-size:11px;color:var(--bs-secondary-color);">1 (Gosp.)</div>
+      </div>
+      <div>
+        <div class="ff-bebas" style="font-size:22px;"><?= (int)($p['countDraw'] ?? 0) ?></div>
+        <div style="font-size:11px;color:var(--bs-secondary-color);">X (Remis)</div>
+      </div>
+      <div>
+        <div class="ff-bebas" style="font-size:22px;"><?= (int)($p['countWin2'] ?? 0) ?></div>
+        <div style="font-size:11px;color:var(--bs-secondary-color);">2 (Goście)</div>
+      </div>
+    </div>
+    <?php if (!empty($p['mostPopularType'])): ?>
+    <div class="mt-1" style="font-size:12px;color:var(--bs-secondary-color);">
+      Popularniejszy typ: <strong><?= esc($p['mostPopularType']) ?></strong>
+      (<?= (int)($p['mostPopularTypeCount'] ?? 0) ?> graczy)
+    </div>
+    <?php endif ?>
+  </div>
+<?php endif ?>
+    
   </div><!-- /.card-body -->
 
   <!-- COLLAPSE: jak typowali? -->

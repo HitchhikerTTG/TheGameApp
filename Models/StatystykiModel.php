@@ -15,26 +15,55 @@ class StatystykiModel extends Model
         $db = \Config\Database::connect();
 
         // 1. Mecz z największą liczbą typów
-        $meczNajwiecejTypow = $db->query("
+        $rowsTypow = $db->query("
             SELECT t.Id, t.HomeName, t.AwayName, t.ScoreHome, t.ScoreAway,
                    COUNT(ty.id) AS liczba
             FROM terminarz t
             JOIN typy ty ON ty.GameID = t.Id
             WHERE t.TurniejID = ? AND t.zakonczony = 1
             GROUP BY t.Id
-            ORDER BY liczba DESC LIMIT 1
-        ", [$turniejID])->getRow();
+            ORDER BY liczba DESC
+        ", [$turniejID])->getResultArray();
 
-        // 2. Mecz z największą liczbą dokładnych trafień
-        $meczNajwiecejTrafien = $db->query("
+        $maxTypow = !empty($rowsTypow) ? (int)$rowsTypow[0]['liczba'] : 0;
+        $meczNajwiecejTypow = [
+            'mecze'  => array_values(array_filter($rowsTypow, fn($r) => (int)$r['liczba'] === $maxTypow)),
+            'liczba' => $maxTypow,
+        ];
+
+        // 2a. Trafienia 1X2 (jakikolwiek pkt > 0)
+        $rowsKierunkowe = $db->query("
             SELECT t.Id, t.HomeName, t.AwayName, t.ScoreHome, t.ScoreAway,
                    COUNT(ty.id) AS liczba
             FROM terminarz t
             JOIN typy ty ON ty.GameID = t.Id AND ty.pkt > 0
             WHERE t.TurniejID = ? AND t.zakonczony = 1
             GROUP BY t.Id
-            ORDER BY liczba DESC LIMIT 1
-        ", [$turniejID])->getRow();
+            ORDER BY liczba DESC
+        ", [$turniejID])->getResultArray();
+
+        $maxKierunkowych = !empty($rowsKierunkowe) ? (int)$rowsKierunkowe[0]['liczba'] : 0;
+        $meczNajwiecejTrafien1X2 = [
+            'mecze'  => array_values(array_filter($rowsKierunkowe, fn($r) => (int)$r['liczba'] === $maxKierunkowych)),
+            'liczba' => $maxKierunkowych,
+        ];
+
+        // 2b. Dokładne trafienia (pkt = 3 lub 6)
+        $rowsDokladne = $db->query("
+            SELECT t.Id, t.HomeName, t.AwayName, t.ScoreHome, t.ScoreAway,
+                   COUNT(ty.id) AS liczba
+            FROM terminarz t
+            JOIN typy ty ON ty.GameID = t.Id AND ty.pkt IN (3, 6)
+            WHERE t.TurniejID = ? AND t.zakonczony = 1
+            GROUP BY t.Id
+            ORDER BY liczba DESC
+        ", [$turniejID])->getResultArray();
+
+        $maxDokladnych = !empty($rowsDokladne) ? (int)$rowsDokladne[0]['liczba'] : 0;
+        $meczNajwiecejDokladnychTrafien = [
+            'mecze'  => array_values(array_filter($rowsDokladne, fn($r) => (int)$r['liczba'] === $maxDokladnych)),
+            'liczba' => $maxDokladnych,
+        ];
 
         // 3. Najpopularniejszy trafiony wynik (across wszystkie mecze)
         $najpopularniejszyTrafiony = $db->query("
@@ -59,12 +88,20 @@ class StatystykiModel extends Model
         // 5. Wynik który zastosowany do wszystkich meczów dałby najwięcej pkt
         // = wynik końcowy który pojawił się najczęściej w historii meczów
         $najskuteczniejszyWynik = $db->query("
-            SELECT ScoreHome, ScoreAway, COUNT(*) AS liczba
-            FROM terminarz
-            WHERE TurniejID = ? AND zakonczony = 1
-            GROUP BY ScoreHome, ScoreAway
-            ORDER BY liczba DESC LIMIT 1
-        ", [$turniejID])->getRow();
+            SELECT k.ScoreHome, k.ScoreAway,
+                   SUM(CASE
+                       WHEN k.ScoreHome = m.ScoreHome AND k.ScoreAway = m.ScoreAway THEN 3
+                       WHEN (k.ScoreHome > k.ScoreAway AND m.ScoreHome > m.ScoreAway)
+                         OR (k.ScoreHome < k.ScoreAway AND m.ScoreHome < m.ScoreAway)
+                         OR (k.ScoreHome = k.ScoreAway AND m.ScoreHome = m.ScoreAway)
+                       THEN 1
+                       ELSE 0
+                   END) AS totalPkt
+            FROM (SELECT DISTINCT ScoreHome, ScoreAway FROM terminarz WHERE TurniejID = ? AND zakonczony = 1) k
+            CROSS JOIN (SELECT ScoreHome, ScoreAway FROM terminarz WHERE TurniejID = ? AND zakonczony = 1) m
+            GROUP BY k.ScoreHome, k.ScoreAway
+            ORDER BY totalPkt DESC LIMIT 1
+        ", [$turniejID, $turniejID])->getRow();
 
         // 6. Rozkład: ile meczów skończyło się z 0/1/2+ dokładnymi trafieniami
         $rozkładTrafien = $db->query("
@@ -143,21 +180,44 @@ class StatystykiModel extends Model
             HAVING wszystkich > 0
             ORDER BY poprawnych ASC LIMIT 1
         ", [$turniejID])->getRow();
+        
+        // Typ oddany najczęściej (spośród wszystkich typów na zakończone mecze)
+$typNajczesciejOddawany = $db->query("
+    SELECT ty.HomeTyp, ty.AwayTyp, COUNT(*) AS ile, SUM(ty.pkt) AS sumapt
+    FROM typy ty
+    JOIN terminarz t ON t.Id = ty.GameID
+    WHERE t.TurniejID = ? AND t.zakonczony = 1
+    GROUP BY ty.HomeTyp, ty.AwayTyp
+    ORDER BY ile DESC LIMIT 1
+", [$turniejID])->getRow();
+
+// Typ który dał graczom łącznie najwięcej punktów
+$typNajwiecejPkt = $db->query("
+    SELECT ty.HomeTyp, ty.AwayTyp, SUM(ty.pkt) AS sumapt, COUNT(*) AS ile
+    FROM typy ty
+    JOIN terminarz t ON t.Id = ty.GameID
+    WHERE t.TurniejID = ? AND t.zakonczony = 1
+    GROUP BY ty.HomeTyp, ty.AwayTyp
+    ORDER BY sumapt DESC LIMIT 1
+", [$turniejID])->getRow();
 
         return [
-            'meczNajwiecejTypow'           => $this->rowToArray($meczNajwiecejTypow),
-            'meczNajwiecejTrafien'         => $this->rowToArray($meczNajwiecejTrafien),
-            'najpopularniejszyTrafiony'    => $this->rowToArray($najpopularniejszyTrafiony),
-            'najpopularniejszyNieTrafiony' => $this->rowToArray($najpopularniejszyNieTrafiony),
-            'najskuteczniejszyWynik'       => $this->rowToArray($najskuteczniejszyWynik),
-            'rozkładTrafien'              => $rozkładMap,
-            'meczNajwiecejPkt'            => $this->rowToArray($meczNajwiecejPkt),
-            'meczNajwiecejGoldenUzytych'  => $this->rowToArray($meczNajwiecejGoldenUzytych),
-            'meczNajwiecejGoldenTrafiony' => $this->rowToArray($meczNajwiecejGoldenTrafiony),
-            'pytanieNajwiecejPoprawnych'  => $this->rowToArray($pytanieNajwiecejPoprawnych),
-            'pytanieNajmniejPoprawnych'   => $this->rowToArray($pytanieNajmniejPoprawnych),
-            'obliczoneAt'                 => date('Y-m-d H:i:s'),
-        ];
+        'meczNajwiecejTypow'              => $meczNajwiecejTypow,
+        'meczNajwiecejTrafien1X2'         => $meczNajwiecejTrafien1X2,
+        'meczNajwiecejDokladnychTrafien'  => $meczNajwiecejDokladnychTrafien,
+        'najpopularniejszyTrafiony'       => $this->rowToArray($najpopularniejszyTrafiony),
+        'najpopularniejszyNieTrafiony'    => $this->rowToArray($najpopularniejszyNieTrafiony),
+        'najskuteczniejszyWynik'          => $this->rowToArray($najskuteczniejszyWynik),
+        'rozkładTrafien'                  => $rozkładMap,
+        'meczNajwiecejPkt'                => $this->rowToArray($meczNajwiecejPkt),
+        'meczNajwiecejGoldenUzytych'      => $this->rowToArray($meczNajwiecejGoldenUzytych),
+        'meczNajwiecejGoldenTrafiony'     => $this->rowToArray($meczNajwiecejGoldenTrafiony),
+        'typNajczesciejOddawany'          => $this->rowToArray($typNajczesciejOddawany),
+        'typNajwiecejPkt'                 => $this->rowToArray($typNajwiecejPkt),
+        'pytanieNajwiecejPoprawnych'      => $this->rowToArray($pytanieNajwiecejPoprawnych),
+        'pytanieNajmniejPoprawnych'       => $this->rowToArray($pytanieNajmniejPoprawnych),
+        'obliczoneAt'                     => date('Y-m-d H:i:s'),
+    ];
     }
 
     // ────────────────────────────────────────────────────────────────

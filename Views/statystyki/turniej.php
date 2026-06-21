@@ -27,18 +27,51 @@
   <p class="section-label mt-4 mb-2">Mecze</p>
 
   <div class="card match-card mb-2">
-    <div class="card-body px-3 py-3">
-      <div class="stat-label">Mecz z największą liczbą typów</div>
-      <div class="stat-value"><?= $mecz($statystyki['meczNajwiecejTypow'], 'liczba', ' typów') ?></div>
-    </div>
+  <div class="card-body px-3 py-3">
+    <div class="stat-label">Mecz z największą liczbą typów</div>
+    <?php $d = $statystyki['meczNajwiecejTypow'] ?? null; ?>
+    <?php if ($d && !empty($d['mecze'])): ?>
+      <div class="stat-value">
+        <strong><?= (int)$d['liczba'] ?> typów</strong>
+        <?= count($d['mecze']) > 1 ? ' <span class="text-secondary small">(' . count($d['mecze']) . ' mecze z takim samym wynikiem)</span>' : '' ?>
+      </div>
+      <?php foreach ($d['mecze'] as $m): ?>
+        <div class="stat-value mt-1">
+          <?= esc($m['HomeName']) ?> – <?= esc($m['AwayName']) ?>
+          <span class="text-secondary small">(<?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?>)</span>
+        </div>
+      <?php endforeach ?>
+    <?php else: ?>
+      <div class="stat-value"><em class="text-secondary">brak danych</em></div>
+    <?php endif ?>
   </div>
+</div>
 
   <div class="card match-card mb-2">
-    <div class="card-body px-3 py-3">
-      <div class="stat-label">Mecz z największą liczbą dokładnych trafień</div>
-      <div class="stat-value"><?= $mecz($statystyki['meczNajwiecejTrafien'], 'liczba', ' trafień') ?></div>
-    </div>
+  <div class="card-body px-3 py-3">
+    <div class="stat-label">Mecz z największą liczbą trafień 1X2</div>
+    <?php $d = $statystyki['meczNajwiecejTrafien1X2'] ?? null; ?>
+    <?php if ($d && !empty($d['mecze'])): ?>
+      <div class="stat-value"><strong><?= (int)$d['liczba'] ?> trafień</strong><?= count($d['mecze']) > 1 ? ' <span class="text-secondary small">(' . count($d['mecze']) . ' mecze)</span>' : '' ?></div>
+      <?php foreach ($d['mecze'] as $m): ?>
+        <div class="stat-value mt-1"><?= esc($m['HomeName']) ?> – <?= esc($m['AwayName']) ?> <span class="text-secondary small">(<?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?>)</span></div>
+      <?php endforeach ?>
+    <?php else: ?><div class="stat-value"><em class="text-secondary">brak danych</em></div><?php endif ?>
   </div>
+</div>
+
+<div class="card match-card mb-2">
+  <div class="card-body px-3 py-3">
+    <div class="stat-label">Mecz z największą liczbą dokładnych trafień</div>
+    <?php $d = $statystyki['meczNajwiecejDokladnychTrafien'] ?? null; ?>
+    <?php if ($d && !empty($d['mecze'])): ?>
+      <div class="stat-value"><strong><?= (int)$d['liczba'] ?> trafień</strong><?= count($d['mecze']) > 1 ? ' <span class="text-secondary small">(' . count($d['mecze']) . ' mecze)</span>' : '' ?></div>
+      <?php foreach ($d['mecze'] as $m): ?>
+        <div class="stat-value mt-1"><?= esc($m['HomeName']) ?> – <?= esc($m['AwayName']) ?> <span class="text-secondary small">(<?= (int)$m['ScoreHome'] ?>:<?= (int)$m['ScoreAway'] ?>)</span></div>
+      <?php endforeach ?>
+    <?php else: ?><div class="stat-value"><em class="text-secondary">brak danych</em></div><?php endif ?>
+  </div>
+</div>
 
   <div class="card match-card mb-2">
     <div class="card-body px-3 py-3">
@@ -97,14 +130,38 @@
       <div class="stat-value">
         <?= $t
           ? '<strong class="ff-bebas" style="font-size:22px;">' . (int)$t['ScoreHome'] . ' : ' . (int)$t['ScoreAway'] . '</strong>'
-            . ' <span class="text-secondary small">(padł ' . $t['liczba'] . ' razy)</span>'
+            . ' <span class="text-secondary small">(dałby łącznie ' . (int)$t['totalPkt'] . ' pkt)</span>'
           : '<em class="text-secondary">brak danych</em>' ?>
       </div>
     </div>
   </div>
+<div class="card match-card mb-2">
+  <div class="card-body px-3 py-3">
+    <div class="stat-label">Typ wpisywany najczęściej ✍️</div>
+    <?php $t = $statystyki['typNajczesciejOddawany'] ?? null; ?>
+    <div class="stat-value">
+      <?= $t
+        ? '<strong class="ff-bebas" style="font-size:22px;">' . (int)$t['HomeTyp'] . ' : ' . (int)$t['AwayTyp'] . '</strong>'
+          . ' <span class="text-secondary small">(' . (int)$t['ile'] . ' razy, łącznie ' . (int)$t['sumapt'] . ' pkt)</span>'
+        : '<em class="text-secondary">brak danych</em>' ?>
+    </div>
+  </div>
+</div>
 
+<div class="card match-card mb-2">
+  <div class="card-body px-3 py-3">
+    <div class="stat-label">Typ który dał graczom najwięcej punktów 💰</div>
+    <?php $t = $statystyki['typNajwiecejPkt'] ?? null; ?>
+    <div class="stat-value">
+      <?= $t
+        ? '<strong class="ff-bebas" style="font-size:22px;">' . (int)$t['HomeTyp'] . ' : ' . (int)$t['AwayTyp'] . '</strong>'
+          . ' <span class="text-secondary small">(' . (int)$t['sumapt'] . ' pkt łącznie, wpisywany ' . (int)$t['ile'] . ' razy)</span>'
+        : '<em class="text-secondary">brak danych</em>' ?>
+    </div>
+  </div>
+</div>
   <!-- ROZKŁAD TRAFIEŃ -->
-  <p class="section-label mt-4 mb-2">Rozkład dokładnych trafień</p>
+  <p class="section-label mt-4 mb-2">Rozkład trafień (ile graczy zdobyło punkty)</p>
   <div class="card match-card mb-2">
     <div class="card-body px-3 py-3">
       <?php
