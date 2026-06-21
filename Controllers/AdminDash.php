@@ -713,10 +713,15 @@ public function zapiszPunktyOdpowiedzi(){
 
     // Przelicz tabelę graczy (uwzględnia punkty za pytania przez OdpowiedziModel::punktyZaPytania)
     $config = get_active_tournament_config();
-    model(\App\Models\TabelaModel::class)
-        ->przeliczTabeleGraczy((int)($config['activeTournamentId'] ?? 0));
+$turniejIDPyt = (int)($config['activeTournamentId'] ?? 0);
+model(\App\Models\TabelaModel::class)->przeliczTabeleGraczy($turniejIDPyt);
+model(\App\Models\StatystykiModel::class)->przeliczIZapiszCache($turniejIDPyt);
 
-    session()->setFlashdata('success', 'Punkty przeliczone, pytanie zamknięte.');
+// Wymuś regenerację JSON z odpowiedziami przy następnym odczycie
+$cacheOdp = WRITEPATH . "odpowiedzi/{$pytanieID}.json";
+if (file_exists($cacheOdp)) { unlink($cacheOdp); }
+
+session()->setFlashdata('success', 'Punkty przeliczone, pytanie zamknięte.');
     return redirect()->to('/hell/pytania/odpowiedzi/' . $pytanieID);
 }
 
@@ -1067,7 +1072,7 @@ public function zapiszIPrezelicz()
 
     // Przelicz tabelę
     model(\App\Models\TabelaModel::class)->przeliczTabeleGraczy($daneMeczu['TurniejID']);
-
+    model(\App\Models\StatystykiModel::class)->przeliczIZapiszCache($daneMeczu['TurniejID']);
     session()->setFlashdata('success', "Wynik {$scoreH}:{$scoreA} zapisany. Punkty i tabela przeliczone.");
     return redirect()->to('/hell/mecze');
 }
