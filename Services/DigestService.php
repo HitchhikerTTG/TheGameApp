@@ -173,7 +173,7 @@ class DigestService
         return $wynik;
     }
     
-    public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): array
+public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): array
 {
     $meczIds = array_column(
         $this->terminarzModel->getMeczeZakonczone24h($turniejID),
@@ -202,20 +202,19 @@ class DigestService
 
     if (empty($punktyGraczy)) return [];
 
-    $best = null;
-    foreach ($punktyGraczy as $g) {
-        $total = $g['pktMecze'] + $g['pktPytania'];
-        if ($best === null || $total > $best['pkt']) {
-            $best = [
-                'nick'       => $g['nick'],
-                'pkt'        => $total,
-                'pktMecze'   => $g['pktMecze'],
-                'pktPytania' => $g['pktPytania'],
-            ];
-        }
-    }
+    $maxPkt = max(array_map(fn($g) => $g['pktMecze'] + $g['pktPytania'], $punktyGraczy));
 
-    return $best ?? [];
+    $winners = array_values(array_filter(
+        $punktyGraczy,
+        fn($g) => ($g['pktMecze'] + $g['pktPytania']) === $maxPkt
+    ));
+
+    return [
+        'nicki'      => array_column($winners, 'nick'),
+        'pkt'        => $maxPkt,
+        'pktMecze'   => $winners[0]['pktMecze'],
+        'pktPytania' => $winners[0]['pktPytania'],
+    ];
 }
 
 }

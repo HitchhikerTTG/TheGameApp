@@ -111,13 +111,24 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
            style="background:#1a1a2e;border-radius:8px;">
       <tr>
         <td style="padding:14px 18px;">
+          <?php
+            $wiele   = count($najlepszyTyper['nicki']) > 1;
+            $tytul   = $wiele ? '🚀 Najlepsi typerzy ostatnich 24h' : '🚀 Najlepszy typer ostatnich 24h';
+            $nicki   = implode(' i ', array_map('esc', $najlepszyTyper['nicki']));
+            $ktory   = $wiele ? 'którzy zdobyli' : 'który zdobył';
+          ?>
           <p style="margin:0;<?= $f ?>font-size:<?= $fsSub ?>;color:#ffffff;line-height:1.5;">
-            <strong>🚀 Najlepszy typer ostatnich 24h</strong> to
-            <strong style="color:<?= $cAccent ?>;"><?= esc($najlepszyTyper['nick']) ?>💪🏻</strong>.
-            Wczorajsza zdobycz najlepszego z typerów to: 
-            <strong style="color:<?= $cAccent ?>;"><?= (int)$najlepszyTyper['pkt'] ?> punkt&oacute;w</strong>
-            (<?= (int)$najlepszyTyper['pktMecze'] ?> z mecz&oacute;w
-            i <?= (int)$najlepszyTyper['pktPytania'] ?> za pytanie).
+            &#x1F3C6;&nbsp;<strong><?= $tytul ?></strong> to
+            <strong style="color:<?= $cAccent ?>;"><?= $nicki ?>💪🏻💪🏻💪🏻</strong>,
+            <?php if ($wiele): ?>
+              <?= $ktory ?>
+              <strong style="color:<?= $cAccent ?>;"><?= (int)$najlepszyTyper['pkt'] ?> punkt&oacute;w</strong>.
+            <?php else: ?>
+              <?= $ktory ?>
+              <strong style="color:<?= $cAccent ?>;"><?= (int)$najlepszyTyper['pkt'] ?> punkt&oacute;w</strong>
+              (<?= (int)$najlepszyTyper['pktMecze'] ?> z mecz&oacute;w
+              i <?= (int)$najlepszyTyper['pktPytania'] ?> za pytanie).
+            <?php endif ?>
             Gratulacje👏🏻!
           </p>
         </td>
