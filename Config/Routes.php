@@ -180,6 +180,9 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     $routes->get('statystyki',          'Statystyki::turniej');
     $routes->get('statystyki/przelicz', 'Statystyki::przelicz');
     
+    $routes->get('statystyki/pojedynek', 'Statystyki::pojedynek');
+    
+    
     $routes->get('hell/generujSlug', 'AdminDash::generujSlugiBrakujace');
     $routes->get('profil/(:segment)',       'Profil::pokaz/$1');        // publiczny profil gracza
     $routes->get('wszechczasy',             'Statystyki::wszechczasy'); // tabela wszech czasów

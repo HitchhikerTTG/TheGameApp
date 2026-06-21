@@ -130,7 +130,7 @@
       <div class="stat-value">
         <?= $t
           ? '<strong class="ff-bebas" style="font-size:22px;">' . (int)$t['ScoreHome'] . ' : ' . (int)$t['ScoreAway'] . '</strong>'
-            . ' <span class="text-secondary small">(dałby łącznie ' . (int)$t['totalPkt'] . ' pkt)</span>'
+            . ' <span class="text-secondary small">(dałby łącznie ' . (int)($t['totalPkt'] ?? $t['liczba'] ?? 0) . ' pkt)</span>'
           : '<em class="text-secondary">brak danych</em>' ?>
       </div>
     </div>

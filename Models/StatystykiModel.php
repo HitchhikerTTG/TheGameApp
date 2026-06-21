@@ -157,15 +157,15 @@ class StatystykiModel extends Model
 
         // 10. Pytanie na które poprawnie odpowiedziało najwięcej graczy
         $pytanieNajwiecejPoprawnych = $db->query("
-            SELECT p.id, p.tresc, p.odpowiedz,
-                   COUNT(o.id) AS poprawnych,
-                   (SELECT COUNT(*) FROM odpowiedzi WHERE idPyt = p.id) AS wszystkich
-            FROM pytania p
-            JOIN odpowiedzi o ON o.idPyt = p.id AND o.pkt > 0
-            WHERE p.TurniejID = ?
-            GROUP BY p.id
-            ORDER BY poprawnych DESC LIMIT 1
-        ", [$turniejID])->getRow();
+        SELECT p.id, p.tresc, p.odpowiedz,
+               COUNT(o.id) AS poprawnych,
+               (SELECT COUNT(*) FROM odpowiedzi WHERE idPyt = p.id) AS wszystkich
+        FROM pytania p
+        JOIN odpowiedzi o ON o.idPyt = p.id AND o.pkt > 0
+        WHERE p.TurniejID = ? AND p.zamkniete = 1
+        GROUP BY p.id
+        ORDER BY poprawnych DESC LIMIT 1
+    ", [$turniejID])->getRow();
 
         // 11. Pytanie na które poprawnie odpowiedziało najmniej graczy
         // (tylko pytania z minimum 1 odpowiedzią łącznie, czyli zamknięte)
@@ -175,7 +175,7 @@ class StatystykiModel extends Model
                    COUNT(o.id) AS wszystkich
             FROM pytania p
             JOIN odpowiedzi o ON o.idPyt = p.id
-            WHERE p.TurniejID = ? AND p.aktywne = 0
+            WHERE p.TurniejID = ? AND p.zamkniete = 1
             GROUP BY p.id
             HAVING wszystkich > 0
             ORDER BY poprawnych ASC LIMIT 1
