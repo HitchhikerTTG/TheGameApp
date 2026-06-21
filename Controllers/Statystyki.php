@@ -116,7 +116,7 @@ public function pojedynek()
     $gracze = $db->query("
         SELECT u.nick, u.emoji, u.slug
         FROM uzytkownicy u
-        JOIN ktowcogra k ON k.uniID = u.uniID AND k.turniejID = ?
+        JOIN ktowcogra k ON k.userID = u.uniID AND k.turniejID = ?
         WHERE u.activated = 1
         ORDER BY u.nick ASC
     ", [$turniejID])->getResultArray();
