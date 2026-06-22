@@ -160,6 +160,105 @@
     </div>
   </div>
 </div>
+
+<!-- MAPA WYNIKÓW I TYPÓW -->
+<p class="section-label mt-4 mb-2">Mapa wyników i typów</p>
+<div class="card match-card mb-2">
+  <div class="card-body px-3 py-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div style="font-size:11px;color:var(--bs-secondary-color);">
+        Oś X: bramki gospodarza &nbsp;·&nbsp; Oś Y: bramki gości
+      </div>
+      <button class="btn btn-sm btn-outline-secondary" id="btn-typy-map"
+              onclick="toggleTypyMap()">Pokaż typy graczy</button>
+    </div>
+
+    <?php
+      $mW = $statystyki['mapaWynikow'] ?? [];
+      $mT = $statystyki['mapaTypow']   ?? [];
+      $maxH = 5; $maxA = 5;
+      foreach ($mW as $h => $arr) foreach ($arr as $a => $c) { $maxH = max($maxH, min((int)$h, 7)); $maxA = max($maxA, min((int)$a, 7)); }
+      foreach ($mT as $h => $arr) foreach ($arr as $a => $c) { $maxH = max($maxH, min((int)$h, 7)); $maxA = max($maxA, min((int)$a, 7)); }
+      $maxFreqW = 1; foreach ($mW as $arr) foreach ($arr as $c) $maxFreqW = max($maxFreqW, $c);
+      $maxFreqT = 1; foreach ($mT as $arr) foreach ($arr as $c) $maxFreqT = max($maxFreqT, $c);
+      $cell = 44; $pL = 22; $pB = 22;
+      $svgW = ($maxH + 1) * $cell + $pL;
+      $svgH = ($maxA + 1) * $cell + $pB;
+      $maxR = ($cell / 2) - 5;
+    ?>
+
+    <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;max-width:400px;display:block;margin:0 auto;" aria-label="Mapa wyników">
+
+      <?php /* Siatka + etykiety osi */ ?>
+      <?php for ($h = 0; $h <= $maxH; $h++):
+        $x = $pL + $h * $cell + $cell/2; ?>
+        <line x1="<?= $x ?>" y1="0" x2="<?= $x ?>" y2="<?= $svgH - $pB ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
+        <text x="<?= $x ?>" y="<?= $svgH - 6 ?>" text-anchor="middle"
+              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $h ?></text>
+      <?php endfor; ?>
+      <?php for ($a = 0; $a <= $maxA; $a++):
+        $y = ($maxA - $a) * $cell + $cell/2; ?>
+        <line x1="<?= $pL ?>" y1="<?= $y ?>" x2="<?= $svgW ?>" y2="<?= $y ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
+        <text x="<?= $pL - 4 ?>" y="<?= $y + 4 ?>" text-anchor="end"
+              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $a ?></text>
+      <?php endfor; ?>
+
+      <?php /* Bąbelki wyników */ ?>
+      <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
+        $cnt = $mW[$h][$a] ?? 0; if (!$cnt) continue;
+        $cx = $pL + $h * $cell + $cell/2;
+        $cy = ($maxA - $a) * $cell + $cell/2;
+        $r  = max(4, round(($cnt / $maxFreqW) * $maxR, 1)); ?>
+        <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
+                fill="var(--ty-accent)" fill-opacity="0.85">
+          <title><?= $h ?>:<?= $a ?> -- padło <?= $cnt ?> <?= $cnt === 1 ? 'raz' : 'razy' ?></title>
+        </circle>
+      <?php endfor; endfor; ?>
+
+      <?php /* Warstwa typów graczy (ukryta domyślnie) */ ?>
+      <g id="typy-map-layer" style="display:none;">
+        <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
+          $cnt = $mT[$h][$a] ?? 0; if (!$cnt) continue;
+          $cx = $pL + $h * $cell + $cell/2;
+          $cy = ($maxA - $a) * $cell + $cell/2;
+          $r  = max(4, round(($cnt / $maxFreqT) * $maxR, 1)); ?>
+          <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
+                  fill="none" stroke="var(--ty-red)" stroke-width="1.5" stroke-opacity="0.75">
+            <title><?= $h ?>:<?= $a ?> -- wytypowano <?= $cnt ?> razy</title>
+          </circle>
+        <?php endfor; endfor; ?>
+      </g>
+    </svg>
+
+    <div class="d-flex gap-3 mt-2" style="font-size:11px;color:var(--bs-secondary-color);">
+      <span>
+        <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.85"/></svg>
+        Rzeczywiste wyniki
+      </span>
+      <span id="legenda-typy" style="display:none;">
+        <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="none" stroke="var(--ty-red)" stroke-width="1.5"/></svg>
+        Typy graczy
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleTypyMap() {
+  var layer = document.getElementById('typy-map-layer');
+  var btn   = document.getElementById('btn-typy-map');
+  var leg   = document.getElementById('legenda-typy');
+  var show  = layer.style.display === 'none';
+  layer.style.display = show ? '' : 'none';
+  leg.style.display   = show ? '' : 'none';
+  btn.textContent = show ? 'Ukryj typy graczy' : 'Pokaż typy graczy';
+}
+</script>
+
   <!-- ROZKŁAD TRAFIEŃ -->
   <p class="section-label mt-4 mb-2">Rozkład trafień (ile graczy zdobyło punkty)</p>
   <div class="card match-card mb-2">

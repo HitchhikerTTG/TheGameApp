@@ -201,6 +201,34 @@ $typNajwiecejPkt = $db->query("
     ORDER BY sumapt DESC LIMIT 1
 ", [$turniejID])->getRow();
 
+// 12. Mapa wyników: ile razy padł każdy wynik końcowy
+$mapaWynikowRaw = $db->query("
+    SELECT ScoreHome, ScoreAway, COUNT(*) AS ile
+    FROM terminarz
+    WHERE TurniejID = ? AND zakonczony = 1
+      AND ScoreHome IS NOT NULL AND ScoreAway IS NOT NULL
+    GROUP BY ScoreHome, ScoreAway
+", [$turniejID])->getResultArray();
+
+$mapaWynikow = [];
+foreach ($mapaWynikowRaw as $r) {
+    $mapaWynikow[(int)$r['ScoreHome']][(int)$r['ScoreAway']] = (int)$r['ile'];
+}
+
+// 13. Mapa typów: ile razy gracze wytypowali każdy wynik
+$mapaTypowRaw = $db->query("
+    SELECT ty.HomeTyp, ty.AwayTyp, COUNT(*) AS ile
+    FROM typy ty
+    JOIN terminarz t ON t.Id = ty.GameID
+    WHERE t.TurniejID = ? AND t.zakonczony = 1
+    GROUP BY ty.HomeTyp, ty.AwayTyp
+", [$turniejID])->getResultArray();
+
+$mapaTypow = [];
+foreach ($mapaTypowRaw as $r) {
+    $mapaTypow[(int)$r['HomeTyp']][(int)$r['AwayTyp']] = (int)$r['ile'];
+}
+
         return [
         'meczNajwiecejTypow'              => $meczNajwiecejTypow,
         'meczNajwiecejTrafien1X2'         => $meczNajwiecejTrafien1X2,
@@ -217,6 +245,8 @@ $typNajwiecejPkt = $db->query("
         'pytanieNajwiecejPoprawnych'      => $this->rowToArray($pytanieNajwiecejPoprawnych),
         'pytanieNajmniejPoprawnych'       => $this->rowToArray($pytanieNajmniejPoprawnych),
         'obliczoneAt'                     => date('Y-m-d H:i:s'),
+        'mapaWynikow'                   => $mapaWynikow,
+        'mapaTypow'                     => $mapaTypow,
     ];
     }
 

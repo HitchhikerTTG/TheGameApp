@@ -195,5 +195,91 @@
     </div>
   </div>
   <?php endif ?>
+  
+  <!-- MAPA TYPÓW GRACZA -->
+<?php
+  // Budujemy siatkę: [homeTyp][awayTyp] => ['total'=>N, 'points'=>N, 'exact'=>N]
+  $typGrid = [];
+  foreach ($szczegolyMeczow as $m) {
+      if ($m['HomeTyp'] === null || $m['AwayTyp'] === null) continue;
+      $h = (int)$m['HomeTyp']; $a = (int)$m['AwayTyp'];
+      if (!isset($typGrid[$h][$a])) {
+          $typGrid[$h][$a] = ['total' => 0, 'points' => 0, 'exact' => 0];
+      }
+      $typGrid[$h][$a]['total']++;
+      if ((int)$m['pkt'] > 0) $typGrid[$h][$a]['points']++;
+      if ((int)$m['pkt'] >= 3) $typGrid[$h][$a]['exact']++;
+  }
+?>
+<?php if (!empty($typGrid)): ?>
+<?php
+  $maxCnt = 1;
+  foreach ($typGrid as $hArr) foreach ($hArr as $cell) $maxCnt = max($maxCnt, $cell['total']);
+  $maxH = 5; $maxA = 5;
+  foreach ($typGrid as $h => $arr) foreach ($arr as $a => $c) {
+      $maxH = max($maxH, min((int)$h, 8)); $maxA = max($maxA, min((int)$a, 8));
+  }
+  $cell = 42; $pL = 22; $pB = 22;
+  $svgW = ($maxH + 1) * $cell + $pL;
+  $svgH = ($maxA + 1) * $cell + $pB;
+  $maxR = ($cell / 2) - 5;
+?>
+<p class="section-label mt-4 mb-2">Mapa typów</p>
+<div class="card match-card mb-3">
+  <div class="card-body px-3 py-3">
+    <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;max-width:360px;display:block;margin:0 auto;" aria-label="Mapa typów gracza">
+
+      <?php /* Siatka + etykiety */ ?>
+      <?php for ($h = 0; $h <= $maxH; $h++):
+        $x = $pL + $h * $cell + $cell/2; ?>
+        <line x1="<?= $x ?>" y1="0" x2="<?= $x ?>" y2="<?= $svgH - $pB ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
+        <text x="<?= $x ?>" y="<?= $svgH - 6 ?>" text-anchor="middle"
+              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $h ?></text>
+      <?php endfor; ?>
+      <?php for ($a = 0; $a <= $maxA; $a++):
+        $y = ($maxA - $a) * $cell + $cell/2; ?>
+        <line x1="<?= $pL ?>" y1="<?= $y ?>" x2="<?= $svgW ?>" y2="<?= $y ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
+        <text x="<?= $pL - 4 ?>" y="<?= $y + 4 ?>" text-anchor="end"
+              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $a ?></text>
+      <?php endfor; ?>
+
+      <?php /* Bąbelki typów */ ?>
+      <?php foreach ($typGrid as $h => $aArr): foreach ($aArr as $a => $cellData):
+        $cx = $pL + $h * $cell + $cell/2;
+        $cy = ($maxA - $a) * $cell + $cell/2;
+        $r  = max(5, round(($cellData['total'] / $maxCnt) * $maxR, 1));
+        if ($cellData['exact'] > 0) {
+            $fill = 'var(--ty-green)'; $op = '0.9';
+        } elseif ($cellData['points'] > 0) {
+            $fill = 'var(--ty-accent)'; $op = '0.75';
+        } else {
+            $fill = 'var(--bs-secondary-color)'; $op = '0.35';
+        }
+        $title = $h . ':' . $a . ' -- typowane ' . $cellData['total'] . ' razy';
+        if ($cellData['exact'] > 0) $title .= ' (' . $cellData['exact'] . '× dokładnie)';
+        elseif ($cellData['points'] > 0) $title .= ' (' . $cellData['points'] . '× trafiony kierunek)';
+      ?>
+        <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
+                fill="<?= $fill ?>" fill-opacity="<?= $op ?>">
+          <title><?= esc($title) ?></title>
+        </circle>
+        <?php if ($cellData['exact'] > 0 && $r >= 8): ?>
+        <text x="<?= $cx ?>" y="<?= $cy + 4 ?>" text-anchor="middle"
+              style="font-size:<?= min(12, (int)$r) ?>px;fill:white;pointer-events:none;font-weight:700;">✓</text>
+        <?php endif; ?>
+      <?php endforeach; endforeach; ?>
+
+    </svg>
+
+    <div class="d-flex gap-3 mt-2" style="font-size:11px;color:var(--bs-secondary-color);">
+      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-green)" fill-opacity="0.9"/></svg> Dokładny ✓</span>
+      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.75"/></svg> Kierunkowy</span>
+      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--bs-secondary-color)" fill-opacity="0.35"/></svg> Pudło</span>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
 
 
