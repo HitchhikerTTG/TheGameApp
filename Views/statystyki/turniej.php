@@ -162,102 +162,210 @@
 </div>
 
 <!-- MAPA WYNIKÓW I TYPÓW -->
-<p class="section-label mt-4 mb-2">Mapa wyników i typów</p>
+<?php if (!empty($statystyki['mapaWynikow'])): ?>
+<p class="section-label mt-4 mb-2">Mapa wyników</p>
+<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
+  Kolor komórki = liczba meczów z tym wynikiem · Biała kropka = 1 typ gracza
+</p>
 <div class="card match-card mb-2">
-  <div class="card-body px-3 py-3">
+  <div class="card-body px-2 py-3">
 
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div style="font-size:11px;color:var(--bs-secondary-color);">
-        Oś X: bramki gospodarza &nbsp;·&nbsp; Oś Y: bramki gości
-      </div>
-      <button class="btn btn-sm btn-outline-secondary" id="btn-typy-map"
-              onclick="toggleTypyMap()">Pokaż typy graczy</button>
-    </div>
+  <?php
+    /* ── Dane ── */
+    $mW = $statystyki['mapaWynikow'] ?? [];
+    $mT = $statystyki['mapaTypow']   ?? [];
 
-    <?php
-      $mW = $statystyki['mapaWynikow'] ?? [];
-      $mT = $statystyki['mapaTypow']   ?? [];
-      $maxH = 5; $maxA = 5;
-      foreach ($mW as $h => $arr) foreach ($arr as $a => $c) { $maxH = max($maxH, min((int)$h, 7)); $maxA = max($maxA, min((int)$a, 7)); }
-      foreach ($mT as $h => $arr) foreach ($arr as $a => $c) { $maxH = max($maxH, min((int)$h, 7)); $maxA = max($maxA, min((int)$a, 7)); }
-      $maxFreqW = 1; foreach ($mW as $arr) foreach ($arr as $c) $maxFreqW = max($maxFreqW, $c);
-      $maxFreqT = 1; foreach ($mT as $arr) foreach ($arr as $c) $maxFreqT = max($maxFreqT, $c);
-      $cell = 44; $pL = 22; $pB = 22;
-      $svgW = ($maxH + 1) * $cell + $pL;
-      $svgH = ($maxA + 1) * $cell + $pB;
-      $maxR = ($cell / 2) - 5;
+    $maxH = 6; $maxA = 6;
+    foreach ($mW as $h => $arr) foreach ($arr as $a => $c) {
+        $maxH = max($maxH, min((int)$h, 8));
+        $maxA = max($maxA, min((int)$a, 8));
+    }
+    foreach ($mT as $h => $arr) foreach ($arr as $a => $c) {
+        $maxH = max($maxH, min((int)$h, 8));
+        $maxA = max($maxA, min((int)$a, 8));
+    }
+
+    $maxFreqW = 1;
+    foreach ($mW as $arr) foreach ($arr as $c) $maxFreqW = max($maxFreqW, $c);
+
+    /* ── Wymiary SVG ── */
+    $cell = 50; $pL = 28; $pT = 8; $pB = 38; $pR = 8;
+    $svgW = $pL + ($maxA + 1) * $cell + $pR;
+    $svgH = $pT + ($maxH + 1) * $cell + $pB;
+    $minDim = min($maxH, $maxA);
+
+    /* ── Kolor komórki (dark-teal → zieleń → żółty → pomarańcz → czerwony) ── */
+    $heatColor = function(int $cnt, int $maxCnt): string {
+        if ($cnt === 0) return '#ebebeb';
+        $r = $cnt / $maxCnt;
+        $stops = [
+            [0.00, [0x2d, 0x4a, 0x3e]],
+            [0.20, [0x2f, 0x70, 0x4a]],
+            [0.45, [0x78, 0xc4, 0x4a]],
+            [0.72, [0xe8, 0xa8, 0x38]],
+            [1.00, [0xc0, 0x39, 0x2b]],
+        ];
+        for ($i = 1; $i < count($stops); $i++) {
+            if ($r <= $stops[$i][0] || $i === count($stops) - 1) {
+                $t = min(1, max(0,
+                    ($r - $stops[$i-1][0]) / max(0.001, $stops[$i][0] - $stops[$i-1][0])
+                ));
+                return sprintf('#%02x%02x%02x',
+                    (int)($stops[$i-1][1][0] + ($stops[$i][1][0] - $stops[$i-1][1][0]) * $t),
+                    (int)($stops[$i-1][1][1] + ($stops[$i][1][1] - $stops[$i-1][1][1]) * $t),
+                    (int)($stops[$i-1][1][2] + ($stops[$i][1][2] - $stops[$i-1][1][2]) * $t)
+                );
+            }
+        }
+        return '#c0392b';
+    };
+
+    /* ── Kolor tekstu na tle komórki ── */
+    $textOnBg = function(string $hex): string {
+        $r = hexdec(substr($hex, 1, 2));
+        $g = hexdec(substr($hex, 3, 2));
+        $b = hexdec(substr($hex, 5, 2));
+        return ((0.299*$r + 0.587*$g + 0.114*$b) / 255 > 0.52) ? '#333333' : '#ffffff';
+    };
+
+    /* ── Deterministyczne pozycje kropek ── */
+    $dotPositions = function(int $h, int $a, int $count, float $cX, float $cY, float $sz): array {
+        $pad = 6; $inner = $sz - $pad * 2; $out = [];
+        for ($d = 0; $d < min($count, 60); $d++) {
+            $s1 = abs(($h * 7919 + $a * 3571 + $d * 1009 + 42) % 100000);
+            $s2 = abs(($s1 * 6364 + $h * 17 + $a) % 100000);
+            $out[] = [
+                round($cX + $pad + ($s1 % 1000) / 999.0 * $inner, 1),
+                round($cY + $pad + ($s2 % 1000) / 999.0 * $inner, 1),
+            ];
+        }
+        return $out;
+    };
+  ?>
+
+  <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>"
+       style="width:100%;max-width:520px;display:block;margin:0 auto;"
+       aria-label="Heatmapa wyników meczów">
+    <defs>
+      <linearGradient id="heatLegendGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%"   stop-color="#2d4a3e"/>
+        <stop offset="20%"  stop-color="#2f704a"/>
+        <stop offset="45%"  stop-color="#78c44a"/>
+        <stop offset="72%"  stop-color="#e8a838"/>
+        <stop offset="100%" stop-color="#c0392b"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Komórki heatmapy -->
+    <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
+      $cnt     = $mW[$h][$a] ?? 0;
+      $cX      = $pL + $a * $cell;
+      $cY      = $pT + ($maxH - $h) * $cell;
+      $bg      = $heatColor($cnt, $maxFreqW);
+      $txtCol  = $textOnBg($bg);
     ?>
+      <rect x="<?= $cX ?>" y="<?= $cY ?>"
+            width="<?= $cell ?>" height="<?= $cell ?>"
+            fill="<?= $bg ?>" stroke="white" stroke-width="0.8" stroke-opacity="0.25"/>
 
-    <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;max-width:400px;display:block;margin:0 auto;" aria-label="Mapa wyników">
+      <?php if ($cnt > 0): ?>
+      <!-- Liczba wyników -- wyśrodkowana, duża, czytelna -->
+      <text x="<?= $cX + $cell/2 ?>" y="<?= $cY + $cell/2 + 6 ?>"
+            text-anchor="middle"
+            style="font-family:'Bebas Neue',sans-serif;font-size:18px;fill:<?= $txtCol ?>;fill-opacity:0.9;">
+        <?= $cnt ?>
+      </text>
+      <?php endif; ?>
+    <?php endfor; endfor; ?>
 
-      <?php /* Siatka + etykiety osi */ ?>
-      <?php for ($h = 0; $h <= $maxH; $h++):
-        $x = $pL + $h * $cell + $cell/2; ?>
-        <line x1="<?= $x ?>" y1="0" x2="<?= $x ?>" y2="<?= $svgH - $pB ?>"
-              stroke="var(--bs-border-color)" stroke-width="0.5"/>
-        <text x="<?= $x ?>" y="<?= $svgH - 6 ?>" text-anchor="middle"
-              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $h ?></text>
-      <?php endfor; ?>
-      <?php for ($a = 0; $a <= $maxA; $a++):
-        $y = ($maxA - $a) * $cell + $cell/2; ?>
-        <line x1="<?= $pL ?>" y1="<?= $y ?>" x2="<?= $svgW ?>" y2="<?= $y ?>"
-              stroke="var(--bs-border-color)" stroke-width="0.5"/>
-        <text x="<?= $pL - 4 ?>" y="<?= $y + 4 ?>" text-anchor="end"
-              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $a ?></text>
-      <?php endfor; ?>
+    <!-- Białe kropki = typy graczy (ukryte domyślnie) -->
+    <g id="typy-heat-layer" style="display:none;">
+    <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
+      $typCnt = $mT[$h][$a] ?? 0;
+      if ($typCnt === 0) continue;
+      $cX     = $pL + $a * $cell;
+      $cY     = $pT + ($maxH - $h) * $cell;
+      $bg     = $heatColor($mW[$h][$a] ?? 0, $maxFreqW);
+      $dCol   = $textOnBg($bg);
+      foreach ($dotPositions($h, $a, $typCnt, $cX, $cY, $cell) as $p):
+    ?>
+      <circle cx="<?= $p[0] ?>" cy="<?= $p[1] ?>" r="2.5"
+              fill="<?= $dCol ?>" fill-opacity="0.75"/>
+    <?php endforeach; endfor; endfor; ?>
+    </g>
 
-      <?php /* Bąbelki wyników */ ?>
-      <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
-        $cnt = $mW[$h][$a] ?? 0; if (!$cnt) continue;
-        $cx = $pL + $h * $cell + $cell/2;
-        $cy = ($maxA - $a) * $cell + $cell/2;
-        $r  = max(4, round(($cnt / $maxFreqW) * $maxR, 1)); ?>
-        <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
-                fill="var(--ty-accent)" fill-opacity="0.85">
-          <title><?= $h ?>:<?= $a ?> -- padło <?= $cnt ?> <?= $cnt === 1 ? 'raz' : 'razy' ?></title>
-        </circle>
-      <?php endfor; endfor; ?>
+    <!-- Linia diagonalna (remis: H = A) -->
+    <line x1="<?= $pL ?>"
+          y1="<?= $pT + ($maxH + 1) * $cell ?>"
+          x2="<?= $pL + ($minDim + 1) * $cell ?>"
+          y2="<?= $pT + ($maxH - $minDim) * $cell ?>"
+          stroke="white" stroke-width="1.5" stroke-dasharray="5 3" stroke-opacity="0.55"/>
 
-      <?php /* Warstwa typów graczy (ukryta domyślnie) */ ?>
-      <g id="typy-map-layer" style="display:none;">
-        <?php for ($h = 0; $h <= $maxH; $h++): for ($a = 0; $a <= $maxA; $a++):
-          $cnt = $mT[$h][$a] ?? 0; if (!$cnt) continue;
-          $cx = $pL + $h * $cell + $cell/2;
-          $cy = ($maxA - $a) * $cell + $cell/2;
-          $r  = max(4, round(($cnt / $maxFreqT) * $maxR, 1)); ?>
-          <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
-                  fill="none" stroke="var(--ty-red)" stroke-width="1.5" stroke-opacity="0.75">
-            <title><?= $h ?>:<?= $a ?> -- wytypowano <?= $cnt ?> razy</title>
-          </circle>
-        <?php endfor; endfor; ?>
-      </g>
-    </svg>
+    <!-- Etykiety stref -->
+    <text x="<?= $pL + 5 ?>" y="<?= $pT + 16 ?>"
+          style="font-size:9px;fill:white;fill-opacity:0.5;font-weight:700;letter-spacing:.06em;">
+      GOSPOD. GÓRĄ ↗
+    </text>
+    <text x="<?= $pL + ($maxA) * $cell + $cell - 4 ?>"
+          y="<?= $pT + ($maxH) * $cell + $cell - 5 ?>"
+          text-anchor="end"
+          style="font-size:9px;fill:white;fill-opacity:0.4;font-weight:700;letter-spacing:.06em;">
+      ↙ GOŚCIE GÓRĄ
+    </text>
 
-    <div class="d-flex gap-3 mt-2" style="font-size:11px;color:var(--bs-secondary-color);">
-      <span>
-        <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.85"/></svg>
-        Rzeczywiste wyniki
-      </span>
-      <span id="legenda-typy" style="display:none;">
-        <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="none" stroke="var(--ty-red)" stroke-width="1.5"/></svg>
-        Typy graczy
-      </span>
+    <!-- Oś X: bramki gości -->
+    <?php for ($a = 0; $a <= $maxA; $a++): ?>
+      <text x="<?= $pL + $a * $cell + $cell/2 ?>"
+            y="<?= $pT + ($maxH + 1) * $cell + 16 ?>"
+            text-anchor="middle"
+            style="font-size:11px;fill:var(--bs-secondary-color);"><?= $a ?></text>
+    <?php endfor; ?>
+    <text x="<?= $pL + ($maxA + 1) * $cell / 2 ?>"
+          y="<?= $svgH - 4 ?>"
+          text-anchor="middle"
+          style="font-size:10px;fill:var(--bs-secondary-color);">bramki gości →</text>
+
+    <!-- Oś Y: bramki gospodarza -->
+    <?php for ($h = 0; $h <= $maxH; $h++): ?>
+      <text x="<?= $pL - 5 ?>"
+            y="<?= $pT + ($maxH - $h) * $cell + $cell/2 + 4 ?>"
+            text-anchor="end"
+            style="font-size:11px;fill:var(--bs-secondary-color);"><?= $h ?></text>
+    <?php endfor; ?>
+    <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($maxH+1)*$cell/2 ?>)"
+          x="<?= $pL - 20 ?>" y="<?= $pT + ($maxH+1)*$cell/2 + 4 ?>"
+          text-anchor="middle"
+          style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+
+  </svg>
+
+  <!-- Sterowanie i legenda -->
+  <div class="d-flex align-items-center flex-wrap gap-3 mt-3 px-1" style="font-size:12px;">
+    <label class="d-flex align-items-center gap-1" style="cursor:pointer;user-select:none;">
+      <input type="checkbox" id="chk-typy-heat" onchange="toggleHeatDots(this.checked)">
+      <span>Pokaż typy graczy</span>
+    </label>
+    <div class="d-flex align-items-center gap-1 ms-auto">
+      <svg width="100" height="10">
+        <rect width="100" height="10" fill="url(#heatLegendGrad)" rx="2"/>
+      </svg>
+      <span style="color:var(--bs-secondary-color);">0 → max meczów</span>
     </div>
+    <span style="color:var(--bs-secondary-color);">
+      <svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="var(--bs-secondary-color)"/></svg>
+      1 typ gracza
+    </span>
+  </div>
 
   </div>
 </div>
 
 <script>
-function toggleTypyMap() {
-  var layer = document.getElementById('typy-map-layer');
-  var btn   = document.getElementById('btn-typy-map');
-  var leg   = document.getElementById('legenda-typy');
-  var show  = layer.style.display === 'none';
-  layer.style.display = show ? '' : 'none';
-  leg.style.display   = show ? '' : 'none';
-  btn.textContent = show ? 'Ukryj typy graczy' : 'Pokaż typy graczy';
+function toggleHeatDots(show) {
+  document.getElementById('typy-heat-layer').style.display = show ? '' : 'none';
 }
 </script>
+<?php endif; ?>
 
   <!-- ROZKŁAD TRAFIEŃ -->
   <p class="section-label mt-4 mb-2">Rozkład trafień (ile graczy zdobyło punkty)</p>

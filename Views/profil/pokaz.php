@@ -198,7 +198,8 @@
   
   <!-- MAPA TYPÓW GRACZA -->
 <?php
-  // Budujemy siatkę: [homeTyp][awayTyp] => ['total'=>N, 'points'=>N, 'exact'=>N]
+  /* ── Budujemy siatkę typów ──
+     X = AwayTyp (bramki gości), Y = HomeTyp (bramki gospodarza) */
   $typGrid = [];
   foreach ($szczegolyMeczow as $m) {
       if ($m['HomeTyp'] === null || $m['AwayTyp'] === null) continue;
@@ -207,77 +208,147 @@
           $typGrid[$h][$a] = ['total' => 0, 'points' => 0, 'exact' => 0];
       }
       $typGrid[$h][$a]['total']++;
-      if ((int)$m['pkt'] > 0) $typGrid[$h][$a]['points']++;
+      if ((int)$m['pkt'] > 0)  $typGrid[$h][$a]['points']++;
       if ((int)$m['pkt'] >= 3) $typGrid[$h][$a]['exact']++;
   }
 ?>
 <?php if (!empty($typGrid)): ?>
 <?php
   $maxCnt = 1;
-  foreach ($typGrid as $hArr) foreach ($hArr as $cell) $maxCnt = max($maxCnt, $cell['total']);
-  $maxH = 5; $maxA = 5;
-  foreach ($typGrid as $h => $arr) foreach ($arr as $a => $c) {
-      $maxH = max($maxH, min((int)$h, 8)); $maxA = max($maxA, min((int)$a, 8));
+  foreach ($typGrid as $hA) foreach ($hA as $c) $maxCnt = max($maxCnt, $c['total']);
+
+  /* Rozmiar siatki */
+  $gMaxH = 5; $gMaxA = 5;
+  foreach ($typGrid as $h => $aA) foreach ($aA as $a => $c) {
+      $gMaxH = max($gMaxH, min((int)$h, 8));
+      $gMaxA = max($gMaxA, min((int)$a, 8));
   }
-  $cell = 42; $pL = 22; $pB = 22;
-  $svgW = ($maxH + 1) * $cell + $pL;
-  $svgH = ($maxA + 1) * $cell + $pB;
-  $maxR = ($cell / 2) - 5;
+
+  $cell = 50; $pL = 28; $pT = 8; $pB = 38; $pR = 8;
+  $svgW = $pL + ($gMaxA + 1) * $cell + $pR;
+  $svgH = $pT + ($gMaxH + 1) * $cell + $pB;
+  $maxR = $cell / 2 - 5;
+
+  /* Kolor bąbelka na podstawie trafności */
+  $bubbleStyle = function(array $c): array {
+      if ($c['exact'] > 0) {
+          /* Zielony -- dokładny (intensywność zależy od udziału dokładnych) */
+          $op = round(min(0.95, 0.65 + ($c['exact'] / $c['total']) * 0.30), 2);
+          return ['fill' => 'var(--ty-green)', 'op' => $op];
+      }
+      if ($c['points'] > 0) {
+          /* Niebieski -- kierunkowy */
+          $op = round(min(0.88, 0.55 + ($c['points'] / $c['total']) * 0.33), 2);
+          return ['fill' => 'var(--ty-accent)', 'op' => $op];
+      }
+      /* Szary -- pudło */
+      return ['fill' => 'var(--bs-secondary-color)', 'op' => 0.18];
+  };
 ?>
-<p class="section-label mt-4 mb-2">Mapa typów</p>
+
+<p class="section-label mt-4 mb-1">Mapa typów</p>
+<p style="font-size:12px;color:var(--bs-secondary-color);margin-bottom:8px;">
+  Rozmiar bąbelka = ile razy wytypowałeś ten wynik · Kolor = efekt
+</p>
 <div class="card match-card mb-3">
-  <div class="card-body px-3 py-3">
-    <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;max-width:360px;display:block;margin:0 auto;" aria-label="Mapa typów gracza">
+  <div class="card-body px-2 py-3">
 
-      <?php /* Siatka + etykiety */ ?>
-      <?php for ($h = 0; $h <= $maxH; $h++):
-        $x = $pL + $h * $cell + $cell/2; ?>
-        <line x1="<?= $x ?>" y1="0" x2="<?= $x ?>" y2="<?= $svgH - $pB ?>"
-              stroke="var(--bs-border-color)" stroke-width="0.5"/>
-        <text x="<?= $x ?>" y="<?= $svgH - 6 ?>" text-anchor="middle"
-              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $h ?></text>
-      <?php endfor; ?>
-      <?php for ($a = 0; $a <= $maxA; $a++):
-        $y = ($maxA - $a) * $cell + $cell/2; ?>
-        <line x1="<?= $pL ?>" y1="<?= $y ?>" x2="<?= $svgW ?>" y2="<?= $y ?>"
-              stroke="var(--bs-border-color)" stroke-width="0.5"/>
-        <text x="<?= $pL - 4 ?>" y="<?= $y + 4 ?>" text-anchor="end"
-              style="font-size:10px;fill:var(--bs-secondary-color);"><?= $a ?></text>
-      <?php endfor; ?>
+  <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>"
+       style="width:100%;max-width:480px;display:block;margin:0 auto;"
+       aria-label="Mapa wytypowanych wyników">
 
-      <?php /* Bąbelki typów */ ?>
-      <?php foreach ($typGrid as $h => $aArr): foreach ($aArr as $a => $cellData):
-        $cx = $pL + $h * $cell + $cell/2;
-        $cy = ($maxA - $a) * $cell + $cell/2;
-        $r  = max(5, round(($cellData['total'] / $maxCnt) * $maxR, 1));
-        if ($cellData['exact'] > 0) {
-            $fill = 'var(--ty-green)'; $op = '0.9';
-        } elseif ($cellData['points'] > 0) {
-            $fill = 'var(--ty-accent)'; $op = '0.75';
-        } else {
-            $fill = 'var(--bs-secondary-color)'; $op = '0.35';
-        }
-        $title = $h . ':' . $a . ' -- typowane ' . $cellData['total'] . ' razy';
-        if ($cellData['exact'] > 0) $title .= ' (' . $cellData['exact'] . '× dokładnie)';
-        elseif ($cellData['points'] > 0) $title .= ' (' . $cellData['points'] . '× trafiony kierunek)';
-      ?>
-        <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
-                fill="<?= $fill ?>" fill-opacity="<?= $op ?>">
-          <title><?= esc($title) ?></title>
-        </circle>
-        <?php if ($cellData['exact'] > 0 && $r >= 8): ?>
-        <text x="<?= $cx ?>" y="<?= $cy + 4 ?>" text-anchor="middle"
-              style="font-size:<?= min(12, (int)$r) ?>px;fill:white;pointer-events:none;font-weight:700;">✓</text>
-        <?php endif; ?>
-      <?php endforeach; endforeach; ?>
+    <!-- Siatka -->
+    <?php for ($h = 0; $h <= $gMaxH; $h++): ?>
+      <line x1="<?= $pL ?>" y1="<?= $pT + ($gMaxH - $h) * $cell + $cell/2 ?>"
+            x2="<?= $pL + ($gMaxA + 1) * $cell ?>"
+            y2="<?= $pT + ($gMaxH - $h) * $cell + $cell/2 ?>"
+            stroke="var(--bs-border-color)" stroke-width="0.5"/>
+    <?php endfor; ?>
+    <?php for ($a = 0; $a <= $gMaxA; $a++): ?>
+      <line x1="<?= $pL + $a * $cell + $cell/2 ?>" y1="<?= $pT ?>"
+            x2="<?= $pL + $a * $cell + $cell/2 ?>" y2="<?= $pT + ($gMaxH + 1) * $cell ?>"
+            stroke="var(--bs-border-color)" stroke-width="0.5"/>
+    <?php endfor; ?>
 
-    </svg>
+    <!-- Bąbelki -->
+    <?php foreach ($typGrid as $h => $aArr): foreach ($aArr as $a => $cellData):
+      if ($h > $gMaxH || $a > $gMaxA) continue;
+      $cx  = $pL + $a * $cell + $cell/2;
+      $cy  = $pT + ($gMaxH - $h) * $cell + $cell/2;
+      $r   = max(6, round(($cellData['total'] / $maxCnt) * $maxR, 1));
+      $sty = $bubbleStyle($cellData);
+      $lbl = $cellData['total'] . '×';
+    ?>
+      <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
+              fill="<?= $sty['fill'] ?>" fill-opacity="<?= $sty['op'] ?>">
+        <title><?= $h ?>:<?= $a ?> -- typowane <?= $cellData['total'] ?>×<?php
+          if ($cellData['exact'])  echo ', dokładnie: '    . $cellData['exact']  . '×';
+          if ($cellData['points']) echo ', kierunkowych: ' . $cellData['points'] . '×';
+        ?></title>
+      </circle>
 
-    <div class="d-flex gap-3 mt-2" style="font-size:11px;color:var(--bs-secondary-color);">
-      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-green)" fill-opacity="0.9"/></svg> Dokładny ✓</span>
-      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.75"/></svg> Kierunkowy</span>
-      <span><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--bs-secondary-color)" fill-opacity="0.35"/></svg> Pudło</span>
-    </div>
+      <?php if ($r >= 11): ?>
+      <!-- Liczba i wynik wewnątrz dużego bąbelka -->
+      <text x="<?= $cx ?>" y="<?= $cy - 3 ?>"
+            text-anchor="middle"
+            style="font-family:'Bebas Neue',sans-serif;font-size:<?= min(16, (int)($r * 0.85)) ?>px;fill:white;pointer-events:none;">
+        <?= $lbl ?>
+      </text>
+      <text x="<?= $cx ?>" y="<?= $cy + 10 ?>"
+            text-anchor="middle"
+            style="font-size:<?= min(10, (int)($r * 0.55)) ?>px;fill:white;fill-opacity:0.75;pointer-events:none;">
+        <?= $h ?>:<?= $a ?>
+      </text>
+      <?php endif; ?>
+
+    <?php endforeach; endforeach; ?>
+
+    <!-- Oś X: bramki gości -->
+    <?php for ($a = 0; $a <= $gMaxA; $a++): ?>
+      <text x="<?= $pL + $a * $cell + $cell/2 ?>"
+            y="<?= $pT + ($gMaxH + 1) * $cell + 16 ?>"
+            text-anchor="middle"
+            style="font-size:11px;fill:var(--bs-secondary-color);"><?= $a ?></text>
+    <?php endfor; ?>
+    <text x="<?= $pL + ($gMaxA + 1) * $cell / 2 ?>"
+          y="<?= $svgH - 4 ?>"
+          text-anchor="middle"
+          style="font-size:10px;fill:var(--bs-secondary-color);">bramki gości →</text>
+
+    <!-- Oś Y: bramki gospodarza -->
+    <?php for ($h = 0; $h <= $gMaxH; $h++): ?>
+      <text x="<?= $pL - 5 ?>"
+            y="<?= $pT + ($gMaxH - $h) * $cell + $cell/2 + 4 ?>"
+            text-anchor="end"
+            style="font-size:11px;fill:var(--bs-secondary-color);"><?= $h ?></text>
+    <?php endfor; ?>
+    <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($gMaxH+1)*$cell/2 ?>)"
+          x="<?= $pL - 20 ?>" y="<?= $pT + ($gMaxH+1)*$cell/2 + 4 ?>"
+          text-anchor="middle"
+          style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+
+  </svg>
+
+  <!-- Legenda -->
+  <div class="d-flex gap-3 flex-wrap mt-2 px-1" style="font-size:11px;color:var(--bs-secondary-color);">
+    <span>
+      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-green)" fill-opacity="0.9"/></svg>
+      Dokładny ✓
+    </span>
+    <span>
+      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.8"/></svg>
+      Kierunkowy
+    </span>
+    <span>
+      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--bs-secondary-color)" fill-opacity="0.2"/></svg>
+      Pudło
+    </span>
+    <span class="ms-auto d-flex align-items-center gap-2">
+      <svg width="16" height="16"><circle cx="8" cy="8" r="4" fill="var(--bs-secondary-color)" fill-opacity="0.4"/></svg>1×
+      <svg width="24" height="24"><circle cx="12" cy="12" r="10" fill="var(--bs-secondary-color)" fill-opacity="0.4"/></svg><?= $maxCnt ?>×
+    </span>
+  </div>
+
   </div>
 </div>
 <?php endif; ?>
