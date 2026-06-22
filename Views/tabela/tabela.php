@@ -20,10 +20,12 @@
 
 <script>
 (function() {
-  var tabelaDanych = <?= json_encode($tabelaDanych) ?>;
-  var userID       = <?= json_encode($userID) ?>;
-  var filtr        = 'punkty';
-  var skrocony     = true;
+    var tabelaDanych = <?= json_encode($tabelaDanych) ?>;
+    var userID       = <?= json_encode($userID) ?>;
+    window.typerLeaderboardData = tabelaDanych;
+    window.typerCurrentUserID   = userID;
+    var filtr        = 'punkty';
+    var skrocony     = true;
 
   // ← NOWE: escHtml przez natywny DOM, displayNick z separatorem niełamliwym
   function escHtml(s) {
@@ -42,7 +44,7 @@
   function ustalPozycje(dane, f) {
     var sorted = dane.slice().sort(function(a, b) { return b[f] - a[f]; });
     var pos = 1;
-    return sorted.map(function(g, i) {
+      return sorted.map(function(g, i) {
       if (i > 0 && g[f] !== sorted[i-1][f]) pos = i + 1;
       // ← NOWE: emoji przekazywane dalej, inaczej displayNick zawsze dostaje undefined
       return { uid: g.uid, nick: g.nick, slug: g.slug,emoji: g.emoji || '', punkty: g[f], pozycja: pos };

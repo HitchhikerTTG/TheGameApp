@@ -212,8 +212,9 @@
   $total = ($p['countWin1'] ?? 0) + ($p['countDraw'] ?? 0) + ($p['countWin2'] ?? 0);
 ?>
   <div class="mt-2 pt-2" style="border-top:1px solid var(--bs-border-color);">
-    <div class="text-secondary mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;">Rozkład typów graczy</div>
-    <div class="d-flex gap-3 text-center">
+    <div class="typer-live-projection" id="typer-live-projection-<?= $match['ApiID'] ?>"></div>
+    <div class="text-secondary text-center mb-1" style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;">Rozkład typów graczy</div>
+            <div class="d-flex gap-3 justify-content-center text-center">
       <div>
         <div class="ff-bebas" style="font-size:22px;"><?= (int)($p['countWin1'] ?? 0) ?></div>
         <div style="font-size:11px;color:var(--bs-secondary-color);">1 (Gosp.)</div>
