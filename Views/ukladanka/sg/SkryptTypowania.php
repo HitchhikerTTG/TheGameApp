@@ -309,53 +309,85 @@ $(document).ready(function () {
   });
   
     /* ── LIVE POLL (co 60s gdy jest mecz na żywo) ──────────────── */
-  if ($('.status-live').length > 0) {
-    function refreshLiveScores() {
-      $.getJSON('/livepoll', function(data) {
-        if (!data || !data.length) return;
-        data.forEach(function(match) {
-          var $card = $('[data-api-id="' + match.apiId + '"]');
-          if (!$card.length) return;
+  if ($('.status-live').length > 0 || $('[data-started="1"][data-przeliczony="0"]').length > 0) {
+function refreshLiveScores() {
+  $.getJSON('/livepoll', function(data) {
+    if (!data || !data.length) return;
 
-          var $scores = $card.find('.score-display.score-live');
-          if (match.homeScore !== null) $scores.eq(0).text(parseInt(match.homeScore));
-          if (match.awayScore !== null) $scores.eq(1).text(parseInt(match.awayScore));
-          typerRenderLiveRanking();
+    data.forEach(function(match) {
+      var $card = $('[data-api-id="' + match.apiId + '"]');
+      if (!$card.length) return;
 
-          if (match.minute) {
-              var $minuteSpan = $card.find('.match-minute');
-              $minuteSpan.text(parseInt(match.minute));
-              $card.find('.live-minute-wrapper').show(); // pokaż ukryty wrapper
+      // [1] Mecz właśnie zaczął się, ale karta nadal pokazuje formularz → przeładuj
+      if ($card.find('.betting-form').length > 0 && match.status !== 'NOT STARTED') {
+        location.reload();
+        return;
+      }
+
+      // [2] Przeliczony → przeładuj, żeby pokazać punkty z serwera
+      if (match.przeliczony == 1 && $card.data('przeliczony') == 0) {
+        location.reload();
+        return;
+      }
+
+      // [3] HALF TIME BREAK
+      if (match.status === 'HALF TIME BREAK') {
+        $card.find('.live-minute-wrapper').hide();
+        $card.find('.match-status-text').text('· Przerwa').show();
+        $card.find('.status-badge')
+             .removeClass('status-live status-done')
+             .addClass('status-live')
+             .text('Na żywo');
+        return;
+      }
+
+      // [4] FINISHED / FINISHED_FALLBACK
+      if (match.status === 'FINISHED' || match.status === 'FINISHED_FALLBACK') {
+        $card.find('.status-badge')
+             .removeClass('status-live')
+             .addClass('status-done')
+             .text('Zakończony');
+        $card.find('.live-minute-wrapper').hide();
+        $card.find('.match-status-text').text('· Zakończony').show();
+        $card.find('.score-display, .vs-div').removeClass('score-live');
+        $card.data('przeliczony', '0');
+        return;
+      }
+
+      // [5] IN PLAY -- aktualizuj wynik i minutę
+      var $scores = $card.find('.score-display.score-live');
+      if (match.homeScore !== null) $scores.eq(0).text(parseInt(match.homeScore));
+      if (match.awayScore !== null) $scores.eq(1).text(parseInt(match.awayScore));
+
+      if (match.minute) {
+        $card.find('.match-minute').text(parseInt(match.minute));
+        $card.find('.live-minute-wrapper').show();
+        $card.find('.match-status-text').hide();
+      }
+
+      typerRenderLiveRanking();
+
+      // [6] Strzelcy -- bez zmian
+      if (Array.isArray(match.goals) && match.goals.length > 0) {
+        var homeHtml = '', awayHtml = '';
+        match.goals.forEach(function(g) {
+          var ball = (g.type === 'owngoal') ? '⚽(og)' : '⚽';
+          var min  = parseInt(g.minute) + '\'';
+          if (g.home_away === 'home') {
+            homeHtml += '<div>' + ball + ' ' + min + ' ' + g.player + '</div>';
+          } else {
+            awayHtml += '<div>' + g.player + ' ' + min + ' ' + ball + '</div>';
           }
-          if (match.status === 'FINISHED' || match.status === 'FINISHED_FALLBACK') {
-           // Usuń live indykatory
-            $card.find('.status-badge').removeClass('status-live').addClass('status-done').text('Zakończony');
-            $card.find('.match-minute').closest('span').remove();
-            $card.find('.score-display').removeClass('score-live');
-            return;
+        });
+        var $scorers = $('#scorers-' + match.apiId);
+        if ($scorers.length) {
+          $scorers.find('div:first-child').html(homeHtml);
+          $scorers.find('.text-end').html(awayHtml);
         }
-
-        // NOWE: strzelcy bramek
-        if (Array.isArray(match.goals) && match.goals.length > 0) {
-          var homeHtml = '', awayHtml = '';
-          match.goals.forEach(function(g) {
-            var ball = (g.type === 'owngoal') ? '⚽(og)' : '⚽';
-            var min  = parseInt(g.minute) + '\'';
-            if (g.home_away === 'home') {
-              homeHtml += '<div>' + ball + ' ' + min + ' ' + g.player + '</div>';
-            } else {
-              awayHtml += '<div>' + g.player + ' ' + min + ' ' + ball + '</div>';
-            }
-          });
-          var $scorers = $('#scorers-' + match.apiId);
-          if ($scorers.length) {
-            $scorers.find('div:first-child').html(homeHtml);
-            $scorers.find('.text-end').html(awayHtml);
-          }
-        }
-      });
+      }
     });
-  }
+  });
+}
     setInterval(refreshLiveScores, 60000);
     refreshLiveScores(); // od razu przy ładowaniu
     typerRenderLiveRanking();
