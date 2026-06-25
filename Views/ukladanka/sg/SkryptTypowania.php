@@ -128,9 +128,16 @@ function typerDeltaText(delta) {
   return 'bez zmian';
 }
 
-function typerMetricHtml(label, player, points) {
+function typerMetricHtml(label, player, points, grayed) {
   var cls = typerDeltaClass(player ? player.delta : 0);
-  return '<div class="typer-live-projection-box">'
+  var boxStyle = grayed
+    ? ' style="opacity:0.38;filter:grayscale(0.7);pointer-events:none;"'
+    : '';
+  var impossibleTag = grayed
+    ? '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:4px;">× Niemożliwe do trafienia</div>'
+    : '';
+  return '<div class="typer-live-projection-box"' + boxStyle + '>'
+    + impossibleTag
     + '<div class="typer-live-projection-label">' + typerEscHtml(label) + '</div>'
     + '<div class="ff-bebas typer-live-projection-pos">' + (player ? player.pozycja + '.' : '-') + '</div>'
     + '<div class="typer-live-projection-delta ' + cls + '">' + (player ? typerDeltaText(player.delta) : 'brak danych') + '</div>'
@@ -152,6 +159,10 @@ function typerRenderLiveRanking() {
     var hitMe            = null;
     var currentPoints    = meScore ? typerPointsForScore(meScore.homeScore + ':' + meScore.awayScore, match.homeScore, match.awayScore) : null;
     var hitPoints        = meScore ? 3 : null;
+
+    var canHit = meScore !== null
+    && match.homeScore <= meScore.homeScore
+    && match.awayScore <= meScore.awayScore;
 
     if (meScore) {
       var hitOverrides = {};
