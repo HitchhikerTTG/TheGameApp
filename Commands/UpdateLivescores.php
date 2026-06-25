@@ -100,6 +100,8 @@ if (isset($historyIndex[$key])) {
     if (!empty($ps_score)) { $timeLabel = 'Karne'; }
     elseif (!empty($et_score)) { $timeLabel = 'Po dogrywce'; }
 
+    [$homeScore, $awayScore] = $this->parseScore($finalScore);
+
     $this->writeLiveJson($livePath, [
         'fixture_id'   => $key,
         'match_id'     => (string)($hm['id'] ?? ''),
