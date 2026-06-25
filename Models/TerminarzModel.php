@@ -23,7 +23,8 @@ class TerminarzModel extends Model{
 			'ScoreAway',
 			'zakonczony',
 			'TurniejID', 
-			'Rozpoczety'
+			'Rozpoczety',
+			'przeliczony'
     ];
 
 	public function getMeczById($meczId) {
@@ -188,6 +189,13 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
     return $query->findAll();
 }
 
+    public function getRozpoczetyNiePrzeliczony(int $turniejID): array {
+        return $this->where('TurniejID', $turniejID)
+                    ->where('Rozpoczety', 1)
+                    ->where('przeliczony', 0)
+                    ->orderBy('Date', 'asc')
+                    ->findAll();
+    }
 
     public function getMatchDateTime($gameID) {
         return $this->where('Id', $gameID)->select('Date, Time')->first();

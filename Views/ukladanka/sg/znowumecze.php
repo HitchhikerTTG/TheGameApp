@@ -18,10 +18,11 @@
     $statusRaw   = $match['details']['status'] ?? '';
     $zakonczony  = !empty($match['zakonczony']);
     $przeliczony = !empty($match['przeliczony']);
+    $liveFinished = in_array($statusRaw, ['FINISHED', 'FINISHED_FALLBACK', 'Zakonczony']);
 
     $isScored   = $przeliczony;
-    $isFinished = ($zakonczony || $statusRaw === 'Zakonczony') && !$przeliczony;
-    $isLive     = ($match['rozpoczety'] == 1 && !$zakonczony);
+    $isFinished = ($zakonczony || $liveFinished) && !$przeliczony;
+    $isLive     = ($match['rozpoczety'] == 1 && !$zakonczony && !$liveFinished);
     $isUpcoming = ($match['rozpoczety'] == 0 && !$zakonczony && !$przeliczony);
 
     $homeScore = $match['details']['home_team']['score'] ?? null;
