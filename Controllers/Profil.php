@@ -285,7 +285,18 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
         $sumaNarastajaca += (int)$m['pkt'];
         $trendPunktowy[] = $sumaNarastajaca;
     }
-
+    
+        // ── Trend pozycji (z cache historii) ──
+    $trendPozycji = [];
+    $histPath = WRITEPATH . "gracze/historia_pozycji_{$turniejID}.json";
+    if (file_exists($histPath)) {
+        $historia = json_decode(file_get_contents($histPath), true) ?? [];
+        ksort($historia);
+        foreach ($historia as $snap) {
+            $poz = $snap['pozycje'][$gracz['uniID']] ?? null;
+            if ($poz !== null) $trendPozycji[] = $poz;
+        }
+    }
 
     $jaMojeKonto = (session()->get('loggedInUser') === $gracz['uniID']);
 
@@ -323,6 +334,7 @@ public function gdzieGram($userID, $wszystkieTurnieje) {
                'srednieTurnieju'        => $srednieTurnieju,
                'najczestszyWynikGracza' => $najczestszyWynikGracza,
                'trendPunktowy'          => $trendPunktowy,
+                'trendPozycji'           => $trendPozycji,
            ])
          . view('typowanie/footer');
 }

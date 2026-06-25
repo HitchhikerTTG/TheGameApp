@@ -179,6 +179,7 @@ $routes->group('', ['filter'=>'authcheck'],function($routes){
     // statystyki?
     $routes->get('statystyki',          'Statystyki::turniej');
     $routes->get('statystyki/przelicz', 'Statystyki::przelicz');
+    $routes->get('statystyki/przelicz-historię', 'Statystyki::przeliczHistoriePozycji');
     
     $routes->get('statystyki/pojedynek', 'Statystyki::pojedynek');
     

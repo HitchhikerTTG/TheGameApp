@@ -66,6 +66,8 @@
       </div>
     </div>
   </div>
+  
+ 
 
   <!-- WYKRES PORÓWNAWCZY SVG -->
   <?php if (count($porownanie) > 1): ?>
@@ -114,6 +116,57 @@
     </div>
   </div>
   <?php endif; ?>
+
+   <!-- WYKRES ZMIAN POZYCJI -->
+  <?php
+    $tp1 = $trendPozycjiG1 ?? [];
+    $tp2 = $trendPozycjiG2 ?? [];
+    $nTp = max(count($tp1), count($tp2));
+  ?>
+  <?php if ($nTp > 1): ?>
+  <div class="card match-card mb-3">
+    <div class="card-body px-3 py-3">
+      <div class="stat-label mb-2">Pozycja w tabeli (cały turniej)</div>
+      <?php
+        $allPoz = array_merge($tp1, $tp2);
+        $minP   = min($allPoz);
+        $maxP   = max($allPoz);
+        $zakres = max(1, $maxP - $minP);
+        $svgW = 300; $svgH = 100; $pB = 4;
+        $chartH = $svgH - $pB;
+
+        $ptsP1 = []; $ptsP2 = [];
+        foreach ($tp1 as $i => $poz) {
+            $x = $nTp > 1 ? ($i / ($nTp - 1)) * $svgW : 0;
+            $y = (($poz - $minP) / $zakres) * $chartH;
+            $ptsP1[] = round($x, 1) . ',' . round($y, 1);
+        }
+        foreach ($tp2 as $i => $poz) {
+            $x = $nTp > 1 ? ($i / ($nTp - 1)) * $svgW : 0;
+            $y = (($poz - $minP) / $zakres) * $chartH;
+            $ptsP2[] = round($x, 1) . ',' . round($y, 1);
+        }
+      ?>
+      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:100px;" preserveAspectRatio="none">
+        <?php if (!empty($ptsP1)): ?>
+        <polyline points="<?= esc(implode(' ', $ptsP1), 'attr') ?>"
+                  fill="none" stroke="var(--ty-green)" stroke-width="2.5"/>
+        <?php endif ?>
+        <?php if (!empty($ptsP2)): ?>
+        <polyline points="<?= esc(implode(' ', $ptsP2), 'attr') ?>"
+                  fill="none" stroke="var(--ty-red)" stroke-width="2.5"/>
+        <?php endif ?>
+      </svg>
+      <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
+        Im niżej na wykresie, tym lepsza pozycja (1. miejsce = dół)
+      </div>
+      <div class="d-flex gap-3 mt-1" style="font-size:11px;">
+        <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
+        <span style="color:var(--ty-red);">── <?= esc($gracz2['nick']) ?></span>
+      </div>
+    </div>
+  </div>
+  <?php endif ?>
 
   <!-- TABELA MECZ PO MECZU -->
   <p class="section-label mt-4 mb-2">Mecz po meczu</p>

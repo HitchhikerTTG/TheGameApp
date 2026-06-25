@@ -152,7 +152,20 @@ public function pojedynek()
             ];
         }
     }
-
+        // ── Historia pozycji z cache ──
+    $trendPozycjiG1 = [];
+    $trendPozycjiG2 = [];
+    $histPath = WRITEPATH . "gracze/historia_pozycji_{$turniejID}.json";
+    if (file_exists($histPath) && $gracz1 && $gracz2) {
+        $historia = json_decode(file_get_contents($histPath), true) ?? [];
+        ksort($historia);
+        foreach ($historia as $snap) {
+            $p1 = $snap['pozycje'][$gracz1['uniID']] ?? null;
+            $p2 = $snap['pozycje'][$gracz2['uniID']] ?? null;
+            if ($p1 !== null) $trendPozycjiG1[] = $p1;
+            if ($p2 !== null) $trendPozycjiG2[] = $p2;
+        }
+    }
     $wstep = ['title' => '#Pojedynek · ' . ($config['activeTournamentName'] ?? '')];
 
     return view('typowanie/header', $wstep)
@@ -167,7 +180,22 @@ public function pojedynek()
                'slug1'       => $slug1,
                'slug2'       => $slug2,
                'turniejName' => $config['activeTournamentName'] ?? '',
+               'trendPozycjiG1'  => $trendPozycjiG1,
+               'trendPozycjiG2'  => $trendPozycjiG2,
            ])
          . view('typowanie/footer');
+}
+public function przeliczHistoriePozycji()
+{
+    if (!session()->get('isAdmin')) {
+        return redirect()->to('/statystyki');
+    }
+    $config    = get_active_tournament_config();
+    $turniejID = (int)$config['activeTournamentId'];
+
+    model(\App\Models\TabelaModel::class)->przeliczHistoriePozycji($turniejID);
+
+    session()->setFlashdata('success', 'Historia pozycji przeliczona.');
+    return redirect()->to('/statystyki');
 }
 }

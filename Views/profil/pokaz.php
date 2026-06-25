@@ -195,7 +195,41 @@
     </div>
   </div>
   <?php endif ?>
-  
+    <!-- TREND POZYCJI -->
+  <?php if (count($trendPozycji ?? []) > 1):
+    $n      = count($trendPozycji);
+    $minPoz = min($trendPozycji);
+    $maxPoz = max($trendPozycji);
+    $zakres = max(1, $maxPoz - $minPoz);
+    $w = 300; $h = 60;
+    $points = [];
+    foreach ($trendPozycji as $i => $poz) {
+        $x = $n > 1 ? ($i / ($n - 1)) * $w : 0;
+        $y = (($poz - $minPoz) / $zakres) * $h; // pozycja 1 = dół (dobry wynik)
+        $points[] = round($x, 1) . ',' . round($y, 1);
+    }
+    $pierwsza = reset($trendPozycji);
+    $ostatnia  = end($trendPozycji);
+    $kolor = $ostatnia < $pierwsza ? 'var(--ty-green)' : ($ostatnia > $pierwsza ? 'var(--ty-red)' : 'var(--ty-accent)');
+  ?>
+  <div class="card match-card mb-3">
+    <div class="card-body px-3 py-3">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
+        Pozycja w tabeli mecz po meczu
+        <span style="font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0;color:<?= $kolor ?>;">
+          <?= $pierwsza ?>. → <?= $ostatnia ?>.<?= $ostatnia < $pierwsza ? ' ↑' : ($ostatnia > $pierwsza ? ' ↓' : '') ?>
+        </span>
+      </div>
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:60px;" preserveAspectRatio="none">
+        <polyline points="<?= esc(implode(' ', $points), 'attr') ?>"
+                  fill="none" stroke="<?= $kolor ?>" stroke-width="2"/>
+      </svg>
+      <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
+        Im niżej na wykresie, tym wyższa pozycja w tabeli (1. miejsce = dół)
+      </div>
+    </div>
+  </div>
+  <?php endif ?>
   <!-- MAPA TYPÓW GRACZA -->
 <?php
   /* ── Budujemy siatkę typów ──
