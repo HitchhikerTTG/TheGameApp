@@ -250,9 +250,10 @@ public function sendDigest(array $users, int $turniejID, string $adminKomentarz,
     $url  = base_url('typowanie');
     $sent = 0;
     $najlepszyTyper = $digestService->getNajlepszyTyper($turniejID, $pytaniaWczorajIds);  // ← nowe, raz przed pętlą
+    $najwiekszySkokGracza = $digestService->getNajwiekszySkokPozycji($turniejID); // i jeszcze nowsze
 
     foreach ($users as $user) {
-        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3,$pytaniaWczorajIds, $pytaniaDzisiajIds,$najlepszyTyper);
+        $data    = $digestService->buildForUser($user, $turniejID, $adminKomentarz, $adminKomentarz2,$adminKomentarz3,$pytaniaWczorajIds, $pytaniaDzisiajIds,$najlepszyTyper, $najwiekszySkokGracza);
         $html    = $this->buildDigestHtml($data, $url);
         $subject = str_replace('{nick}', $user['nick'] ?? '', $subjectTemplate);
 

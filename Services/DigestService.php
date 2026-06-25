@@ -32,7 +32,8 @@ class DigestService
         string $adminKomentarz3,
         array  $pytaniaWczorajIds = [],
         array  $pytaniaDzisiajIds = [],
-        array  $najlepszyTyper = []
+        array  $najlepszyTyper = [],
+        array  $najwiekszySkokGracza = []   // ← nowe
     ): array {
         $wczorajMecze   = $this->getWczorajszeMecze($user, $turniejID);
         $dzisiajMecze   = $this->getDzisiajszeMecze($user, $turniejID);
@@ -55,6 +56,7 @@ class DigestService
             'adminKomentarz2' => $adminKomentarz2,
             'adminKomentarz3' => $adminKomentarz3,
             'najlepszyTyper'  => $najlepszyTyper,
+            'najwiekszySkokGracza' => $najwiekszySkokGracza,
             
         ];
     }
@@ -215,6 +217,68 @@ public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): arr
         'pktMecze'   => $winners[0]['pktMecze'],
         'pktPytania' => $winners[0]['pktPytania'],
     ];
+}
+
+    public function getNajwiekszySkokPozycji(int $turniejID): array
+{
+    $histPath = WRITEPATH . "gracze/historia_pozycji_{$turniejID}.json";
+    if (!file_exists($histPath)) return [];
+
+    $historia = json_decode(file_get_contents($histPath), true) ?? [];
+    if (empty($historia)) return [];
+    ksort($historia);
+
+    $wczoraj = date('Y-m-d', strtotime('-1 day'));
+
+    $snapshotySprzed  = [];
+    $snapshotyWczoraj = [];
+    foreach ($historia as $meczId => $snap) {
+        if ($snap['data'] < $wczoraj)       $snapshotySprzed[$meczId]  = $snap;
+        elseif ($snap['data'] === $wczoraj) $snapshotyWczoraj[$meczId] = $snap;
+    }
+
+    if (empty($snapshotyWczoraj)) return [];
+
+    $snapPo     = end($snapshotyWczoraj);
+    $snapSprzed = !empty($snapshotySprzed) ? end($snapshotySprzed) : reset($snapshotyWczoraj);
+
+    $maxSkok   = 0;
+    $zwyciezca = null;
+    foreach ($snapPo['pozycje'] as $uid => $pozPo) {
+        $pozSprzed = $snapSprzed['pozycje'][$uid] ?? null;
+        if ($pozSprzed === null) continue;
+        $skok = $pozSprzed - $pozPo;
+        if ($skok > $maxSkok) {
+            $maxSkok   = $skok;
+            $zwyciezca = [
+                'uniID'       => $uid,
+                'skok'        => $skok,
+                'pozAktualna' => $pozPo,
+                'pozSprzed'   => $pozSprzed,
+            ];
+        }
+    }
+
+    if (!$zwyciezca) return [];
+
+    // Nick z leaderboard cache (szybsze niż DB)
+    $tabelaPath = WRITEPATH . "tabelaGraczy_{$turniejID}.json";
+    if (file_exists($tabelaPath)) {
+        foreach (json_decode(file_get_contents($tabelaPath), true) ?? [] as $w) {
+            if (($w['uniID'] ?? '') === $zwyciezca['uniID']) {
+                $zwyciezca['nick']  = $w['nick'];
+                $zwyciezca['emoji'] = $w['emoji'] ?? '';
+                break;
+            }
+        }
+    }
+    if (!isset($zwyciezca['nick'])) {
+        $g = model(\App\Models\UserModel::class)->select('nick,emoji')->where('uniID', $zwyciezca['uniID'])->first();
+        $zwyciezca['nick']  = $g['nick']  ?? $zwyciezca['uniID'];
+        $zwyciezca['emoji'] = $g['emoji'] ?? '';
+    }
+
+    return $zwyciezca;
 }
 
 }

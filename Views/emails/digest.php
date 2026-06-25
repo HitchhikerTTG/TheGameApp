@@ -138,6 +138,31 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
 </tr>
 <?php endif ?>
 
+<!-- NAJWIĘKSZY SKOK -->
+<?php if (!empty($najwiekszySkokGracza)):
+  $sg    = $najwiekszySkokGracza;
+  $skok  = (int)$sg['skok'];
+  $forma = $skok === 1 ? 'miejsce' : ($skok < 5 ? 'miejsca' : 'miejsc');
+?>
+<tr>
+  <td bgcolor="<?= $cCard ?>" style="padding:12px 24px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+           style="background:#0f2d1a;border-radius:8px;">
+      <tr>
+        <td style="padding:14px 18px;">
+          <p style="margin:0;<?= $f ?>font-size:<?= $fsSub ?>;color:#ffffff;line-height:1.5;">
+            📈&nbsp;<strong>Największy skok dnia</strong>:
+            <strong style="color:<?= $cAccent ?>;"><?= !empty($sg['emoji']) ? esc($sg['emoji']) . '&nbsp;' : '' ?><?= esc($sg['nick']) ?></strong>
+            awansował o
+            <strong style="color:<?= $cAccent ?>;"><?= $skok ?> <?= $forma ?></strong>
+            (z&nbsp;<?= (int)$sg['pozSprzed'] ?>.&nbsp;na&nbsp;<?= (int)$sg['pozAktualna'] ?>.&nbsp;miejsce). 🚀
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<?php endif ?>
 
   <!-- KOMENTARZ ADMINA -->
   <?php if (!empty($adminKomentarz)): ?>
