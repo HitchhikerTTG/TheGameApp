@@ -84,3 +84,9 @@ ALTER TABLE turnieje ADD COLUMN liczyDoWszechczasow TINYINT(1) NOT NULL DEFAULT 
 
 ALTER TABLE uzytkownicy ADD COLUMN slug VARCHAR(100) NULL UNIQUE; 
 ALTER TABLE uzytkownicy  ADD UNIQUE INDEX idx_slug (slug);
+
+-- Aby rozróżnić zamknięty i przeliczony
+
+ALTER TABLE terminarz
+  ADD COLUMN przeliczony TINYINT(1) NOT NULL DEFAULT 0
+  AFTER zakonczony;

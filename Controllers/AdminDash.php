@@ -592,8 +592,9 @@ public function mecze()
     $wszystkieMecze = [];
 
     if ($turniejID > 0) {
-        $terminarz      = model(\App\Models\TerminarzModel::class)
-                            ->getRozpoczeteNieZakonczone($turniejID) ?? [];
+        //$terminarz    = model(\App\Models\TerminarzModel::class)->getRozpoczeteNieZakonczone($turniejID) ?? [];
+        $terminarz      = model(\App\Models\TerminarzModel::class)->getRozpoczetyNiePrzeliczony($turniejID) ?? [];
+                    
         $wszystkieMecze = (new \App\Services\MeczService())
                             ->getRozegraneMeczeTurnieju($turniejID) ?? [];
 
@@ -1034,10 +1035,12 @@ public function zapiszIPrezelicz()
     $terminarzModel = model(\App\Models\TerminarzModel::class);
     $typyModel      = model(\App\Models\TypyModel::class);
 
+    // PO:
     $terminarzModel->update($meczId, [
-        'ScoreHome'  => (int)$this->request->getPost('scoreH'),
-        'ScoreAway'  => (int)$this->request->getPost('scoreA'),
-        'zakonczony' => 1,
+        'ScoreHome'   => (int)$this->request->getPost('scoreH'),
+        'ScoreAway'   => (int)$this->request->getPost('scoreA'),
+        'zakonczony'  => 1,
+        'przeliczony' => 1,
     ]);
 
     $daneMeczu = $terminarzModel->getMeczById($meczId);
