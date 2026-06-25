@@ -15,12 +15,14 @@
     $homeTeamName = $match['details']['home_team']['plName'] ?? $match['details']['home_team']['name'] ?? '?';
     $awayTeamName = $match['details']['away_team']['plName'] ?? $match['details']['away_team']['name'] ?? '?';    
     
-    $statusRaw  = $match['details']['status'] ?? '';
-    $isScored   = !empty($match['zakonczony']);
-    $liveFinished = in_array($statusRaw, ['FINISHED', 'FINISHED_FALLBACK', 'Zakonczony']);
-    $isFinished   = $liveFinished && !$isScored;
-    $isLive       = ($match['rozpoczety'] == 1 && !$liveFinished && !$isScored);
-    $isUpcoming = ($match['rozpoczety'] == 0 && !$isScored);
+    $statusRaw   = $match['details']['status'] ?? '';
+    $zakonczony  = !empty($match['zakonczony']);
+    $przeliczony = !empty($match['przeliczony']);
+
+    $isScored   = $przeliczony;
+    $isFinished = ($zakonczony || $statusRaw === 'Zakonczony') && !$przeliczony;
+    $isLive     = ($match['rozpoczety'] == 1 && !$zakonczony);
+    $isUpcoming = ($match['rozpoczety'] == 0 && !$zakonczony && !$przeliczony);
 
     $homeScore = $match['details']['home_team']['score'] ?? null;
     $awayScore = $match['details']['away_team']['score'] ?? null;
@@ -50,23 +52,30 @@
   </div>
 <?php endif; ?>
 
-<div class="card match-card mb-3" data-api-id="<?= $match['ApiID'] ?>">
+<div class="card match-card mb-3"
+     data-api-id="<?= $match['ApiID'] ?>"
+     data-started="<?= (int)($match['rozpoczety'] ?? 0) ?>"
+     data-zakonczony="<?= (int)$zakonczony ?>"
+     data-przeliczony="<?= (int)$przeliczony ?>">
 
   <!-- HEAD -->
   <div class="match-head d-flex align-items-center justify-content-between px-3 py-2">
   
   <span class="match-time">
-    <?= $naszCzas ?>
-    <?php if ($isLive && $statusRaw === 'HALF TIME BREAK'): ?>
-      · Przerwa
-    <?php elseif ($isLive && isset($match['details']['minute'])): ?>
-      · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
-    <?php elseif ($match['rozpoczety'] == 1 && !$isScored): ?>
-      <span class="live-minute-wrapper" style="display:none"> · <span style="color:var(--ty-red)">●</span> <span class="match-minute"></span>'</span>
-    <?php elseif ($isFinished || $isScored): ?>
-      · Zakończony
-    <?php endif; ?>
-  </span>
+  <?= $naszCzas ?>
+  <?php if ($isLive && $statusRaw === 'HALF TIME BREAK'): ?>
+    · Przerwa
+  <?php elseif ($isLive && isset($match['details']['minute'])): ?>
+    · <span style="color:var(--ty-red)">●</span> <span class="match-minute"><?= (int)$match['details']['minute'] ?></span>'
+  <?php elseif ($isLive): ?>
+    <span class="live-minute-wrapper" style="display:none"> · <span style="color:var(--ty-red)">●</span> <span class="match-minute"></span>'</span>
+  <?php elseif ($isFinished || $isScored): ?>
+    · Zakończony
+  <?php endif; ?>
+  <?php if ($match['rozpoczety'] == 1 && !$isScored): ?>
+    <span class="match-status-text" style="display:none"></span>
+  <?php endif; ?>
+</span>
 
       <?php if ($isUpcoming): ?>
         <span class="status-badge status-upcoming">Przyjmuje typy</span>

@@ -273,7 +273,7 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface
     $turniejID = $config['activeTournamentId'];
 
     $terminarz = model(\App\Models\TerminarzModel::class)
-                    ->getRozpoczeteNieZakonczone($turniejID);
+                ->getRozpoczetyNiePrzeliczony($turniejID);
 
     $result = [];
     foreach ($terminarz as $mecz) {
@@ -290,6 +290,8 @@ public function livePoll(): \CodeIgniter\HTTP\ResponseInterface
                 'score'        => $live['score']        ?? null,
                 'last_changed' => $live['last_changed'] ?? null,
                 'goals'        => $live['goals']        ?? [],
+                'zakonczony'   => (int)$mecz['zakonczony'],   // ← nowe
+                'przeliczony'  => (int)$mecz['przeliczony'],  // ← nowe
             ];
         } else {
             $result[] = [
