@@ -229,6 +229,28 @@ foreach ($mapaTypowRaw as $r) {
     $mapaTypow[(int)$r['HomeTyp']][(int)$r['AwayTyp']] = (int)$r['ile'];
 }
 
+// ── Mapa typów z informacją o trafieniu ──
+$typyRozszerzone = $db->query("
+    SELECT ty.HomeTyp, ty.AwayTyp, ty.pkt,
+           t.ScoreHome, t.ScoreAway
+    FROM typy ty
+    JOIN terminarz t ON t.Id = ty.GameID
+    WHERE t.TurniejID = ? AND t.zakonczony = 1
+      AND ty.HomeTyp IS NOT NULL AND ty.AwayTyp IS NOT NULL
+", [$turniejID])->getResultArray();
+
+$mapaTypowTrafienia = [];
+foreach ($typyRozszerzone as $r) {
+    $h = (int)$r['HomeTyp']; $a = (int)$r['AwayTyp'];
+    if (!isset($mapaTypowTrafienia[$h][$a])) {
+        $mapaTypowTrafienia[$h][$a] = ['total' => 0, 'hit' => 0, 'exact' => 0];
+    }
+    $mapaTypowTrafienia[$h][$a]['total']++;
+    if ((int)$r['pkt'] > 0)  $mapaTypowTrafienia[$h][$a]['hit']++;
+    if ((int)$r['pkt'] >= 3) $mapaTypowTrafienia[$h][$a]['exact']++;
+}
+//$statystyki['mapaTypowTrafienia'] = $mapaTypowTrafienia;
+
         return [
         'meczNajwiecejTypow'              => $meczNajwiecejTypow,
         'meczNajwiecejTrafien1X2'         => $meczNajwiecejTrafien1X2,
@@ -247,7 +269,11 @@ foreach ($mapaTypowRaw as $r) {
         'obliczoneAt'                     => date('Y-m-d H:i:s'),
         'mapaWynikow'                   => $mapaWynikow,
         'mapaTypow'                     => $mapaTypow,
+        'mapaTypowTrafienia'                     => $mapaTypowTrafienia,
+        
     ];
+    
+  
     }
 
     // ────────────────────────────────────────────────────────────────

@@ -367,6 +367,123 @@ function toggleHeatDots(show) {
 </script>
 <?php endif; ?>
 
+<!-- MAPA TYPÓW GRACZY Z TRAFIENIAMI -->
+<?php if (!empty($statystyki['mapaTypowTrafienia'])): 
+  $mTT = $statystyki['mapaTypowTrafienia'];
+  
+  $maxHT = 5; $maxAT = 5;
+  $maxTotal = 1;
+  foreach ($mTT as $h => $arr) foreach ($arr as $a => $c) {
+      $maxHT = max($maxHT, min((int)$h, 8));
+      $maxAT = max($maxAT, min((int)$a, 8));
+      $maxTotal = max($maxTotal, $c['total']);
+  }
+
+  $cellBase = 48;
+  $pL = 28; $pT = 8; $pB = 38; $pR = 8;
+  $svgWT = $pL + ($maxAT + 1) * $cellBase + $pR;
+  $svgHT = $pT + ($maxHT + 1) * $cellBase + $pB;
+?>
+<p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
+<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
+  Każdy kwadrat = jeden wytypowany wynik · Podział paska: zielony=dokładne, niebieski=kierunkowe, szary=pudło
+</p>
+<div class="card match-card mb-2">
+  <div class="card-body px-2 py-3">
+  <svg viewBox="0 0 <?= $svgWT ?> <?= $svgHT ?>"
+       style="width:100%;max-width:520px;display:block;margin:0 auto;">
+
+    <?php for ($h = 0; $h <= $maxHT; $h++): for ($a = 0; $a <= $maxAT; $a++):
+      $c   = $mTT[$h][$a] ?? null;
+      $cX  = $pL + $a * $cellBase;
+      $cY  = $pT + ($maxHT - $h) * $cellBase;
+      $sz  = $cellBase;
+    ?>
+      <!-- Tło komórki -->
+      <rect x="<?= $cX ?>" y="<?= $cY ?>"
+            width="<?= $sz ?>" height="<?= $sz ?>"
+            fill="var(--bs-body-bg)" stroke="var(--bs-border-color)" stroke-width="0.5"/>
+
+      <?php if ($c && $c['total'] > 0):
+        $total   = $c['total'];
+        $exact   = $c['exact'];
+        $hit     = $c['hit'] - $exact;  // kierunkowe (bez dokładnych)
+        $miss    = $total - $c['hit'];
+
+        // Szerokości pasków proporcjonalnie do szerokości komórki
+        $wExact = round($exact / $total * $sz, 2);
+        $wHit   = round($hit   / $total * $sz, 2);
+        $wMiss  = $sz - $wExact - $wHit;
+
+        // Pasek u dołu komórki (wysokość 8px)
+        $barH  = 7;
+        $barY  = $cY + $sz - $barH;
+        $xE    = $cX;
+        $xH    = $cX + $wExact;
+        $xM    = $cX + $wExact + $wHit;
+      ?>
+      <!-- Pasek dokładne -->
+      <?php if ($wExact > 0): ?>
+      <rect x="<?= $xE ?>" y="<?= $barY ?>" width="<?= $wExact ?>" height="<?= $barH ?>"
+            fill="var(--ty-green)" opacity="0.9"/>
+      <?php endif ?>
+      <!-- Pasek kierunkowe -->
+      <?php if ($wHit > 0): ?>
+      <rect x="<?= $xH ?>" y="<?= $barY ?>" width="<?= $wHit ?>" height="<?= $barH ?>"
+            fill="var(--ty-accent)" opacity="0.85"/>
+      <?php endif ?>
+      <!-- Pasek pudła -->
+      <?php if ($wMiss > 0): ?>
+      <rect x="<?= $xM ?>" y="<?= $barY ?>" width="<?= $wMiss ?>" height="<?= $barH ?>"
+            fill="#888" opacity="0.25"/>
+      <?php endif ?>
+
+      <!-- Liczba w środku komórki -->
+      <text x="<?= $cX + $sz/2 ?>" y="<?= $cY + $sz/2 + 4 ?>"
+            text-anchor="middle"
+            style="font-family:'Bebas Neue',sans-serif;font-size:15px;fill:var(--bs-body-color);fill-opacity:0.8;">
+        <?= $total ?>
+      </text>
+      <!-- Wynik w rogu -->
+      <text x="<?= $cX + 3 ?>" y="<?= $cY + 10 ?>"
+            style="font-size:8px;fill:var(--bs-secondary-color);"><?= $h ?>:<?= $a ?></text>
+      <title><?= $h ?>:<?= $a ?> – <?= $total ?> typów: <?= $exact ?> dokładnych, <?= $hit ?> kier., <?= $miss ?> pudło</title>
+
+      <?php endif ?>
+    <?php endfor; endfor ?>
+
+    <!-- Oś X -->
+    <?php for ($a = 0; $a <= $maxAT; $a++): ?>
+      <text x="<?= $pL + $a * $cellBase + $cellBase/2 ?>"
+            y="<?= $pT + ($maxHT + 1) * $cellBase + 16 ?>"
+            text-anchor="middle" style="font-size:11px;fill:var(--bs-secondary-color);"><?= $a ?></text>
+    <?php endfor ?>
+    <text x="<?= $pL + ($maxAT + 1) * $cellBase / 2 ?>"
+          y="<?= $svgHT - 4 ?>" text-anchor="middle"
+          style="font-size:10px;fill:var(--bs-secondary-color);">bramki gości →</text>
+
+    <!-- Oś Y -->
+    <?php for ($h = 0; $h <= $maxHT; $h++): ?>
+      <text x="<?= $pL - 5 ?>"
+            y="<?= $pT + ($maxHT - $h) * $cellBase + $cellBase/2 + 4 ?>"
+            text-anchor="end" style="font-size:11px;fill:var(--bs-secondary-color);"><?= $h ?></text>
+    <?php endfor ?>
+    <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($maxHT+1)*$cellBase/2 ?>)"
+          x="<?= $pL - 20 ?>" y="<?= $pT + ($maxHT+1)*$cellBase/2 + 4 ?>"
+          text-anchor="middle" style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+  </svg>
+
+  <!-- Legenda -->
+  <div class="d-flex gap-3 flex-wrap mt-2 px-1" style="font-size:11px;color:var(--bs-secondary-color);">
+    <span><svg width="14" height="8"><rect width="14" height="8" fill="var(--ty-green)" opacity="0.9"/></svg> Dokładne</span>
+    <span><svg width="14" height="8"><rect width="14" height="8" fill="var(--ty-accent)" opacity="0.85"/></svg> Kierunkowe</span>
+    <span><svg width="14" height="8"><rect width="14" height="8" fill="#888" opacity="0.25"/></svg> Pudło</span>
+    <span class="ms-auto">Liczba w komórce = łączna liczba typów</span>
+  </div>
+  </div>
+</div>
+<?php endif ?>
+
   <!-- ROZKŁAD TRAFIEŃ -->
   <p class="section-label mt-4 mb-2">Rozkład trafień (ile graczy zdobyło punkty)</p>
   <div class="card match-card mb-2">
