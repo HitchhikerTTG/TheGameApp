@@ -171,7 +171,7 @@ function typerRenderLiveRanking() {
     }
 
     projectionBox.innerHTML = typerMetricHtml('Pozycja dla aktualnego wyniku', me, currentPoints)
-      + typerMetricHtml('Pozycja gdy trafisz z wynikiem:', hitMe, hitPoints);
+      + typerMetricHtml('Pozycja gdy trafisz z wynikiem:', hitMe, hitPoints, !canHit);
 
     var rows = typerResultsRows(match.apiId).map(function(row) {
       var player = projectedByNick.get(typerNormalizeNick(row.nickText));
