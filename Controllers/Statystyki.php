@@ -187,9 +187,7 @@ public function pojedynek()
 }
 public function przeliczHistoriePozycji()
 {
-    if (!session()->get('isAdmin')) {
-        return redirect()->to('/statystyki');
-    }
+
     $config    = get_active_tournament_config();
     $turniejID = (int)$config['activeTournamentId'];
 
