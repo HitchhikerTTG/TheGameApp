@@ -466,7 +466,7 @@ function toggleHeatDots(show) {
       <?php   endfor; endfor; ?>
 
       <!-- Nagłówek wyniku – nad kwadratem, w dedykowanym obszarze $labelH -->
-        <text x="<?= $cX + $szW/2 ?>" y="<?= $cY + $labelH - 6 ?>"
+        <text x="<?= $cX + $szW/2 ?>" y="<?= $cY + $labelH -1 ?>"
               text-anchor="middle"
               style="font-family:'Bebas Neue',sans-serif;font-size:14px;fill:var(--bs-body-color);fill-opacity:0.85;pointer-events:none;">
           <?= $h ?>:<?= $a ?>
