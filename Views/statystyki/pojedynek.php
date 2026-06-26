@@ -66,7 +66,10 @@
       </div>
     </div>
   </div>
-  
+  <?php if (count($porownanie) > 1): ?>
+  <div class="card match-card mb-3">
+    <div class="card-body px-3 py-3">
+      <div class="stat-label mb-2">Punkty narastająco</div>
       <?php
         $n      = count($porownanie);
         $maxPkt = max(
