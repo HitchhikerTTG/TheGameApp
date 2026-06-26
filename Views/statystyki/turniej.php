@@ -414,24 +414,22 @@ function toggleHeatDots(show) {
 
     <?php for ($h = $maxHT; $h >= 0; $h--): for ($a = 0; $a <= $maxAT; $a++):
       $c    = $mTT[$h][$a] ?? null;
+      if (!$c || $c['total'] === 0) continue;  // ← POMIJAMY PUSTE
       $cX   = $colX[$a];
       $cY   = $rowY[$h];
       $szW  = $colW[$a];
       $szH  = $rowH[$h];
-      // Rozmiar tej konkretnej komórki (dla centrowania)
-      $thisSz = $c ? (int)round($cellMin + (sqrt($c['total']) / sqrt($maxTotal)) * ($cellMax - $cellMin)) : $cellMin;
-      // Przesunięcie żeby wycentrować mniejszą komórkę w większej kolumnie/wierszu
+      $thisSz = (int)round($cellMin + (sqrt($c['total']) / sqrt($maxTotal)) * ($cellMax - $cellMin));
       $offX = (int)(($szW - $thisSz) / 2);
       $offY = (int)(($szH - $thisSz) / 2);
       $bX   = $cX + $offX; $bY = $cY + $offY;
     ?>
-      <!-- Tło obszaru kolumny/wiersza (opcjonalnie można pominąć) -->
-      <!-- Komórka właściwa -->
+      <!-- Komórka -->
       <rect x="<?= $bX ?>" y="<?= $bY ?>"
             width="<?= $thisSz ?>" height="<?= $thisSz ?>"
             fill="var(--bs-body-bg)" stroke="var(--bs-border-color)" stroke-width="0.5"/>
 
-      <?php if ($c && $c['total'] > 0):
+      <?php if (true):   // zawsze prawda – $c['total'] > 0 zagwarantowane wyżej 
         $total = $c['total'];
         $exact = $c['exact'];
         $hit   = $c['hit'] - $exact;
@@ -468,14 +466,18 @@ function toggleHeatDots(show) {
           $barH   = 5; $barY2 = $bY + $thisSz - $barH;
           $xE = $bX; $xH = $bX + $wExact; $xM = $bX + $wExact + $wHit;
         ?>
-        <?php if ($wExact > 0): ?><rect x="<?= $xE ?>" y="<?= $barY2 ?>" width="<?= $wExact ?>" height="<?= $barH ?>" fill="var(--ty-green)" opacity="0.9"/><?php endif ?>
-        <?php if ($wHit > 0):   ?><rect x="<?= $xH ?>" y="<?= $barY2 ?>" width="<?= $wHit ?>"   height="<?= $barH ?>" fill="var(--ty-accent)" opacity="0.85"/><?php endif ?>
-        <?php if ($wMiss > 0):  ?><rect x="<?= $xM ?>" y="<?= $barY2 ?>" width="<?= $wMiss ?>"  height="<?= $barH ?>" fill="#888" opacity="0.25"/><?php endif ?>
+               <g class="mapa-bar-group" style="display:none;">
+          <?php if ($wExact > 0): ?><rect x="<?= $xE ?>" y="<?= $barY2 ?>" width="<?= $wExact ?>" height="<?= $barH ?>" fill="var(--ty-green)" opacity="0.9"/><?php endif ?>
+          <?php if ($wHit > 0):   ?><rect x="<?= $xH ?>" y="<?= $barY2 ?>" width="<?= $wHit ?>"   height="<?= $barH ?>" fill="var(--ty-accent)" opacity="0.85"/><?php endif ?>
+          <?php if ($wMiss > 0):  ?><rect x="<?= $xM ?>" y="<?= $barY2 ?>" width="<?= $wMiss ?>"  height="<?= $barH ?>" fill="#888" opacity="0.25"/><?php endif ?>
+        </g>
 
-        <!-- Wynik w rogu -->
-        <text x="<?= $bX + 3 ?>" y="<?= $bY + 10 ?>"
-              style="font-size:8px;fill:var(--bs-secondary-color);"><?= $h ?>:<?= $a ?></text>
-        <title><?= $h ?>:<?= $a ?> – <?= $total ?> typów: <?= $exact ?> dokładnych, <?= $hit ?> kier., <?= $miss ?> pudło</title>
+               <!-- Nagłówek wyniku – wyśrodkowany, u góry komórki -->
+        <text x="<?= $bX + $thisSz/2 ?>" y="<?= $bY + 13 ?>"
+              text-anchor="middle"
+              style="font-family:'Bebas Neue',sans-serif;font-size:<?= max(10, min(16, (int)($thisSz * 0.18))) ?>px;fill:var(--bs-body-color);fill-opacity:0.7;pointer-events:none;">
+          <?= $h ?>:<?= $a ?>
+        </text>
       <?php endif ?>
     <?php endfor; endfor ?>
 
@@ -520,6 +522,12 @@ function toggleHeatDots(show) {
   <button class="btn btn-sm btn-outline-success" onclick="filterMapaDots('exact',this)">Tylko dokładne</button>
   <button class="btn btn-sm btn-outline-primary" onclick="filterMapaDots('hit',this)">Trafienia</button>
   <button class="btn btn-sm btn-outline-secondary" onclick="filterMapaDots('miss',this)">Pudła</button>
+</div>
+<div class="d-flex gap-2 mb-2 align-items-center flex-wrap" style="font-size:12px;">
+  <label class="d-flex align-items-center gap-1" style="cursor:pointer;">
+    <input type="checkbox" id="toggle-bars" onchange="toggleMapaBars(this.checked)">
+    Pokaż paski proporcji
+  </label>
 </div>
 <p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
 <p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
@@ -611,5 +619,10 @@ function filterMapaDots(type, btn) {
     b.classList.remove('active');
   });
   if (btn) btn.classList.add('active');
+}
+function toggleMapaBars(show) {
+  document.querySelectorAll('.mapa-bar-group').forEach(function(el) {
+    el.style.display = show ? '' : 'none';
+  });
 }
 </script>
