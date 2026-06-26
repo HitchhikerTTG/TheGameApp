@@ -182,24 +182,25 @@
       <?php
         $max = max($trendPunktowy) ?: 1;
         $maxY5 = (int)(ceil($max / 5) * 5) ?: 5;
-        $w = 300; $h = 120; $pR = 44; $n = count($trendPunktowy);
-        $chartW = $w - $pR;
+        $w = 300; $h = 150; $pR = 40; $pT = 10; $pB = 10;
+        $chartW = $w - $pR; $chartH = $h - $pT - $pB;
+        $n = count($trendPunktowy);
         $points = [];
         foreach ($trendPunktowy as $i => $v) {
             $x = $n > 1 ? ($i / ($n - 1)) * $chartW : 0;
-            $y = $h - ($v / $maxY5) * $h;
+            $y = $pT + $chartH - ($v / $maxY5) * $chartH;
             $points[] = round($x, 1) . ',' . round($y, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:130px;" preserveAspectRatio="none">
         <?php for ($tick = 0; $tick <= $maxY5; $tick += 5):
-          $ty = round($h - ($tick / $maxY5) * $h, 1); ?>
+          $ty = round($pT + $chartH - ($tick / $maxY5) * $chartH, 1); ?>
           <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
           <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?></text>
         <?php endfor; ?>
-        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $h ?>"
+        <line x1="<?= $chartW ?>" y1="<?= $pT ?>" x2="<?= $chartW ?>" y2="<?= $pT + $chartH ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>" fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
       </svg>
@@ -214,13 +215,13 @@
     $tickMin = max(1, (int)(floor($minPoz / 5) * 5));
     $tickMax = (int)(ceil($maxPoz / 5) * 5);
     $tickZakres = max(1, $tickMax - $tickMin);
-    $w = 300; $h = 120; $pR = 44;
-    $chartW = $w - $pR;
+    $w = 300; $h = 130; $pR = 44; $pT = 10; $pB = 10;
+    $chartW = $w - $pR; $chartH = $h - $pT - $pB;
     $ostatnia = end($trendPozycji);
     $points = [];
     foreach ($trendPozycji as $i => $poz) {
         $x = $n > 1 ? ($i / ($n - 1)) * $chartW : 0;
-        $y = (($poz - $tickMin) / $tickZakres) * $h;
+        $y = $pT + (($poz - $tickMin) / $tickZakres) * $chartH;
         $points[] = round($x, 1) . ',' . round($y, 1);
     }
   ?>
@@ -232,15 +233,15 @@
           – aktualna: <strong><?= $ostatnia ?>. miejsce</strong>
         </span>
       </div>
-      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:130px;" preserveAspectRatio="none">
         <?php for ($tick = $tickMin; $tick <= $tickMax; $tick += 5):
-          $ty = round((($tick - $tickMin) / $tickZakres) * $h, 1); ?>
+          $ty = round($pT + (($tick - $tickMin) / $tickZakres) * $chartH, 1); ?>
           <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
           <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?>.</text>
         <?php endfor; ?>
-        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $h ?>"
+        <line x1="<?= $chartW ?>" y1="<?= $pT ?>" x2="<?= $chartW ?>" y2="<?= $pT + $chartH ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>"
                   fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
