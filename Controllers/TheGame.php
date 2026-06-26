@@ -514,7 +514,6 @@ foreach ($meczeArchiwalne as &$mecz) {
             'status' => 'Zakonczony', 'competition' => $mecz['CompetitionName'] ?? '',
         ];
     } else { $mecz['details'] = null; }
-}
     }
     if ($mecz['rozpoczety']) {
         $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";
