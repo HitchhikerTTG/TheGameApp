@@ -179,28 +179,27 @@
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
         Trend punktowy (suma narastająco)
       </div>
-       <?php
+      <?php
         $max = max($trendPunktowy) ?: 1;
-        $w = 300; $h = 120; $pL = 44; $n = count($trendPunktowy);
         $maxY5 = (int)(ceil($max / 5) * 5) ?: 5;
+        $w = 300; $h = 120; $pR = 36; $n = count($trendPunktowy);
+        $chartW = $w - $pR;
         $points = [];
         foreach ($trendPunktowy as $i => $v) {
-            $x = $pL + ($n > 1 ? ($i / ($n - 1)) * ($w - $pL) : 0);
+            $x = $n > 1 ? ($i / ($n - 1)) * $chartW : 0;
             $y = $h - ($v / $maxY5) * $h;
             $points[] = round($x, 1) . ',' . round($y, 1);
         }
       ?>
       <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
-        <!-- Oś Y: linie pomocnicze i etykiety co 5 pkt -->
         <?php for ($tick = 0; $tick <= $maxY5; $tick += 5):
           $ty = round($h - ($tick / $maxY5) * $h, 1); ?>
-          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $w ?>" y2="<?= $ty ?>"
+          <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
-          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+          <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?></text>
         <?php endfor; ?>
-        <!-- Oś Y pionowa -->
-        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $h ?>"
+        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $h ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>" fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
       </svg>
@@ -212,20 +211,18 @@
     $n      = count($trendPozycji);
     $minPoz = min($trendPozycji);
     $maxPoz = max($trendPozycji);
-    $zakres = max(1, $maxPoz - $minPoz);
-    $w = 300; $h = 120; $pL = 44;
-    // Ticki osi Y co 5 pozycji (zaokrąglone do pełnych 5)
-    $tickMin = (int)(floor($minPoz / 5) * 5); if ($tickMin < 1) $tickMin = 1;
+    $tickMin = max(1, (int)(floor($minPoz / 5) * 5));
     $tickMax = (int)(ceil($maxPoz / 5) * 5);
     $tickZakres = max(1, $tickMax - $tickMin);
+    $w = 300; $h = 120; $pR = 44;
+    $chartW = $w - $pR;
+    $ostatnia = end($trendPozycji);
     $points = [];
     foreach ($trendPozycji as $i => $poz) {
-        $x = $pL + ($n > 1 ? ($i / ($n - 1)) * ($w - $pL) : 0);
-        $y = (($poz - $tickMin) / $tickZakres) * $h; // pozycja 1 = góra wykresu (lepsza = wyżej)
+        $x = $n > 1 ? ($i / ($n - 1)) * $chartW : 0;
+        $y = (($poz - $tickMin) / $tickZakres) * $h;
         $points[] = round($x, 1) . ',' . round($y, 1);
     }
-    $ostatnia = end($trendPozycji);
-    $kolor = 'var(--ty-accent)';
   ?>
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
@@ -236,22 +233,20 @@
         </span>
       </div>
       <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
-        <!-- Oś Y: linie pomocnicze i etykiety co 5 pozycji -->
         <?php for ($tick = $tickMin; $tick <= $tickMax; $tick += 5):
           $ty = round((($tick - $tickMin) / $tickZakres) * $h, 1); ?>
-          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $w ?>" y2="<?= $ty ?>"
+          <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
-          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+          <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?>.</text>
         <?php endfor; ?>
-        <!-- Oś Y pionowa -->
-        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $h ?>"
+        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $h ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>"
-                  fill="none" stroke="<?= $kolor ?>" stroke-width="2"/>
+                  fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
       </svg>
       <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
-        Oś Y: pozycja w tabeli (im wyżej na wykresie, tym lepsza pozycja)
+        Im wyżej na wykresie, tym lepsza pozycja w tabeli
       </div>
     </div>
   </div>
