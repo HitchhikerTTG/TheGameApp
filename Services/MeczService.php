@@ -80,10 +80,15 @@ class MeczService {
     if ($static) {
         $ids = array_column($wypelniona_lista, 'Id');
         $liczby = $this->typyModel->liczbaTypowDlaMeczow($ids);   // [GameID => count]
+        $baseDir = WRITEPATH . "typy";
         foreach ($wypelniona_lista as &$mecz) {
             $mecz['liczbaTypow'] = $liczby[$mecz['Id']] ?? 0;
             $mecz['rozpoczety']  = 1;                              // rozegrany = rozpoczęty
+            if (!file_exists("{$baseDir}/{$mecz['Id']}.json")) {
+                $this->wygenerujTypyDlaMeczu($mecz['Id']);
+            }
         }
+        
         unset($mecz);
         return $wypelniona_lista;                                  // bez czyRozpoczety/UPDATE, bez odswiezLiveMecze
     }
