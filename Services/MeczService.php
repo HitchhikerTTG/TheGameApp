@@ -690,27 +690,7 @@ private function parseScore(string $score): array
     return [$homeScore, $awayScore];
 }
 
-public function liczbaTypowDlaMeczow(array $meczIds): array
-{
-    if (empty($meczIds)) return [];
-    $rows = $this->db->table($this->table)
-        ->select('GameID, COUNT(*) AS cnt')
-        ->whereIn('GameID', $meczIds)
-        ->groupBy('GameID')
-        ->get()->getResultArray();
-    $out = [];
-    foreach ($rows as $r) { $out[(int)$r['GameID']] = (int)$r['cnt']; }
-    return $out;
-}
 
-public function typyGraczaDlaMeczow($userUniID, array $meczIds): array
-{
-    if (empty($meczIds)) return [];
-    $rows = $this->where('uniID', $userUniID)->whereIn('GameID', $meczIds)->findAll();
-    $out = [];
-    foreach ($rows as $r) { $out[(int)$r['GameID']] = $r; }
-    return $out;
-}
 
 }
 
