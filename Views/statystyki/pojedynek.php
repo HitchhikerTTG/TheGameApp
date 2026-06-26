@@ -69,7 +69,7 @@
   <?php if (count($porownanie) > 1): ?>
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
-      <div class="stat-label mb-2">Punkty narastająco</div>
+      <div class="stat-label mb-2">Porównanie zdobyczy punktowych</div>
       <?php
         $n      = count($porownanie);
         $maxPkt = max(
@@ -109,6 +109,8 @@
         <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
         <span style="color:var(--ty-red);">── <?= esc($gracz2['nick']) ?></span>
       </div>
+    </div>
+  </div>
   <?php endif ?>
    <!-- WYKRES ZMIAN POZYCJI -->
   <?php
@@ -119,7 +121,7 @@
   <?php if ($nTp > 1): ?>
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
-      <div class="stat-label mb-2">Pozycja w tabeli (cały turniej)</div>
+      <div class="stat-label mb-2">Porównaniie pozycji w tabeli</div>
        <?php
         $allPoz = array_merge($tp1, $tp2);
         $minP   = min($allPoz);
