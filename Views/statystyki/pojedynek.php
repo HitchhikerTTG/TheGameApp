@@ -75,36 +75,33 @@
             1
         );
         $maxY5  = (int)(ceil($maxPkt / 5) * 5) ?: 5;
-        $svgW   = 300; $svgH = 120; $pR = 36; $pB = 4;
-        $chartW = $svgW - $pR; $chartH = $svgH - $pB;
+        $svgW   = 300; $svgH = 150; $pR = 50; $pT = 10; $pB = 10;
+        $chartW = $svgW - $pR; $chartH = $svgH - $pT - $pB;
 
         $pts1 = []; $pts2 = [];
         foreach ($porownanie as $i => $m) {
             $x  = $n > 1 ? ($i / ($n - 1)) * $chartW : 0;
-            $y1 = $svgH - $pB - ($m['g1Sum'] / $maxY5) * $chartH;
-            $y2 = $svgH - $pB - ($m['g2Sum'] / $maxY5) * $chartH;
+            $y1 = $pT + $chartH - ($m['g1Sum'] / $maxY5) * $chartH;
+            $y2 = $pT + $chartH - ($m['g2Sum'] / $maxY5) * $chartH;
             $pts1[] = round($x, 1) . ',' . round($y1, 1);
             $pts2[] = round($x, 1) . ',' . round($y2, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:130px;" preserveAspectRatio="none">
         <?php for ($tick = 0; $tick <= $maxY5; $tick += 5):
-          $ty = round($svgH - $pB - ($tick / $maxY5) * $chartH, 1); ?>
+          $ty = round($pT + $chartH - ($tick / $maxY5) * $chartH, 1); ?>
           <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
           <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?></text>
         <?php endfor; ?>
-        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $svgH ?>"
-              stroke="var(--bs-border-color)" stroke-width="0.5"/>
-        <line x1="0" y1="<?= $svgH - $pB ?>" x2="<?= $chartW ?>" y2="<?= $svgH - $pB ?>"
+        <line x1="<?= $chartW ?>" y1="<?= $pT ?>" x2="<?= $chartW ?>" y2="<?= $pT + $chartH ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $pts1), 'attr') ?>"
                   fill="none" stroke="var(--ty-green)" stroke-width="2.5"/>
         <polyline points="<?= esc(implode(' ', $pts2), 'attr') ?>"
                   fill="none" stroke="var(--ty-red)" stroke-width="2.5"/>
       </svg>
-      <!-- Legenda -->
       <div class="d-flex gap-3 mt-1" style="font-size:11px;">
         <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
         <span style="color:var(--ty-red);">── <?= esc($gracz2['nick']) ?></span>
@@ -120,37 +117,37 @@
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
       <div class="stat-label mb-2">Pozycja w tabeli (cały turniej)</div>
-      <?php
+       <?php
         $allPoz = array_merge($tp1, $tp2);
         $minP   = min($allPoz);
         $maxP   = max($allPoz);
         $tickMin = max(1, (int)(floor($minP / 5) * 5));
         $tickMax = (int)(ceil($maxP / 5) * 5);
         $tickZakres = max(1, $tickMax - $tickMin);
-        $svgW = 300; $svgH = 120; $pR = 44; $pB = 4;
-        $chartW = $svgW - $pR; $chartH = $svgH - $pB;
+        $svgW = 300; $svgH = 150; $pR = 44; $pT = 10; $pB = 10;
+        $chartW = $svgW - $pR; $chartH = $svgH - $pT - $pB;
 
         $ptsP1 = []; $ptsP2 = [];
         foreach ($tp1 as $i => $poz) {
             $x = $nTp > 1 ? ($i / ($nTp - 1)) * $chartW : 0;
-            $y = (($poz - $tickMin) / $tickZakres) * $chartH;
+            $y = $pT + (($poz - $tickMin) / $tickZakres) * $chartH;
             $ptsP1[] = round($x, 1) . ',' . round($y, 1);
         }
         foreach ($tp2 as $i => $poz) {
             $x = $nTp > 1 ? ($i / ($nTp - 1)) * $chartW : 0;
-            $y = (($poz - $tickMin) / $tickZakres) * $chartH;
+            $y = $pT + (($poz - $tickMin) / $tickZakres) * $chartH;
             $ptsP2[] = round($x, 1) . ',' . round($y, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:130px;" preserveAspectRatio="none">
         <?php for ($tick = $tickMin; $tick <= $tickMax; $tick += 5):
-          $ty = round((($tick - $tickMin) / $tickZakres) * $chartH, 1); ?>
+          $ty = round($pT + (($tick - $tickMin) / $tickZakres) * $chartH, 1); ?>
           <line x1="0" y1="<?= $ty ?>" x2="<?= $chartW ?>" y2="<?= $ty ?>"
                 stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
           <text x="<?= $chartW + 4 ?>" y="<?= $ty + 3 ?>"
                 style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?>.</text>
         <?php endfor; ?>
-        <line x1="<?= $chartW ?>" y1="0" x2="<?= $chartW ?>" y2="<?= $svgH ?>"
+        <line x1="<?= $chartW ?>" y1="<?= $pT ?>" x2="<?= $chartW ?>" y2="<?= $pT + $chartH ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <?php if (!empty($ptsP1)): ?>
         <polyline points="<?= esc(implode(' ', $ptsP1), 'attr') ?>"

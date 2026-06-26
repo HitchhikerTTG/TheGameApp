@@ -215,7 +215,7 @@
     $tickMin = max(1, (int)(floor($minPoz / 5) * 5));
     $tickMax = (int)(ceil($maxPoz / 5) * 5);
     $tickZakres = max(1, $tickMax - $tickMin);
-    $w = 300; $h = 130; $pR = 44; $pT = 10; $pB = 10;
+    $w = 300; $h = 150; $pR = 44; $pT = 10; $pB = 10;
     $chartW = $w - $pR; $chartH = $h - $pT - $pB;
     $ostatnia = end($trendPozycji);
     $points = [];
@@ -227,7 +227,7 @@
   ?>
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
         Pozycja w tabeli mecz po meczu
         <span style="font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0;">
           – aktualna: <strong><?= $ostatnia ?>. miejsce</strong>
@@ -246,7 +246,7 @@
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>"
                   fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
       </svg>
-      <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
+      <div style="font-size:12px;color:var(--bs-secondary-color);margin-top:4px;">
         Im wyżej na wykresie, tym lepsza pozycja w tabeli
       </div>
     </div>
