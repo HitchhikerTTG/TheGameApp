@@ -370,7 +370,7 @@ function toggleHeatDots(show) {
 <!-- MAPA TYPÓW GRACZY Z TRAFIENIAMI -->
 <p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
 <p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
-  Każdy punkt = jeden oddany typ · Zielony = dokładny, niebieski = kierunkowy, szary = pudło
+  Każdy punkt = jeden oddany typ · Zielony = dokładny, czarny = trafienie 1x2, szary = pudło
 </p>
 
 <?php if (!empty($statystyki['mapaTypowTrafienia'])): 
@@ -466,7 +466,7 @@ function toggleHeatDots(show) {
       <?php   endfor; endfor; ?>
 
       <!-- Nagłówek wyniku – nad kwadratem, w dedykowanym obszarze $labelH -->
-        <text x="<?= $cX + $szW/2 ?>" y="<?= $cY + $labelH - 4 ?>"
+        <text x="<?= $cX + $szW/2 ?>" y="<?= $cY + $labelH - 6 ?>"
               text-anchor="middle"
               style="font-family:'Bebas Neue',sans-serif;font-size:14px;fill:var(--bs-body-color);fill-opacity:0.85;pointer-events:none;">
           <?= $h ?>:<?= $a ?>
@@ -492,7 +492,7 @@ function toggleHeatDots(show) {
     <?php endfor ?>
     <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($svgHT - $pT - $pB)/2 ?>)"
           x="<?= $pL - 20 ?>" y="<?= $pT + ($svgHT - $pT - $pB)/2 + 4 ?>"
-          text-anchor="middle" style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+          text-anchor="middle" style="font-size:10px;fill:var(--bs-secondary-color);">bramki gospodarza →</text>
   </svg>
 
   <!-- Legenda -->
