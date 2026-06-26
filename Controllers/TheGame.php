@@ -503,30 +503,18 @@ foreach ($meczeArchiwalne as &$mecz) {
     if (file_exists($jsonPath)) {
         $mecz['details'] = json_decode(file_get_contents($jsonPath), true);
     } else {
-        // Fallback: buduj details z danych DB gdy brakuje cache
-        $dbMecz = model(TerminarzModel::class)->getMeczById($mecz['Id']);
-        if ($dbMecz) {
-            $dtFb = new \DateTime($dbMecz['Date'] . ' ' . $dbMecz['Time'], new \DateTimeZone('UTC'));
-            $dtFb->setTimezone(new \DateTimeZone('Europe/Warsaw'));
-            $mecz['details'] = [
-                'date'        => $dbMecz['Date'],
-                'time'        => $dbMecz['Time'],
-                'naszCzas'  => $dtFb->format('H:i:s'),
-                'naszaData' => $dtFb->format('Y-m-d'),
-                'home_team'   => [
-                    'name'  => $dbMecz['HomeName'],
-                    'score' => $dbMecz['ScoreHome'],
-                ],
-                'away_team'   => [
-                    'name'  => $dbMecz['AwayName'],
-                    'score' => $dbMecz['ScoreAway'],
-                ],
-                'status'      => $dbMecz['zakonczony'] ? 'Zakonczony' : '',
-                'competition' => $dbMecz['CompetitionName'] ?? '',
-            ];
-        } else {
-            $mecz['details'] = null;
-        }
+    if (!empty($mecz['Date'])) {
+        $dtFb = new \DateTime($mecz['Date'].' '.$mecz['Time'], new \DateTimeZone('UTC'));
+        $dtFb->setTimezone(new \DateTimeZone('Europe/Warsaw'));
+        $mecz['details'] = [
+            'date' => $mecz['Date'], 'time' => $mecz['Time'],
+            'naszCzas' => $dtFb->format('H:i:s'), 'naszaData' => $dtFb->format('Y-m-d'),
+            'home_team' => ['name' => $mecz['HomeName'], 'score' => $mecz['ScoreHome']],
+            'away_team' => ['name' => $mecz['AwayName'], 'score' => $mecz['ScoreAway']],
+            'status' => 'Zakonczony', 'competition' => $mecz['CompetitionName'] ?? '',
+        ];
+    } else { $mecz['details'] = null; }
+}
     }
     if ($mecz['rozpoczety']) {
         $jsonPath = WRITEPATH . "typy/{$mecz['Id']}.json";

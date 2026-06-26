@@ -59,71 +59,49 @@ class MeczService {
     }
 
     public function meczeUzytkownikaWTurnieju($userUniID, $turniejID, $zewnetrznyTurniejID, $filtr){
-        $this->common->custom_log("Uruchomiliśmy mecz service: ");
+    $static = ($filtr === 'rozegrane');
+    $lista_meczow = [];
 
-        $lista_meczow=[];
-        // Po pierwsze, określmy które mecze nas interesują na podstawie filtra
-        
-        switch($filtr){
-            case "najblizsze":
-                $lista_meczow=$this->getMeczeDnia($turniejID, true);
-                break;
-            case "najblizsze_24h":
-                $lista_meczow = $this->terminarzModel->getMecze24h($turniejID, true);
-                break;
-            case "do_rozegrania":
-                $lista_meczow =$this->getMeczeTurniejuDoRozegrania($turniejID, true);
-                break;
-            case "wszystkie":
-                $lista_meczow = $this->getMeczeTurnieju($turniejID, true);
-                break;
-            case "rozegrane":
-                $lista_meczow = $this->getRozegraneMeczeTurnieju($turniejID, true);
-                break;
+    switch ($filtr) {
+        case "najblizsze":      $lista_meczow = $this->getMeczeDnia($turniejID, true); break;
+        case "najblizsze_24h":  $lista_meczow = $this->terminarzModel->getMecze24h($turniejID, true); break;
+        case "do_rozegrania":   $lista_meczow = $this->getMeczeTurniejuDoRozegrania($turniejID, true); break;
+        case "wszystkie":       $lista_meczow = $this->getMeczeTurnieju($turniejID, true); break;
+        case "rozegrane":       $lista_meczow = $this->getRozegraneMeczeTurnieju($turniejID, true); break;
+    }
+
+    // Statyczne archiwum: NIE odpytujemy API (dane zakończonych meczów się nie zmieniają)
+    if (!$static) {
+        $this->manageJsonFiles($lista_meczow, $turniejID, $zewnetrznyTurniejID);
+    }
+
+    $wypelniona_lista = $this->getUserTypesForMatches($lista_meczow, $userUniID, $turniejID, $static);
+
+    if ($static) {
+        $ids = array_column($wypelniona_lista, 'Id');
+        $liczby = $this->typyModel->liczbaTypowDlaMeczow($ids);   // [GameID => count]
+        foreach ($wypelniona_lista as &$mecz) {
+            $mecz['liczbaTypow'] = $liczby[$mecz['Id']] ?? 0;
+            $mecz['rozpoczety']  = 1;                              // rozegrany = rozpoczęty
         }
-//        echo "<p>Lista meczów, chciałbym, żeby miała dwa pola - iD i zewnętrze ip</p><pre>";
-//        print_r($lista_meczow);
-//        echo "</pre>";
-        // kiedy mamy listę tych meczów powinniśmy sprawdzić pliki JSON dla tych meczów
-        $JSONySprawdzone = $this->manageJsonFiles($lista_meczow, $turniejID, $zewnetrznyTurniejID);
-        //log_message('debug', 'JSONySprawdzone: ' . $JSONySprawdzone);
+        unset($mecz);
+        return $wypelniona_lista;                                  // bez czyRozpoczety/UPDATE, bez odswiezLiveMecze
+    }
 
-        // jeśli $jsonySprawdzone są true wtedy idziemy dalej, jeśli 0, wtedy przykro i trzeba sprawdzic // wypluć bład.
-
-#        $wypelniona_lista=$lista_meczow;         
-#        echo "Sprawdzam użytkownika: ".$userID;
-        $wypelniona_lista = $this->getUserTypesForMatches($lista_meczow, $userUniID, $turniejID);
-
-           // Dodanie liczby typów dla każdego meczu
+    // ── ścieżka live/przyszłe mecze: bez zmian względem oryginału ──
     foreach ($wypelniona_lista as &$mecz) {
         $mecz['liczbaTypow'] = $this->typyModel->liczbaTypowDlaMeczu($mecz['Id']);
-        $mecz['rozpoczety']= $this->terminarzModel->czyRozpoczety($mecz['Id']);
-        // jeśli mecz jest rozpoczęty i nie ma jeszcze pliku JSON dla tego pliku z typami, wygeneruj pliki z typami.. jeśli rozpoczęty i są typy dla tego meczu, 
-        
-        if ($mecz['rozpoczety']){
-            
-            $baseDir = WRITEPATH . "typy"; // Bazowy katalog dla plików JSON    
-            $pathTypy = "{$baseDir}/{$mecz['Id']}.json";
-
-            // Sprawdź, czy plik istnieje
-            if (!file_exists($pathTypy)) {
-                // Jeśli plik nie istnieje, utwórz go
-                $this->common->custom_log("Wiemy, ze to potrzeba sprawdzić?");
-                $this->wygenerujTypyDlaMeczu($mecz['Id']);
-                } 
-    
-            }
-        
-        
-        
+        $mecz['rozpoczety']  = $this->terminarzModel->czyRozpoczety($mecz['Id']);
+        if ($mecz['rozpoczety']) {
+            $pathTypy = WRITEPATH . "typy/{$mecz['Id']}.json";
+            if (!file_exists($pathTypy)) { $this->wygenerujTypyDlaMeczu($mecz['Id']); }
         }
-        // ── NOWE: odśwież live dane dla rozpoczętych meczów ──
-        $this->odswiezLiveMecze($wypelniona_lista, $turniejID, $zewnetrznyTurniejID);
-
-
-        return $wypelniona_lista;
-    
     }
+    unset($mecz);
+
+    $this->odswiezLiveMecze($wypelniona_lista, $turniejID, $zewnetrznyTurniejID);
+    return $wypelniona_lista;
+}
 
 
     public function prepareMeczData($meczId, $userId) {
@@ -260,16 +238,21 @@ class MeczService {
         ];
     }
 
-    public function getUserTypesForMatches($mecze, $userUniID, $turniejID)
-    {
-        // Pobiera typy użytkownika dla listy meczów
-        foreach ($mecze as &$mecz) {
-            $mecz['typy'] = $this->typyModel->getTypyByMeczIdAndUserId($mecz['Id'], $userUniID) ?? 'Brak typów';
-            /*$mecz['isGoldenGame'] = $this->typyModel->czyGraczUzylJokeraWTymMeczu($mecz['Id'], $userUniID) ?? "Nie";
-            $mecz['hasGoldenGame'] = $this->typyModel->czyGraczMozeJeszczeUzycJokera($turniejID, $userUniID) ?? 'Nie';*/
-        }
+public function getUserTypesForMatches($mecze, $userUniID, $turniejID, $batch = false)
+{
+    if ($batch) {
+        $ids = array_column($mecze, 'Id');
+        $idx = $this->typyModel->typyGraczaDlaMeczow($userUniID, $ids);   // [GameID => wiersz]
+        foreach ($mecze as &$mecz) { $mecz['typy'] = $idx[$mecz['Id']] ?? 'Brak typów'; }
+        unset($mecz);
         return $mecze;
     }
+    foreach ($mecze as &$mecz) {
+        $mecz['typy'] = $this->typyModel->getTypyByMeczIdAndUserId($mecz['Id'], $userUniID) ?? 'Brak typów';
+    }
+    unset($mecz);
+    return $mecze;
+}
 
 
 private function manageJsonFiles($mecze, $turniejID, $zewnetrznyTurniejID) {
@@ -705,6 +688,28 @@ private function parseScore(string $score): array
     $homeScore = isset($parts[0]) ? (int)trim($parts[0]) : 0;
     $awayScore = isset($parts[1]) ? (int)trim($parts[1]) : 0;
     return [$homeScore, $awayScore];
+}
+
+public function liczbaTypowDlaMeczow(array $meczIds): array
+{
+    if (empty($meczIds)) return [];
+    $rows = $this->db->table($this->table)
+        ->select('GameID, COUNT(*) AS cnt')
+        ->whereIn('GameID', $meczIds)
+        ->groupBy('GameID')
+        ->get()->getResultArray();
+    $out = [];
+    foreach ($rows as $r) { $out[(int)$r['GameID']] = (int)$r['cnt']; }
+    return $out;
+}
+
+public function typyGraczaDlaMeczow($userUniID, array $meczIds): array
+{
+    if (empty($meczIds)) return [];
+    $rows = $this->where('uniID', $userUniID)->whereIn('GameID', $meczIds)->findAll();
+    $out = [];
+    foreach ($rows as $r) { $out[(int)$r['GameID']] = $r; }
+    return $out;
 }
 
 }

@@ -163,11 +163,11 @@ public function getRozegraneMecze($turniejID, $onlyIds = false){
 	$query = $this	->where('TurniejID', $turniejID)
 					-> where('zakonczony', 1)
 					-> orderBy('Date', 'asc');
-	
-	if ($onlyIds) {
-        $query->select('Id, ApiID, HomeID, AwayID, zakonczony');
-
+	    
+    if ($onlyIds) {
+        $query->select('Id, ApiID, HomeID, AwayID, zakonczony, HomeName, AwayName, ScoreHome, ScoreAway, Date, Time, CompetitionName');
     }
+    
 
     return $query->findAll();
     }
