@@ -368,6 +368,11 @@ function toggleHeatDots(show) {
 <?php endif; ?>
 
 <!-- MAPA TYPÓW GRACZY Z TRAFIENIAMI -->
+<p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
+<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
+  Każdy punkt = jeden oddany typ · Zielony = dokładny, niebieski = kierunkowy, szary = pudło
+</p>
+
 <?php if (!empty($statystyki['mapaTypowTrafienia'])): 
   $mTT = $statystyki['mapaTypowTrafienia'];
   
@@ -380,9 +385,10 @@ function toggleHeatDots(show) {
   }
 
   // Rozmiar komórki proporcjonalny do sqrt(total) – max komórka = $cellMax
-  $cellMax = 80;  // px – rozmiar komórki z najczęściej typoawnym wynikiem
-  $cellMin = 20;  // px – minimalna komórka (żeby nie znikała)
+  $cellMax = 90;  // px – rozmiar komórki z najczęściej typoawnym wynikiem
+  $cellMin = 25;  // px – minimalna komórka (żeby nie znikała)
   $dotR    = 2.5; // stały promień każdego punktu
+  $labelH  = 18;
 
   // Oblicz rozmiary komórek i pozycje w siatce
   // Najpierw oblicz szerokości kolumn i wysokości wierszy jako max w danej kolumnie/wierszu
@@ -393,7 +399,7 @@ function toggleHeatDots(show) {
       if ($h > $maxHT || $a > $maxAT) continue;
       $sz = (int)round($cellMin + (sqrt($c['total']) / sqrt($maxTotal)) * ($cellMax - $cellMin));
       $colW[$a] = max($colW[$a], $sz);
-      $rowH[$h] = max($rowH[$h], $sz);
+      $rowH[$h] = max($rowH[$h], $sz+$labelH);
   }
 
   // Pozycje X kolumn i Y wierszy (kumulatywne)
@@ -420,9 +426,10 @@ function toggleHeatDots(show) {
       $szW  = $colW[$a];
       $szH  = $rowH[$h];
       $thisSz = (int)round($cellMin + (sqrt($c['total']) / sqrt($maxTotal)) * ($cellMax - $cellMin));
-      $offX = (int)(($szW - $thisSz) / 2);
-      $offY = (int)(($szH - $thisSz) / 2);
-      $bX   = $cX + $offX; $bY = $cY + $offY;
+      $offX   = (int)(($szW - $thisSz) / 2);
+      $offY   = $labelH + (int)(($szH - $labelH - $thisSz) / 2);  // ← kwadrat poniżej labela
+      $bX     = $cX + $offX;
+      $bY     = $cY + $offY;
     ?>
       <!-- Komórka -->
       <rect x="<?= $bX ?>" y="<?= $bY ?>"
@@ -458,24 +465,10 @@ function toggleHeatDots(show) {
                   data-dot-type="<?= $dt ?>"/>
       <?php   endfor; endfor; ?>
 
-        <!-- Pasek u dołu komórki -->
-        <?php
-          $wExact = round($exact / $total * $thisSz, 2);
-          $wHit   = round($hit   / $total * $thisSz, 2);
-          $wMiss  = $thisSz - $wExact - $wHit;
-          $barH   = 5; $barY2 = $bY + $thisSz - $barH;
-          $xE = $bX; $xH = $bX + $wExact; $xM = $bX + $wExact + $wHit;
-        ?>
-               <g class="mapa-bar-group" style="display:none;">
-          <?php if ($wExact > 0): ?><rect x="<?= $xE ?>" y="<?= $barY2 ?>" width="<?= $wExact ?>" height="<?= $barH ?>" fill="var(--ty-green)" opacity="0.9"/><?php endif ?>
-          <?php if ($wHit > 0):   ?><rect x="<?= $xH ?>" y="<?= $barY2 ?>" width="<?= $wHit ?>"   height="<?= $barH ?>" fill="var(--ty-accent)" opacity="0.85"/><?php endif ?>
-          <?php if ($wMiss > 0):  ?><rect x="<?= $xM ?>" y="<?= $barY2 ?>" width="<?= $wMiss ?>"  height="<?= $barH ?>" fill="#888" opacity="0.25"/><?php endif ?>
-        </g>
-
-               <!-- Nagłówek wyniku – wyśrodkowany, u góry komórki -->
-        <text x="<?= $bX + $thisSz/2 ?>" y="<?= $bY + 13 ?>"
+      <!-- Nagłówek wyniku – nad kwadratem, w dedykowanym obszarze $labelH -->
+        <text x="<?= $cX + $szW/2 ?>" y="<?= $cY + $labelH - 4 ?>"
               text-anchor="middle"
-              style="font-family:'Bebas Neue',sans-serif;font-size:<?= max(10, min(16, (int)($thisSz * 0.18))) ?>px;fill:var(--bs-body-color);fill-opacity:0.7;pointer-events:none;">
+              style="font-family:'Bebas Neue',sans-serif;font-size:14px;fill:var(--bs-body-color);fill-opacity:0.85;pointer-events:none;">
           <?= $h ?>:<?= $a ?>
         </text>
       <?php endif ?>
@@ -507,16 +500,13 @@ function toggleHeatDots(show) {
     <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="var(--ty-green)" opacity="0.9"/></svg> Dokładne</span>
     <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="var(--ty-accent)" opacity="0.8"/></svg> Kierunkowe</span>
     <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="#888" opacity="0.35"/></svg> Pudło</span>
-    <span class="ms-auto">Pasek u dołu = proporcje · Każdy punkt = 1 typ</span>
+    <span class="ms-auto">Każdy punkt = 1 typ</span>
   </div>
   </div>
 </div>
 <?php endif ?>
 
-<p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
-<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
-  Każdy punkt = jeden oddany typ · Zielony = dokładny, niebieski = kierunkowy, szary = pudło
-</p>
+
 <div class="d-flex gap-2 mb-2 flex-wrap" id="dot-filter-btns" style="font-size:12px;">
   <button class="btn btn-sm btn-outline-secondary active" onclick="filterMapaDots('all',this)">Wszystkie</button>
   <button class="btn btn-sm btn-outline-success" onclick="filterMapaDots('exact',this)">Tylko dokładne</button>
@@ -524,15 +514,7 @@ function toggleHeatDots(show) {
   <button class="btn btn-sm btn-outline-secondary" onclick="filterMapaDots('miss',this)">Pudła</button>
 </div>
 <div class="d-flex gap-2 mb-2 align-items-center flex-wrap" style="font-size:12px;">
-  <label class="d-flex align-items-center gap-1" style="cursor:pointer;">
-    <input type="checkbox" id="toggle-bars" onchange="toggleMapaBars(this.checked)">
-    Pokaż paski proporcji
-  </label>
 </div>
-<p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
-<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
-  Każdy kwadrat = jeden wytypowany wynik · Podział paska: zielony=dokładne, niebieski=kierunkowe, szary=pudło
-</p>
 
   <!-- ROZKŁAD TRAFIEŃ -->
   <p class="section-label mt-4 mb-2">Rozkład trafień (ile graczy zdobyło punkty)</p>
@@ -620,9 +602,5 @@ function filterMapaDots(type, btn) {
   });
   if (btn) btn.classList.add('active');
 }
-function toggleMapaBars(show) {
-  document.querySelectorAll('.mapa-bar-group').forEach(function(el) {
-    el.style.display = show ? '' : 'none';
-  });
-}
+
 </script>
