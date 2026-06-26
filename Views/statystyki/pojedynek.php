@@ -109,7 +109,7 @@
         <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
         <span style="color:var(--ty-red);">── <?= esc($gracz2['nick']) ?></span>
       </div>
-
+  <?php endif ?>
    <!-- WYKRES ZMIAN POZYCJI -->
   <?php
     $tp1 = $trendPozycjiG1 ?? [];
