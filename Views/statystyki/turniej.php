@@ -386,6 +386,16 @@ function toggleHeatDots(show) {
 ?>
 <p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
 <p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
+  Każdy punkt = jeden oddany typ · Zielony = dokładny, niebieski = kierunkowy, szary = pudło
+</p>
+<div class="d-flex gap-2 mb-2 flex-wrap" id="dot-filter-btns" style="font-size:12px;">
+  <button class="btn btn-sm btn-outline-secondary active" onclick="filterMapaDots('all',this)">Wszystkie</button>
+  <button class="btn btn-sm btn-outline-success" onclick="filterMapaDots('exact',this)">Tylko dokładne</button>
+  <button class="btn btn-sm btn-outline-primary" onclick="filterMapaDots('hit',this)">Trafienia</button>
+  <button class="btn btn-sm btn-outline-secondary" onclick="filterMapaDots('miss',this)">Pudła</button>
+</div>
+<p class="section-label mt-4 mb-2">Mapa typów graczy – skuteczność</p>
+<p style="font-size:12px;color:var(--bs-secondary-color);margin-top:-6px;margin-bottom:8px;">
   Każdy kwadrat = jeden wytypowany wynik · Podział paska: zielony=dokładne, niebieski=kierunkowe, szary=pudło
 </p>
 <div class="card match-card mb-2">
@@ -404,46 +414,61 @@ function toggleHeatDots(show) {
             width="<?= $sz ?>" height="<?= $sz ?>"
             fill="var(--bs-body-bg)" stroke="var(--bs-border-color)" stroke-width="0.5"/>
 
-      <?php if ($c && $c['total'] > 0):
-        $total   = $c['total'];
-        $exact   = $c['exact'];
-        $hit     = $c['hit'] - $exact;  // kierunkowe (bez dokładnych)
-        $miss    = $total - $c['hit'];
+           <?php if ($c && $c['total'] > 0):
+        $total = $c['total'];
+        $exact = $c['exact'];
+        $hit   = $c['hit'] - $exact;  // kierunkowe bez dokładnych
+        $miss  = $total - $c['hit'];
 
-        // Szerokości pasków proporcjonalnie do szerokości komórki
+        // Pasek u dołu komórki
         $wExact = round($exact / $total * $sz, 2);
         $wHit   = round($hit   / $total * $sz, 2);
         $wMiss  = $sz - $wExact - $wHit;
+        $barH   = 5; $barY = $cY + $sz - $barH;
+        $xE = $cX; $xH = $cX + $wExact; $xM = $cX + $wExact + $wHit;
 
-        // Pasek u dołu komórki (wysokość 8px)
-        $barH  = 7;
-        $barY  = $cY + $sz - $barH;
-        $xE    = $cX;
-        $xH    = $cX + $wExact;
-        $xM    = $cX + $wExact + $wHit;
+        // Układ punktów w komórce (siatka NxN)
+        $cols = max(1, (int)ceil(sqrt($total)));
+        $r    = max(1.5, min(3.0, ($sz - 12) / ($cols * 2.5)));
+        $innerSz = $sz - 10;
+        $step    = $cols > 1 ? $innerSz / ($cols - 1) : 0;
+        $dots    = []; // [x, y, type]
+        $types   = array_merge(
+            array_fill(0, $exact, 'exact'),
+            array_fill(0, $hit,   'hit'),
+            array_fill(0, $miss,  'miss')
+        );
+        $drawn = 0;
+        for ($row = 0; $row < $cols && $drawn < $total; $row++) {
+            for ($col = 0; $col < $cols && $drawn < $total; $col++) {
+                $dx = $cX + 5 + ($cols > 1 ? $col * $step : $innerSz / 2);
+                $dy = $cY + 5 + ($cols > 1 ? $row * $step : $innerSz / 2);
+                $dots[] = ['x' => round($dx,1), 'y' => round($dy,1), 'type' => $types[$drawn]];
+                $drawn++;
+            }
+        }
+        $dotColors = ['exact' => 'var(--ty-green)', 'hit' => 'var(--ty-accent)', 'miss' => '#888'];
+        $dotOpacity = ['exact' => '0.9', 'hit' => '0.8', 'miss' => '0.35'];
       ?>
-      <!-- Pasek dokładne -->
+      <!-- Punkty typów -->
+      <?php foreach ($dots as $dot): ?>
+        <circle cx="<?= $dot['x'] ?>" cy="<?= $dot['y'] ?>" r="<?= $r ?>"
+                fill="<?= $dotColors[$dot['type']] ?>" fill-opacity="<?= $dotOpacity[$dot['type']] ?>"
+                data-dot-type="<?= $dot['type'] ?>"/>
+      <?php endforeach; ?>
+      <!-- Pasek u dołu -->
       <?php if ($wExact > 0): ?>
-      <rect x="<?= $xE ?>" y="<?= $barY ?>" width="<?= $wExact ?>" height="<?= $barH ?>"
-            fill="var(--ty-green)" opacity="0.9"/>
+        <rect x="<?= $xE ?>" y="<?= $barY ?>" width="<?= $wExact ?>" height="<?= $barH ?>"
+              fill="var(--ty-green)" opacity="0.9"/>
       <?php endif ?>
-      <!-- Pasek kierunkowe -->
       <?php if ($wHit > 0): ?>
-      <rect x="<?= $xH ?>" y="<?= $barY ?>" width="<?= $wHit ?>" height="<?= $barH ?>"
-            fill="var(--ty-accent)" opacity="0.85"/>
+        <rect x="<?= $xH ?>" y="<?= $barY ?>" width="<?= $wHit ?>" height="<?= $barH ?>"
+              fill="var(--ty-accent)" opacity="0.85"/>
       <?php endif ?>
-      <!-- Pasek pudła -->
       <?php if ($wMiss > 0): ?>
-      <rect x="<?= $xM ?>" y="<?= $barY ?>" width="<?= $wMiss ?>" height="<?= $barH ?>"
-            fill="#888" opacity="0.25"/>
+        <rect x="<?= $xM ?>" y="<?= $barY ?>" width="<?= $wMiss ?>" height="<?= $barH ?>"
+              fill="#888" opacity="0.25"/>
       <?php endif ?>
-
-      <!-- Liczba w środku komórki -->
-      <text x="<?= $cX + $sz/2 ?>" y="<?= $cY + $sz/2 + 4 ?>"
-            text-anchor="middle"
-            style="font-family:'Bebas Neue',sans-serif;font-size:15px;fill:var(--bs-body-color);fill-opacity:0.8;">
-        <?= $total ?>
-      </text>
       <!-- Wynik w rogu -->
       <text x="<?= $cX + 3 ?>" y="<?= $cY + 10 ?>"
             style="font-size:8px;fill:var(--bs-secondary-color);"><?= $h ?>:<?= $a ?></text>
@@ -474,11 +499,11 @@ function toggleHeatDots(show) {
   </svg>
 
   <!-- Legenda -->
-  <div class="d-flex gap-3 flex-wrap mt-2 px-1" style="font-size:11px;color:var(--bs-secondary-color);">
-    <span><svg width="14" height="8"><rect width="14" height="8" fill="var(--ty-green)" opacity="0.9"/></svg> Dokładne</span>
-    <span><svg width="14" height="8"><rect width="14" height="8" fill="var(--ty-accent)" opacity="0.85"/></svg> Kierunkowe</span>
-    <span><svg width="14" height="8"><rect width="14" height="8" fill="#888" opacity="0.25"/></svg> Pudło</span>
-    <span class="ms-auto">Liczba w komórce = łączna liczba typów</span>
+    <div class="d-flex gap-3 flex-wrap mt-2 px-1" style="font-size:11px;color:var(--bs-secondary-color);">
+    <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="var(--ty-green)" opacity="0.9"/></svg> Dokładne</span>
+    <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="var(--ty-accent)" opacity="0.8"/></svg> Kierunkowe</span>
+    <span><svg width="8" height="8"><circle cx="4" cy="4" r="4" fill="#888" opacity="0.35"/></svg> Pudło</span>
+    <span class="ms-auto">Pasek u dołu = proporcje · Każdy punkt = 1 typ</span>
   </div>
   </div>
 </div>
@@ -560,3 +585,14 @@ function toggleHeatDots(show) {
 .stat-label { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:4px; }
 .stat-value { font-size:15px; }
 </style>
+<script>
+function filterMapaDots(type, btn) {
+  document.querySelectorAll('[data-dot-type]').forEach(function(el) {
+    el.style.display = (type === 'all' || el.dataset.dotType === type) ? '' : 'none';
+  });
+  document.querySelectorAll('#dot-filter-btns button').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+}
+</script>

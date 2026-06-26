@@ -69,53 +69,47 @@
   
  
 
-  <!-- WYKRES PORÓWNAWCZY SVG -->
-  <?php if (count($porownanie) > 1): ?>
-  <div class="card match-card mb-3">
-    <div class="card-body px-3 py-3">
-      <div class="stat-label mb-2">Punkty narastająco</div>
-      <?php
-        $n      = count($porownanie);
+         $n      = count($porownanie);
         $maxPkt = max(
             max(array_column($porownanie, 'g1Sum')),
             max(array_column($porownanie, 'g2Sum')),
             1
         );
-        $svgW = 300; $svgH = 100; $pL = 0; $pB = 4;
+        $svgW = 300; $svgH = 160; $pL = 36; $pB = 8;
+        $maxY5 = (int)(ceil($maxPkt / 5) * 5) ?: 5;
         $chartW = $svgW - $pL; $chartH = $svgH - $pB;
 
         $pts1 = []; $pts2 = [];
-        // Startujemy od 0 na lewej krawędzi
-        $pts1[] = '0,' . $svgH;
-        $pts2[] = '0,' . $svgH;
         foreach ($porownanie as $i => $m) {
             $x  = $pL + ($n > 1 ? ($i / ($n - 1)) * $chartW : 0);
-            $y1 = $svgH - $pB - ($m['g1Sum'] / $maxPkt) * $chartH;
-            $y2 = $svgH - $pB - ($m['g2Sum'] / $maxPkt) * $chartH;
+            $y1 = $svgH - $pB - ($m['g1Sum'] / $maxY5) * $chartH;
+            $y2 = $svgH - $pB - ($m['g2Sum'] / $maxY5) * $chartH;
             $pts1[] = round($x, 1) . ',' . round($y1, 1);
             $pts2[] = round($x, 1) . ',' . round($y2, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:100px;" preserveAspectRatio="none">
-        <!-- Linia bazowa -->
-        <line x1="0" y1="<?= $svgH - $pB ?>" x2="<?= $svgW ?>" y2="<?= $svgH - $pB ?>"
+      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:160px;" preserveAspectRatio="none">
+        <!-- Oś Y: linie pomocnicze i etykiety co 5 pkt -->
+        <?php for ($tick = 0; $tick <= $maxY5; $tick += 5):
+          $ty = round($svgH - $pB - ($tick / $maxY5) * $chartH, 1); ?>
+          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $svgW ?>" y2="<?= $ty ?>"
+                stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+                style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?></text>
+        <?php endfor; ?>
+        <!-- Oś Y pionowa -->
+        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $svgH ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
+        <!-- Linia bazowa (oś X) -->
+        <line x1="<?= $pL ?>" y1="<?= $svgH - $pB ?>" x2="<?= $svgW ?>" y2="<?= $svgH - $pB ?>"
               stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <!-- Gracz 1 -->
-        <polyline points="<?= esc(implode(' ', array_slice($pts1, 1)), 'attr') ?>"
+        <polyline points="<?= esc(implode(' ', $pts1), 'attr') ?>"
                   fill="none" stroke="var(--ty-green)" stroke-width="2.5"/>
         <!-- Gracz 2 -->
-        <polyline points="<?= esc(implode(' ', array_slice($pts2, 1)), 'attr') ?>"
+        <polyline points="<?= esc(implode(' ', $pts2), 'attr') ?>"
                   fill="none" stroke="var(--ty-red)" stroke-width="2.5"/>
       </svg>
-
-      <!-- Legenda -->
-      <div class="d-flex gap-3 mt-1" style="font-size:11px;">
-        <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
-        <span style="color:var(--ty-red);">── <?= esc($gracz2['nick']) ?></span>
-      </div>
-    </div>
-  </div>
-  <?php endif; ?>
 
    <!-- WYKRES ZMIAN POZYCJI -->
   <?php
@@ -128,26 +122,39 @@
     <div class="card-body px-3 py-3">
       <div class="stat-label mb-2">Pozycja w tabeli (cały turniej)</div>
       <?php
-        $allPoz = array_merge($tp1, $tp2);
+                $allPoz = array_merge($tp1, $tp2);
         $minP   = min($allPoz);
         $maxP   = max($allPoz);
-        $zakres = max(1, $maxP - $minP);
-        $svgW = 300; $svgH = 100; $pB = 4;
-        $chartH = $svgH - $pB;
+        $tickMin = (int)(floor($minP / 5) * 5); if ($tickMin < 1) $tickMin = 1;
+        $tickMax = (int)(ceil($maxP / 5) * 5);
+        $tickZakres = max(1, $tickMax - $tickMin);
+        $svgW = 300; $svgH = 160; $pL = 36; $pB = 8;
+        $chartW = $svgW - $pL; $chartH = $svgH - $pB;
 
         $ptsP1 = []; $ptsP2 = [];
         foreach ($tp1 as $i => $poz) {
-            $x = $nTp > 1 ? ($i / ($nTp - 1)) * $svgW : 0;
-            $y = (($poz - $minP) / $zakres) * $chartH;
+            $x = $pL + ($nTp > 1 ? ($i / ($nTp - 1)) * $chartW : 0);
+            $y = (($poz - $tickMin) / $tickZakres) * $chartH;
             $ptsP1[] = round($x, 1) . ',' . round($y, 1);
         }
         foreach ($tp2 as $i => $poz) {
-            $x = $nTp > 1 ? ($i / ($nTp - 1)) * $svgW : 0;
-            $y = (($poz - $minP) / $zakres) * $chartH;
+            $x = $pL + ($nTp > 1 ? ($i / ($nTp - 1)) * $chartW : 0);
+            $y = (($poz - $tickMin) / $tickZakres) * $chartH;
             $ptsP2[] = round($x, 1) . ',' . round($y, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:100px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $svgW ?> <?= $svgH ?>" style="width:100%;height:160px;" preserveAspectRatio="none">
+        <!-- Oś Y: linie pomocnicze i etykiety co 5 pozycji -->
+        <?php for ($tick = $tickMin; $tick <= $tickMax; $tick += 5):
+          $ty = round((($tick - $tickMin) / $tickZakres) * $chartH, 1); ?>
+          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $svgW ?>" y2="<?= $ty ?>"
+                stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+                style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?>.</text>
+        <?php endfor; ?>
+        <!-- Oś Y pionowa -->
+        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $svgH ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <?php if (!empty($ptsP1)): ?>
         <polyline points="<?= esc(implode(' ', $ptsP1), 'attr') ?>"
                   fill="none" stroke="var(--ty-green)" stroke-width="2.5"/>
@@ -158,7 +165,7 @@
         <?php endif ?>
       </svg>
       <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
-        Im niżej na wykresie, tym lepsza pozycja (1. miejsce = dół)
+        Oś Y: pozycja w tabeli (wyżej na wykresie = lepsza pozycja)
       </div>
       <div class="d-flex gap-3 mt-1" style="font-size:11px;">
         <span style="color:var(--ty-green);">── <?= esc($gracz1['nick']) ?></span>
