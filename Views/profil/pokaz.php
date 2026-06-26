@@ -181,7 +181,7 @@
       </div>
        <?php
         $max = max($trendPunktowy) ?: 1;
-        $w = 300; $h = 120; $pL = 36; $n = count($trendPunktowy);
+        $w = 300; $h = 120; $pL = 44; $n = count($trendPunktowy);
         $maxY5 = (int)(ceil($max / 5) * 5) ?: 5;
         $points = [];
         foreach ($trendPunktowy as $i => $v) {
@@ -213,7 +213,7 @@
     $minPoz = min($trendPozycji);
     $maxPoz = max($trendPozycji);
     $zakres = max(1, $maxPoz - $minPoz);
-    $w = 300; $h = 120; $pL = 36;
+    $w = 300; $h = 120; $pL = 44;
     // Ticki osi Y co 5 pozycji (zaokrąglone do pełnych 5)
     $tickMin = (int)(floor($minPoz / 5) * 5); if ($tickMin < 1) $tickMin = 1;
     $tickMax = (int)(ceil($maxPoz / 5) * 5);

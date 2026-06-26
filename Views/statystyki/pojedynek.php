@@ -69,13 +69,14 @@
   
  
 
-         $n      = count($porownanie);
+              <?php
+        $n      = count($porownanie);
         $maxPkt = max(
             max(array_column($porownanie, 'g1Sum')),
             max(array_column($porownanie, 'g2Sum')),
             1
         );
-        $svgW = 300; $svgH = 160; $pL = 36; $pB = 8;
+        $svgW = 300; $svgH = 160; $pL = 44; $pB = 8;
         $maxY5 = (int)(ceil($maxPkt / 5) * 5) ?: 5;
         $chartW = $svgW - $pL; $chartH = $svgH - $pB;
 
@@ -128,7 +129,7 @@
         $tickMin = (int)(floor($minP / 5) * 5); if ($tickMin < 1) $tickMin = 1;
         $tickMax = (int)(ceil($maxP / 5) * 5);
         $tickZakres = max(1, $tickMax - $tickMin);
-        $svgW = 300; $svgH = 160; $pL = 36; $pB = 8;
+        $svgW = 300; $svgH = 160; $pL = 44; $pB = 8;
         $chartW = $svgW - $pL; $chartH = $svgH - $pB;
 
         $ptsP1 = []; $ptsP2 = [];
