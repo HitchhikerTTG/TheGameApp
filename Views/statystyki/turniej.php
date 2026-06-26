@@ -335,7 +335,7 @@
     <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($maxH+1)*$cell/2 ?>)"
           x="<?= $pL - 20 ?>" y="<?= $pT + ($maxH+1)*$cell/2 + 4 ?>"
           text-anchor="middle"
-          style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+          style="font-size:10px;fill:var(--bs-secondary-color);">bramki gospodarza →</text>
 
   </svg>
 

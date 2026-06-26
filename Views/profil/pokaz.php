@@ -182,7 +182,7 @@
       <?php
         $max = max($trendPunktowy) ?: 1;
         $maxY5 = (int)(ceil($max / 5) * 5) ?: 5;
-        $w = 300; $h = 120; $pR = 36; $n = count($trendPunktowy);
+        $w = 300; $h = 120; $pR = 44; $n = count($trendPunktowy);
         $chartW = $w - $pR;
         $points = [];
         foreach ($trendPunktowy as $i => $v) {
@@ -287,16 +287,16 @@
   /* Kolor bąbelka na podstawie trafności */
   $bubbleStyle = function(array $c): array {
       if ($c['exact'] > 0) {
-          /* Zielony -- dokładny (intensywność zależy od udziału dokładnych) */
+          /* Zielony: dokładny (intensywność zależy od udziału dokładnych) */
           $op = round(min(0.95, 0.65 + ($c['exact'] / $c['total']) * 0.30), 2);
           return ['fill' => 'var(--ty-green)', 'op' => $op];
       }
       if ($c['points'] > 0) {
-          /* Niebieski -- kierunkowy */
+          /* Czarny: trafienie 1x2 */
           $op = round(min(0.88, 0.55 + ($c['points'] / $c['total']) * 0.33), 2);
           return ['fill' => 'var(--ty-accent)', 'op' => $op];
       }
-      /* Szary -- pudło */
+      /* Szary: pudło */
       return ['fill' => 'var(--bs-secondary-color)', 'op' => 0.18];
   };
 ?>
@@ -361,7 +361,7 @@
       <!-- Szary spód (pudła) jako pełne koło -->
       <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
               fill="var(--bs-secondary-color)" fill-opacity="0.25"/>
-      <!-- Wycinek kierunkowy (niebieski) -->
+      <!-- Wycinek kierunkowy (czarny) -->
       <?php if ($kierDeg > 0.5) echo $pieSlice($cx, $cy, $r, $a0, $a0+$kierDeg, 'var(--ty-accent)', 0.80); ?>
       <!-- Wycinek dokładny (zielony) – rysowany na wierzchu -->
       <?php if ($exactDeg > 0.5) echo $pieSlice($cx, $cy, $r, $a0+$kierDeg, $a0+$kierDeg+$exactDeg, 'var(--ty-green)', 0.90); ?>
@@ -403,7 +403,7 @@
     <text transform="rotate(-90,<?= $pL - 20 ?>,<?= $pT + ($gMaxH+1)*$cell/2 ?>)"
           x="<?= $pL - 20 ?>" y="<?= $pT + ($gMaxH+1)*$cell/2 + 4 ?>"
           text-anchor="middle"
-          style="font-size:10px;fill:var(--bs-secondary-color);">↑ bramki gospodarza</text>
+          style="font-size:10px;fill:var(--bs-secondary-color);">bramki gospodarza →</text>
 
   </svg>
 
@@ -419,7 +419,7 @@
       <svg width="12" height="12" style="vertical-align:middle;">
         <path d="M6,6 L6,1 A5,5 0 0,1 11,6 Z" fill="var(--ty-accent)" fill-opacity="0.8"/>
       </svg>
-      Kierunkowe (niebieski)
+      Trafienie 1x2 (czarny)
     </span>
     <span>
       <svg width="12" height="12" style="vertical-align:middle;">
