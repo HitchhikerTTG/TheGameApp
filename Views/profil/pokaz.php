@@ -179,17 +179,29 @@
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
         Trend punktowy (suma narastająco)
       </div>
-      <?php
+       <?php
         $max = max($trendPunktowy) ?: 1;
-        $w = 300; $h = 60; $n = count($trendPunktowy);
+        $w = 300; $h = 120; $pL = 36; $n = count($trendPunktowy);
+        $maxY5 = (int)(ceil($max / 5) * 5) ?: 5;
         $points = [];
         foreach ($trendPunktowy as $i => $v) {
-            $x = $n > 1 ? ($i / ($n - 1)) * $w : 0;
-            $y = $h - ($v / $max) * $h;
+            $x = $pL + ($n > 1 ? ($i / ($n - 1)) * ($w - $pL) : 0);
+            $y = $h - ($v / $maxY5) * $h;
             $points[] = round($x, 1) . ',' . round($y, 1);
         }
       ?>
-      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:60px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+        <!-- Oś Y: linie pomocnicze i etykiety co 5 pkt -->
+        <?php for ($tick = 0; $tick <= $maxY5; $tick += 5):
+          $ty = round($h - ($tick / $maxY5) * $h, 1); ?>
+          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $w ?>" y2="<?= $ty ?>"
+                stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+                style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?></text>
+        <?php endfor; ?>
+        <!-- Oś Y pionowa -->
+        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $h ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>" fill="none" stroke="var(--ty-accent)" stroke-width="2"/>
       </svg>
     </div>
@@ -201,31 +213,45 @@
     $minPoz = min($trendPozycji);
     $maxPoz = max($trendPozycji);
     $zakres = max(1, $maxPoz - $minPoz);
-    $w = 300; $h = 60;
+    $w = 300; $h = 120; $pL = 36;
+    // Ticki osi Y co 5 pozycji (zaokrąglone do pełnych 5)
+    $tickMin = (int)(floor($minPoz / 5) * 5); if ($tickMin < 1) $tickMin = 1;
+    $tickMax = (int)(ceil($maxPoz / 5) * 5);
+    $tickZakres = max(1, $tickMax - $tickMin);
     $points = [];
     foreach ($trendPozycji as $i => $poz) {
-        $x = $n > 1 ? ($i / ($n - 1)) * $w : 0;
-        $y = (($poz - $minPoz) / $zakres) * $h; // pozycja 1 = dół (dobry wynik)
+        $x = $pL + ($n > 1 ? ($i / ($n - 1)) * ($w - $pL) : 0);
+        $y = (($poz - $tickMin) / $tickZakres) * $h; // pozycja 1 = góra wykresu (lepsza = wyżej)
         $points[] = round($x, 1) . ',' . round($y, 1);
     }
-    $pierwsza = reset($trendPozycji);
-    $ostatnia  = end($trendPozycji);
-    $kolor = $ostatnia < $pierwsza ? 'var(--ty-green)' : ($ostatnia > $pierwsza ? 'var(--ty-red)' : 'var(--ty-accent)');
+    $ostatnia = end($trendPozycji);
+    $kolor = 'var(--ty-accent)';
   ?>
   <div class="card match-card mb-3">
     <div class="card-body px-3 py-3">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--bs-secondary-color);margin-bottom:8px;">
         Pozycja w tabeli mecz po meczu
-        <span style="font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0;color:<?= $kolor ?>;">
-          <?= $pierwsza ?>. → <?= $ostatnia ?>.<?= $ostatnia < $pierwsza ? ' ↑' : ($ostatnia > $pierwsza ? ' ↓' : '') ?>
+        <span style="font-size:11px;font-weight:normal;text-transform:none;letter-spacing:0;">
+          – aktualna: <strong><?= $ostatnia ?>. miejsce</strong>
         </span>
       </div>
-      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:60px;" preserveAspectRatio="none">
+      <svg viewBox="0 0 <?= $w ?> <?= $h ?>" style="width:100%;height:120px;" preserveAspectRatio="none">
+        <!-- Oś Y: linie pomocnicze i etykiety co 5 pozycji -->
+        <?php for ($tick = $tickMin; $tick <= $tickMax; $tick += 5):
+          $ty = round((($tick - $tickMin) / $tickZakres) * $h, 1); ?>
+          <line x1="<?= $pL ?>" y1="<?= $ty ?>" x2="<?= $w ?>" y2="<?= $ty ?>"
+                stroke="var(--bs-border-color)" stroke-width="0.5" stroke-dasharray="2,3"/>
+          <text x="<?= $pL - 4 ?>" y="<?= $ty + 3 ?>" text-anchor="end"
+                style="font-size:9px;fill:var(--bs-secondary-color);"><?= $tick ?>.</text>
+        <?php endfor; ?>
+        <!-- Oś Y pionowa -->
+        <line x1="<?= $pL ?>" y1="0" x2="<?= $pL ?>" y2="<?= $h ?>"
+              stroke="var(--bs-border-color)" stroke-width="0.5"/>
         <polyline points="<?= esc(implode(' ', $points), 'attr') ?>"
                   fill="none" stroke="<?= $kolor ?>" stroke-width="2"/>
       </svg>
       <div style="font-size:10px;color:var(--bs-secondary-color);margin-top:4px;">
-        Im niżej na wykresie, tym wyższa pozycja w tabeli (1. miejsce = dół)
+        Oś Y: pozycja w tabeli (im wyżej na wykresie, tym lepsza pozycja)
       </div>
     </div>
   </div>
@@ -304,25 +330,48 @@
             stroke="var(--bs-border-color)" stroke-width="0.5"/>
     <?php endfor; ?>
 
-    <!-- Bąbelki -->
-    <?php foreach ($typGrid as $h => $aArr): foreach ($aArr as $a => $cellData):
+    <!-- Wykresy kołowe typów -->
+    <?php
+    $pieSlice = function(float $cx, float $cy, float $r, float $startDeg, float $endDeg, string $fill, float $op): string {
+        if ($endDeg - $startDeg >= 359.9) {
+            return "<circle cx=\"$cx\" cy=\"$cy\" r=\"$r\" fill=\"$fill\" fill-opacity=\"$op\"/>";
+        }
+        $s = deg2rad($startDeg - 90);
+        $e = deg2rad($endDeg - 90);
+        $x1 = round($cx + $r * cos($s), 2); $y1 = round($cy + $r * sin($s), 2);
+        $x2 = round($cx + $r * cos($e), 2); $y2 = round($cy + $r * sin($e), 2);
+        $large = ($endDeg - $startDeg > 180) ? 1 : 0;
+        return "<path d=\"M $cx $cy L $x1 $y1 A $r $r 0 $large 1 $x2 $y2 Z\" fill=\"$fill\" fill-opacity=\"$op\"/>";
+    };
+    foreach ($typGrid as $h => $aArr): foreach ($aArr as $a => $cellData):
       if ($h > $gMaxH || $a > $gMaxA) continue;
       $cx  = $pL + $a * $cell + $cell/2;
       $cy  = $pT + ($gMaxH - $h) * $cell + $cell/2;
       $r   = max(6, round(($cellData['total'] / $maxCnt) * $maxR, 1));
-      $sty = $bubbleStyle($cellData);
       $lbl = $cellData['total'] . '×';
+
+      $exactDeg     = ($cellData['total'] > 0) ? ($cellData['exact'] / $cellData['total']) * 360 : 0;
+      $kierDeg      = ($cellData['total'] > 0) ? (max(0, $cellData['points'] - $cellData['exact']) / $cellData['total']) * 360 : 0;
+      $pudlaDeg     = 360 - $exactDeg - $kierDeg;
+
+      $a0 = 0; $a1 = $a0 + $exactDeg; $a2 = $a1 + $kierDeg;
     ?>
+      <!-- Tooltip -->
+      <title><?= $h ?>:<?= $a ?> – typowane <?= $cellData['total'] ?>×<?php
+        if ($cellData['exact'])  echo ', dokładnie: '    . $cellData['exact']  . '×';
+        if ($cellData['points']) echo ', kierunkowych: ' . max(0,$cellData['points']-$cellData['exact']) . '×';
+        $pudla = $cellData['total'] - $cellData['points'];
+        if ($pudla > 0) echo ', pudła: ' . $pudla . '×';
+      ?></title>
+      <!-- Szary spód (pudła) jako pełne koło -->
       <circle cx="<?= $cx ?>" cy="<?= $cy ?>" r="<?= $r ?>"
-              fill="<?= $sty['fill'] ?>" fill-opacity="<?= $sty['op'] ?>">
-        <title><?= $h ?>:<?= $a ?> -- typowane <?= $cellData['total'] ?>×<?php
-          if ($cellData['exact'])  echo ', dokładnie: '    . $cellData['exact']  . '×';
-          if ($cellData['points']) echo ', kierunkowych: ' . $cellData['points'] . '×';
-        ?></title>
-      </circle>
+              fill="var(--bs-secondary-color)" fill-opacity="0.25"/>
+      <!-- Wycinek kierunkowy (niebieski) -->
+      <?php if ($kierDeg > 0.5) echo $pieSlice($cx, $cy, $r, $a0, $a0+$kierDeg, 'var(--ty-accent)', 0.80); ?>
+      <!-- Wycinek dokładny (zielony) – rysowany na wierzchu -->
+      <?php if ($exactDeg > 0.5) echo $pieSlice($cx, $cy, $r, $a0+$kierDeg, $a0+$kierDeg+$exactDeg, 'var(--ty-green)', 0.90); ?>
 
       <?php if ($r >= 11): ?>
-      <!-- Liczba i wynik wewnątrz dużego bąbelka -->
       <text x="<?= $cx ?>" y="<?= $cy - 3 ?>"
             text-anchor="middle"
             style="font-family:'Bebas Neue',sans-serif;font-size:<?= min(16, (int)($r * 0.85)) ?>px;fill:white;pointer-events:none;">
@@ -366,16 +415,22 @@
   <!-- Legenda -->
   <div class="d-flex gap-3 flex-wrap mt-2 px-1" style="font-size:11px;color:var(--bs-secondary-color);">
     <span>
-      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-green)" fill-opacity="0.9"/></svg>
-      Dokładny ✓
+      <svg width="12" height="12" style="vertical-align:middle;">
+        <path d="M6,6 L6,1 A5,5 0 0,1 11,6 Z" fill="var(--ty-green)" fill-opacity="0.9"/>
+      </svg>
+      Dokładne (zielony wycinek)
     </span>
     <span>
-      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--ty-accent)" fill-opacity="0.8"/></svg>
-      Kierunkowy
+      <svg width="12" height="12" style="vertical-align:middle;">
+        <path d="M6,6 L6,1 A5,5 0 0,1 11,6 Z" fill="var(--ty-accent)" fill-opacity="0.8"/>
+      </svg>
+      Kierunkowe (niebieski)
     </span>
     <span>
-      <svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="var(--bs-secondary-color)" fill-opacity="0.2"/></svg>
-      Pudło
+      <svg width="12" height="12" style="vertical-align:middle;">
+        <circle cx="6" cy="6" r="5" fill="var(--bs-secondary-color)" fill-opacity="0.25"/>
+      </svg>
+      Pudła (szary)
     </span>
     <span class="ms-auto d-flex align-items-center gap-2">
       <svg width="16" height="16"><circle cx="8" cy="8" r="4" fill="var(--bs-secondary-color)" fill-opacity="0.4"/></svg>1×
