@@ -151,13 +151,12 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
       <tr>
         <td style="padding:14px 18px;">
           <p style="margin:0;<?= $f ?>font-size:<?= $fsSub ?>;color:#ffffff;line-height:1.5;">
-            📈&nbsp;<strong>Największy skok dnia</strong>:
+            📈&nbsp;<strong>Największy skok dnia *</strong>:
             <strong style="color:<?= $cAccent ?>;"><?= !empty($sg['emoji']) ? esc($sg['emoji']) . '&nbsp;' : '' ?><?= esc($sg['nick']) ?></strong>
             awansował o
             <strong style="color:<?= $cAccent ?>;"><?= $skok ?> <?= $forma ?></strong>
             (z&nbsp;<?= (int)$sg['pozSprzed'] ?>.&nbsp;na&nbsp;<?= (int)$sg['pozAktualna'] ?>.&nbsp;miejsce). 🚀
           </p>
-          <p style="font-size=14"><i>To jest eksperymentalna funkcja. Podchodźmy to niej z zaufaniem jak do rzadu, prezydenta, choć to na pewno wspaniali fachowcy, to jednak z rezerwą</i></p> 
         </td>
       </tr>
     </table>
@@ -362,6 +361,7 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
         <tr>
           <td style="border-top:1px solid <?= $cBorder ?>;padding-top:20px;">
             <p style="margin:0 0 6px;<?= $f ?>font-size:16px;color:<?= $cLabel ?>;font-style:italic;">may the odds be always in your <em>flavour</em></p>
+            <p style="margin:0 0 6px;<?= $f ?>font-size:16px;color:<?= $cLabel ?>;font-style:italic;">* To jest eksperymentalna funkcja. Podchodźmy to niej z zaufaniem jak do rzadu, prezydenta, choć to na pewno wspaniali fachowcy, to jednak z rezerwą</p> 
             <p style="margin:10 0 6px;<?= $f ?>font-size:16px;color:<?= $cLabel ?>">Jeśli widzisz w tym mailu coś, co się nie zgadza - daj mi proszę znać (choćby odpisując na tego maila). Postaram się to naprostować. Dziękuję. </em></p>
             <p style="margin:10;<?= $f ?>font-size:16px;color:#cccccc;">
               A jeśli dobrze się bawisz, pamietaj że zawsze możesz mi postawić kaw&#x119; &#x2615; &rarr;
