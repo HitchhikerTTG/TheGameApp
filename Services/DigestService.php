@@ -219,41 +219,70 @@ public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): arr
     ];
 }
 
-    public function getNajwiekszySkokPozycji(int $turniejID): array
+public function getNajwiekszySkokPozycji(int $turniejID): array
 {
     $histPath = WRITEPATH . "gracze/historia_pozycji_{$turniejID}.json";
     if (!file_exists($histPath)) return [];
 
     $historia = json_decode(file_get_contents($histPath), true) ?? [];
     if (empty($historia)) return [];
-    ksort($historia);
 
-    $wczoraj = date('Y-m-d', strtotime('-1 day'));
+    // ── Wczorajsze mecze: to samo okno 24h co reszta digestu ──
+    $wczorajszeMecze = $this->terminarzModel->getMeczeZakonczone24h($turniejID);
+    if (empty($wczorajszeMecze)) return [];
 
-    $snapshotySprzed  = [];
-    $snapshotyWczoraj = [];
-    foreach ($historia as $meczId => $snap) {
-        if ($snap['data'] < $wczoraj)       $snapshotySprzed[$meczId]  = $snap;
-        elseif ($snap['data'] === $wczoraj) $snapshotyWczoraj[$meczId] = $snap;
+    // ── Snapshot PO: ostatni wczorajszy mecz, który ma snapshot ──
+    $snapPo = null;
+    for ($i = count($wczorajszeMecze) - 1; $i >= 0; $i--) {
+        $id = $wczorajszeMecze[$i]['Id'];
+        if (isset($historia[$id])) {
+            $snapPo = $historia[$id];
+            break;
+        }
+    }
+    if ($snapPo === null) return [];
+
+    // ── Snapshot SPRZED: ostatni zakończony mecz przed pierwszym wczorajszym ──
+    $pierwszy   = $wczorajszeMecze[0];
+    $przedMecze = \Config\Database::connect()
+        ->table('terminarz')
+        ->select('Id')
+        ->where('TurniejID', $turniejID)
+        ->where('zakonczony', 1)
+        ->where("CONCAT(Date, ' ', Time) <", $pierwszy['Date'] . ' ' . $pierwszy['Time'])
+        ->orderBy('Date', 'DESC')->orderBy('Time', 'DESC')
+        ->get()->getResultArray();
+
+    $snapSprzed = null;
+    foreach ($przedMecze as $m) {
+        if (isset($historia[$m['Id']])) {
+            $snapSprzed = $historia[$m['Id']];
+            break;
+        }
     }
 
-    if (empty($snapshotyWczoraj)) return [];
+    // ── Pozycje bazowe (brak punktu odniesienia → wszyscy z ostatniego miejsca) ──
+    $pozPo = $snapPo['pozycje'];
+    if ($snapSprzed !== null && !empty($snapSprzed['pozycje'])) {
+        $bazaPozycje         = $snapSprzed['pozycje'];
+        $ostatnieMiejsceBaza = max($bazaPozycje);
+    } else {
+        $bazaPozycje         = [];
+        $ostatnieMiejsceBaza = max($pozPo ?: [1]);
+    }
 
-    $snapPo     = end($snapshotyWczoraj);
-    $snapSprzed = !empty($snapshotySprzed) ? end($snapshotySprzed) : reset($snapshotyWczoraj);
-
+    // ── Największy awans w górę tabeli ──
     $maxSkok   = 0;
     $zwyciezca = null;
-    foreach ($snapPo['pozycje'] as $uid => $pozPo) {
-        $pozSprzed = $snapSprzed['pozycje'][$uid] ?? null;
-        if ($pozSprzed === null) continue;
-        $skok = $pozSprzed - $pozPo;
+    foreach ($pozPo as $uid => $pozAktualna) {
+        $pozSprzed = $bazaPozycje[$uid] ?? $ostatnieMiejsceBaza;
+        $skok      = $pozSprzed - $pozAktualna;     // dodatni = awans
         if ($skok > $maxSkok) {
             $maxSkok   = $skok;
             $zwyciezca = [
                 'uniID'       => $uid,
                 'skok'        => $skok,
-                'pozAktualna' => $pozPo,
+                'pozAktualna' => $pozAktualna,
                 'pozSprzed'   => $pozSprzed,
             ];
         }
@@ -261,7 +290,7 @@ public function getNajlepszyTyper(int $turniejID, array $pytaniaWczorajIds): arr
 
     if (!$zwyciezca) return [];
 
-    // Nick z leaderboard cache (szybsze niż DB)
+    // ── Nick/emoji z leaderboard cache (szybsze niż DB) ──
     $tabelaPath = WRITEPATH . "tabelaGraczy_{$turniejID}.json";
     if (file_exists($tabelaPath)) {
         foreach (json_decode(file_get_contents($tabelaPath), true) ?? [] as $w) {

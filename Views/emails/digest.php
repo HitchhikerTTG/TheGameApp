@@ -157,6 +157,7 @@ $matchCard = fn(string $inner, string $bg, string $border = '', string $mb = '8p
             <strong style="color:<?= $cAccent ?>;"><?= $skok ?> <?= $forma ?></strong>
             (z&nbsp;<?= (int)$sg['pozSprzed'] ?>.&nbsp;na&nbsp;<?= (int)$sg['pozAktualna'] ?>.&nbsp;miejsce). 🚀
           </p>
+          <p style="font-size=14"><i>To jest eksperymentalna funkcja. Podchodźmy to niej z zaufaniem jak do rzadu, prezydenta, choć to na pewno wspaniali fachowcy, to jednak z rezerwą</i></p> 
         </td>
       </tr>
     </table>
